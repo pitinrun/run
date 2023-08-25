@@ -1,13 +1,14 @@
 const dummyUsers = [
   {
-    id: 1,
-    name: '삼호타이어',
+    id: '1',
+    company: '삼호타이어',
     phone: '010-1234-1234',
     email: 'alfkzmf@namver.com',
     address: '서울시 강남구'
   },
   {
-    name: '삼호타이어',
+    id: '2',
+    company: '삼호타이어',
     phone: '010-1234-1234',
     email: 'alfkzmf@namver.com',
     address: '서울시 강남구'
@@ -41,7 +42,7 @@ export default function UserPage() {
             {dummyUsers.map(user => {
               return (
                 <tr key={`user-${user.id}`}>
-                  <td>{user.name}</td>
+                  <td>{user.company}</td>
                   <td>{user.phone}</td>
                   <td>{user.email}</td>
                   <td>{user.address}</td>

@@ -1,13 +1,14 @@
 const dummyUsers = [
   {
     id: 1,
-    name: '삼호타이어',
+    company: '삼호타이어',
     phone: '010-1234-1234',
     email: 'alfkzmf@namver.com',
     address: '서울시 강남구'
   },
   {
-    name: '삼호타이어',
+    id: 2,
+    company: '삼호타이어',
     phone: '010-1234-1234',
     email: 'alfkzmf@namver.com',
     address: '서울시 강남구'
