@@ -15,66 +15,93 @@ export const BRANDS = [
   '사일룬',
   '트라이앵글',
   'BFG',
-  '라우펜'
+  '라우펜',
+  '',
 ] as const
 export type BrandType = (typeof BRANDS)[number]
 
-export interface IProduct extends Document {
+export interface IProduct {
   brand: BrandType
   pattern: string
   patternKr: string
   productCode: string
   size: string
   speedSymbolLoadIndex: string
-  marking: string
-  origin: string
-  season: string
-  special: string
-  specialPrice: number
+  marking?: string
+  origin?: string
+  season?: string
+  special?: string
+  etc?: string
+  specialPrice?: number
   factoryPrice: number
   storages: {
     name: string
     stock: number
-    dot: string
+    dot: Array<string>
   }[]
 }
+
+export interface IProductDocument extends Document, IProduct {}
 
 const ProductSchema: Schema = new Schema({
   brand: {
     type: String,
     enum: BRANDS,
-    require: true
+    require: true,
   },
   pattern: {
     type: String,
-    require: true
+    require: true,
   },
   patternKr: {
     type: String,
-    require: true
+    require: true,
   },
   productCode: {
     type: String,
-    require: true
+    require: true,
   },
   size: {
     type: String,
-    require: true
+    require: true,
   },
   speedSymbolLoadIndex: {
     type: String,
-    require: true
+    require: true,
   },
   marking: {
-    type: String
+    type: String,
   },
   origin: {
-    type: String
+    type: String,
   },
   season: {
-    type: String
-  }
+    type: String,
+  },
+  special: {
+    type: String,
+  },
+  etc: {
+    type: String,
+  },
+  specialPrice: {
+    type: Number,
+  },
+  factoryPrice: {
+    type: Number,
+    require: true,
+  },
+  storages: {
+    type: [
+      {
+        name: String,
+        stock: Number,
+        dot: Array,
+      },
+    ],
+    require: true,
+  },
 })
 
 export const Product = (mongoose.models.Post ||
-  model('Product', ProductSchema)) as Model<IProduct>
+  model('Product', ProductSchema)) as Model<IProductDocument>

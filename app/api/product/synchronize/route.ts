@@ -1,110 +1,233 @@
-import Validate from 'next-api-validation'
-import { NextResponse } from 'next/server'
-import { Post, IPost } from 'src/Models'
-import { connectToDatabase } from 'src/utils'
-import { google } from 'googleapis'
-import { client_email, private_key } from '.meta/google-credentials.json'
+import { NextResponse } from 'next/server';
+import { connectToDatabase } from 'src/utils';
+import { google } from 'googleapis';
+import { client_email, private_key } from '.meta/google-credentials.json';
+import { IProduct } from '@/src/Models/product';
+import { toColumnName } from './utils';
 
-connectToDatabase()
+connectToDatabase();
 
-const START_CELL = 'A6'
+const START_CELL = 'A6';
 
-const { SPREAD_SHEET_ID, SPREAD_SHEET_PRODUCT_NAME } = process.env
+const { SPREAD_SHEET_ID, SPREAD_SHEET_PRODUCT_NAME } = process.env;
+
+const SHEET_MATCH_MAP: { [K in keyof IProduct] } = {
+  brand: {
+    row: 'A',
+    rowNum: 1,
+  },
+  pattern: {
+    row: 'B',
+    rowNum: 2,
+  },
+  patternKr: {
+    row: 'C',
+    rowNum: 3,
+  },
+  productCode: {
+    row: 'D',
+    rowNum: 4,
+  },
+  size: {
+    row: 'E',
+    rowNum: 5,
+  },
+  speedSymbolLoadIndex: {
+    row: 'F',
+    rowNum: 6,
+  },
+  marking: {
+    row: 'G',
+    rowNum: 7,
+  },
+  origin: {
+    row: 'H',
+    rowNum: 8,
+  },
+  season: {
+    row: 'I',
+    rowNum: 9,
+  },
+  special: {
+    row: 'J',
+    rowNum: 10,
+  },
+  etc: {
+    row: 'K',
+    rowNum: 11,
+  },
+  specialPrice: {
+    row: 'L',
+    rowNum: 12,
+  },
+  factoryPrice: {
+    row: 'M',
+    rowNum: 13,
+  },
+  storages: {
+    startRowNum: 15, // 첫번째 sto-a가 시작하는 칼럼의 번호
+  },
+};
+
+// const serializeSheetToObjectForMongo = (sheetData: Array<Array<string>>): Object => {
+//   return {}
+// }
+
+const serializeSheetToObjectForMongo = (
+  sheetData: Array<Array<string>>
+): IProduct[] => {
+  const results: IProduct[] = [];
+
+  sheetData.slice(2).forEach(row => {
+    const product: IProduct = {
+      brand: '',
+      pattern: '',
+      patternKr: '',
+      productCode: '',
+      size: '',
+      speedSymbolLoadIndex: '',
+      factoryPrice: 0,
+      storages: [],
+    };
+
+    Object.keys(SHEET_MATCH_MAP).forEach(key => {
+      const map = SHEET_MATCH_MAP[key as keyof IProduct];
+
+      if (key !== 'storages') {
+        if (typeof row[map.rowNum - 1] !== 'undefined') {
+          if (key === 'specialPrice' || key === 'factoryPrice') {
+            (product[key as keyof IProduct] as number) = parseInt(
+              row[map.rowNum - 1].replace('₩', '').replace(',', ''),
+              10
+            );
+          } else {
+            (product[key as keyof IProduct] as string) = row[map.rowNum - 1];
+          }
+        }
+      } else {
+        const storageNames = sheetData[0].slice(map.startRowNum - 1);
+        const storageRows = row.slice(map.startRowNum - 1);
+        const storages: IProduct['storages'] = storageNames.reduce(
+          (acc, name, index) => {
+            if (name) {
+              return [
+                ...acc,
+                {
+                  name,
+                  stock: parseInt(storageRows[index], 10),
+                  dot: storageRows[index + 1]
+                    ? storageRows[index + 1].split('\n')
+                    : [],
+                },
+              ];
+            }
+            return acc;
+          },
+          []
+        );
+        product.storages = storages;
+      }
+    });
+
+    results.push(product);
+  });
+
+  return results;
+};
 
 async function getSheetRange(
   spreadsheetId: string = SPREAD_SHEET_ID ?? '',
   sheetName: string = SPREAD_SHEET_PRODUCT_NAME ?? ''
 ) {
   const authorize = new google.auth.JWT(client_email, undefined, private_key, [
-    'https://www.googleapis.com/auth/spreadsheets'
-  ])
+    'https://www.googleapis.com/auth/spreadsheets',
+  ]);
 
   const googleSheet = google.sheets({
     version: 'v4',
-    auth: authorize
-  })
+    auth: authorize,
+  });
 
   // 스프레드시트의 메타데이터를 먼저 가져옵니다.
   const sheetMetadata = await googleSheet.spreadsheets.get({
-    spreadsheetId
-  })
+    spreadsheetId,
+  });
 
   // 첫 번째 시트의 정보를 가져옵니다. (여러 시트가 있을 수 있으므로 필요하면 수정)
   if (!sheetMetadata.data.sheets) {
-    throw new Error('No sheet found')
+    throw new Error('No sheet found');
   }
 
   const sheetInfo = sheetMetadata.data.sheets.find(
     sheet => sheet.properties?.title === sheetName
-  )
+  );
 
   if (!sheetInfo?.properties?.gridProperties) {
-    throw new Error('No gridProperties found')
+    throw new Error('No gridProperties found');
   }
 
-  const rowCount = sheetInfo.properties.gridProperties.rowCount
-  const colCount = sheetInfo.properties.gridProperties.columnCount
+  const rowCount = sheetInfo.properties.gridProperties.rowCount ?? 0;
+  const colCount = sheetInfo.properties.gridProperties.columnCount ?? 0;
+
+  const endCell = toColumnName(colCount) + rowCount;
 
   return {
-    rowCount,
-    colCount
-  }
+    startCell: START_CELL,
+    endCell,
+  };
 }
 
-async function getSpreadSheetData() {
+async function getSpreadSheetData(
+  spreadsheetId = SPREAD_SHEET_ID ?? '',
+  sheetName = SPREAD_SHEET_PRODUCT_NAME ?? '',
+  startCell: string,
+  endCell: string
+) {
   const authorize = new google.auth.JWT(client_email, undefined, private_key, [
-    'https://www.googleapis.com/auth/spreadsheets'
-  ])
+    'https://www.googleapis.com/auth/spreadsheets',
+  ]);
   const googleSheet = google.sheets({
     version: 'v4',
-    auth: authorize
-  })
+    auth: authorize,
+  });
 
-  // const context = await googleSheet.spreadsheets.values.get({
-  //   spreadsheetId: '165omGujGf-3I5zdWQV-U4dNTkJor6X0OpNPaUAZ2LJA',
-  //   range: 'A1:A3'
-  // })
+  const context = await googleSheet.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${sheetName}!${startCell}:${endCell}`,
+  });
 
-  const context = await googleSheet.spreadsheets.get({
-    spreadsheetId: SPREAD_SHEET_ID
-    // range: 'A1:A3'
-  })
-
-  return context
-
-  // return context.data.values;
+  return context.data.values;
 }
 
-export async function GET() {
+export async function POST() {
   try {
-    // const posts = await Post.find()
-    // return NextResponse.json(posts.reverse())
-    // TODO: 여기에 데이터베이스랑 spread sheet랑 동기화 하는 코드 작성
-    const sheetRange = await getSheetRange()
-    // const spreadSheetData = await getSpreadSheetData()
-    // const spreadSheetData = await getSpreadSheetData()
+    const sheetRange = await getSheetRange();
+    const spreadSheetData =
+      (await getSpreadSheetData(
+        SPREAD_SHEET_ID,
+        SPREAD_SHEET_PRODUCT_NAME,
+        sheetRange.startCell,
+        // sheetRange.endCell
+        'AN10'
+      )) ?? [];
+    const serializedSheetData = serializeSheetToObjectForMongo(spreadSheetData);
+
     return NextResponse.json({
       message: 'success',
-      data: sheetRange,
-      status: 200
-    })
+      data: { sheetRange, serializedSheetData },
+      status: 201,
+    });
   } catch (error) {
-    console.log('$$ error', error)
-
     if (error instanceof Error) {
-      return NextResponse.json(
-        {
-          status: 500,
-          message: error.message
-        },
-        {
-          status: 500
-        }
-      )
+      console.error('!! ERROR: ', error.message);
+      return NextResponse.json({
+        status: 500,
+        message: error.message,
+      });
     }
 
     return NextResponse.json('unknown error', {
-      status: 500
-    })
+      status: 500,
+    });
   }
 }
