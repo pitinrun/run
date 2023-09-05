@@ -1,4 +1,4 @@
-import mongoose, { Document, model, Model, Schema } from 'mongoose'
+import mongoose, { Document, model, Model, Schema } from 'mongoose';
 
 export const BRANDS = [
   '금호',
@@ -17,28 +17,28 @@ export const BRANDS = [
   'BFG',
   '라우펜',
   '',
-] as const
-export type BrandType = (typeof BRANDS)[number]
+] as const;
+export type BrandType = (typeof BRANDS)[number];
 
 export interface IProduct {
-  brand: BrandType
-  pattern: string
-  patternKr: string
-  productCode: string
-  size: string
-  speedSymbolLoadIndex: string
-  marking?: string
-  origin?: string
-  season?: string
-  special?: string
-  etc?: string
-  specialPrice?: number
-  factoryPrice: number
+  brand: BrandType;
+  pattern: string;
+  patternKr: string;
+  productCode: string;
+  size: string;
+  speedSymbolLoadIndex: string;
+  marking?: string;
+  origin?: string;
+  season?: string;
+  special?: string;
+  etc?: string;
+  specialPrice?: number;
+  factoryPrice: number;
   storages: {
-    name: string
-    stock: number
-    dot: Array<string>
-  }[]
+    name: string;
+    stock: number;
+    dot: Array<string>;
+  }[];
 }
 
 export interface IProductDocument extends Document, IProduct {}
@@ -101,7 +101,7 @@ const ProductSchema: Schema = new Schema({
     ],
     require: true,
   },
-})
+});
 
-export const Product = (mongoose.models.Post ||
-  model('Product', ProductSchema)) as Model<IProductDocument>
+export const Product = (mongoose.models.Product ||
+  model('Product', ProductSchema)) as Model<IProductDocument>;

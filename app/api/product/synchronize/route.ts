@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from 'src/utils';
 import { google } from 'googleapis';
 import { client_email, private_key } from '.meta/google-credentials.json';
-import { IProduct } from '@/src/Models/product';
+import { IProduct, Product } from '@/src/Models/product';
 import { toColumnName } from './utils';
 
 connectToDatabase();
@@ -69,10 +69,6 @@ const SHEET_MATCH_MAP: { [K in keyof IProduct] } = {
   },
 };
 
-// const serializeSheetToObjectForMongo = (sheetData: Array<Array<string>>): Object => {
-//   return {}
-// }
-
 const serializeSheetToObjectForMongo = (
   sheetData: Array<Array<string>>
 ): IProduct[] => {
@@ -95,7 +91,10 @@ const serializeSheetToObjectForMongo = (
 
       if (key !== 'storages') {
         if (typeof row[map.rowNum - 1] !== 'undefined') {
-          if (key === 'specialPrice' || key === 'factoryPrice') {
+          if (
+            (key === 'specialPrice' || key === 'factoryPrice') &&
+            row[map.rowNum - 1]
+          ) {
             (product[key as keyof IProduct] as number) = parseInt(
               row[map.rowNum - 1].replace('₩', '').replace(',', ''),
               10
@@ -199,6 +198,30 @@ async function getSpreadSheetData(
   return context.data.values;
 }
 
+const dropAndBulkInsertProducts = async (products: IProduct[]) => {
+  try {
+    await Product.deleteMany({});
+  } catch (error) {
+    console.error('!! ERROR: ', error.message);
+    return false;
+  }
+
+  const bulkOption = products.map(product => ({
+    insertOne: {
+      document: product,
+    },
+  }));
+
+  try {
+    await Product.bulkWrite(bulkOption);
+  } catch (error) {
+    console.error('!! ERROR: ', error.message);
+    return false;
+  }
+
+  return true;
+};
+
 export async function POST() {
   try {
     const sheetRange = await getSheetRange();
@@ -207,14 +230,17 @@ export async function POST() {
         SPREAD_SHEET_ID,
         SPREAD_SHEET_PRODUCT_NAME,
         sheetRange.startCell,
-        // sheetRange.endCell
-        'AN10'
+        sheetRange.endCell
       )) ?? [];
-    const serializedSheetData = serializeSheetToObjectForMongo(spreadSheetData);
+    const serializedProducts = serializeSheetToObjectForMongo(spreadSheetData);
+
+    const isDropAndBulkInsertSuccess = await dropAndBulkInsertProducts(
+      serializedProducts
+    );
 
     return NextResponse.json({
       message: 'success',
-      data: { sheetRange, serializedSheetData },
+      data: { isDropAndBulkInsertSuccess, sheetRange, serializedProducts },
       status: 201,
     });
   } catch (error) {
