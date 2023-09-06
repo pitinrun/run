@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from 'src/utils';
 import { google } from 'googleapis';
 import { client_email, private_key } from '.meta/google-credentials.json';
-import { IProduct, Product } from '@/src/Models/product';
+import { IProduct, Product } from '@/src/models/product';
 import { toColumnName } from './utils';
+import { dropAndBulkInsertProducts } from '@/src/services/product';
 
 connectToDatabase();
 
@@ -56,7 +57,7 @@ const SHEET_MATCH_MAP: { [K in keyof IProduct] } = {
     row: 'K',
     rowNum: 11,
   },
-  specialPrice: {
+  specialDiscountRate: {
     row: 'L',
     rowNum: 12,
   },
@@ -91,14 +92,24 @@ const serializeSheetToObjectForMongo = (
 
       if (key !== 'storages') {
         if (typeof row[map.rowNum - 1] !== 'undefined') {
-          if (
-            (key === 'specialPrice' || key === 'factoryPrice') &&
-            row[map.rowNum - 1]
-          ) {
+          if (key === 'factoryPrice' && row[map.rowNum - 1]) {
             (product[key as keyof IProduct] as number) = parseInt(
               row[map.rowNum - 1].replace('₩', '').replace(',', ''),
               10
             );
+          } else if (key === 'specialDiscountRate' && row[map.rowNum - 1]) {
+            (product[key as keyof IProduct] as number) =
+              parseInt(row[map.rowNum - 1].replace('%', ''), 10) / 100;
+          } else if (key == 'season') {
+            if (row[map.rowNum - 1] === '겨울용') {
+              (product[key as keyof IProduct] as string) = 'winter';
+            } else if (row[map.rowNum - 1] === '썸머용') {
+              (product[key as keyof IProduct] as string) = 'summer';
+            } else if (row[map.rowNum - 1] === '사계절') {
+              (product[key as keyof IProduct] as string) = 'all-weathers';
+            } else {
+              (product[key as keyof IProduct] as string) = '';
+            }
           } else {
             (product[key as keyof IProduct] as string) = row[map.rowNum - 1];
           }
@@ -198,30 +209,6 @@ async function getSpreadSheetData(
   return context.data.values;
 }
 
-const dropAndBulkInsertProducts = async (products: IProduct[]) => {
-  try {
-    await Product.deleteMany({});
-  } catch (error) {
-    console.error('!! ERROR: ', error.message);
-    return false;
-  }
-
-  const bulkOption = products.map(product => ({
-    insertOne: {
-      document: product,
-    },
-  }));
-
-  try {
-    await Product.bulkWrite(bulkOption);
-  } catch (error) {
-    console.error('!! ERROR: ', error.message);
-    return false;
-  }
-
-  return true;
-};
-
 export async function POST() {
   try {
     const sheetRange = await getSheetRange();
@@ -240,7 +227,7 @@ export async function POST() {
 
     return NextResponse.json({
       message: 'success',
-      data: { isDropAndBulkInsertSuccess, sheetRange, serializedProducts },
+      data: isDropAndBulkInsertSuccess,
       status: 201,
     });
   } catch (error) {

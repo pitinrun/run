@@ -1,21 +1,32 @@
-import { connect, connection } from 'mongoose'
-import { google } from 'googleapis'
-import { client_email, private_key } from '../.meta/google-credentials.json'
+import mongoose, { connect, mongo } from 'mongoose';
 
 const {
   // Attempts to connect to MongoDB and then tries to connect locally:)
   // MONGO_URI = 'mongodb://localhost:27017/next_test'
-  MONGO_URI = ''
-} = process.env
+  MONGO_URI = '',
+} = process.env;
 
 const options: any = {
   useUnifiedTopology: true,
-  useNewUrlParser: true
-}
+  useNewUrlParser: true,
+};
+
+const connection: {
+  isConnected?: number;
+} = {};
 
 export const connectToDatabase = async () => {
-  if (!connection.readyState) {
-    console.log('Connecting to ', MONGO_URI)
-    connect(MONGO_URI, options)
+  if (!connection.isConnected) {
+    console.log('=> using existing database connection');
+    return;
   }
-}
+
+  mongoose.set('debug', true);
+
+  if (MONGO_URI) {
+    const db = await mongoose.connect(MONGO_URI, options);
+
+    connection.isConnected = db.connections[0].readyState;
+    console.log('=> using new database connection');
+  }
+};

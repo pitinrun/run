@@ -1,6 +1,6 @@
 import Validate from 'next-api-validation'
 import { NextResponse } from 'next/server'
-import { Post, IPost } from 'src/Models'
+import { Post, IPost } from '@/src/models'
 import { connectToDatabase } from 'src/utils'
 
 connectToDatabase()

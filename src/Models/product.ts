@@ -20,6 +20,9 @@ export const BRANDS = [
 ] as const;
 export type BrandType = (typeof BRANDS)[number];
 
+export const SEASONS = ['winter', 'summer', 'all-weathers'] as const;
+export type SeasonType = (typeof SEASONS)[number];
+
 export interface IProduct {
   brand: BrandType;
   pattern: string;
@@ -32,7 +35,7 @@ export interface IProduct {
   season?: string;
   special?: string;
   etc?: string;
-  specialPrice?: number;
+  specialDiscountRate?: number;
   factoryPrice: number;
   storages: {
     name: string;
@@ -46,7 +49,7 @@ export interface IProductDocument extends Document, IProduct {}
 const ProductSchema: Schema = new Schema({
   brand: {
     type: String,
-    enum: BRANDS,
+    enum: BRANDS, // ["금호", "한국", "넥센", "미쉐린", "콘티넨탈", "피렐리", "던롭", "브릿지스톤", "굿이어", "요코하마", "패더럴", "사일룬", "트라이앵글", "BFG", "라우펜", ""]
     require: true,
   },
   pattern: {
@@ -77,6 +80,7 @@ const ProductSchema: Schema = new Schema({
   },
   season: {
     type: String,
+    enum: SEASONS, // ['winter', 'summer', 'all-weathers']
   },
   special: {
     type: String,
@@ -84,7 +88,7 @@ const ProductSchema: Schema = new Schema({
   etc: {
     type: String,
   },
-  specialPrice: {
+  specialDiscountRate: {
     type: Number,
   },
   factoryPrice: {
