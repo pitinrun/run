@@ -5,6 +5,7 @@ import { client_email, private_key } from '.meta/google-credentials.json';
 import { IProduct, Product } from '@/src/models/product';
 import { toColumnName } from './utils';
 import { dropAndBulkInsertProducts } from '@/src/services/product';
+import { updateStorageNames } from '@/src/services/metadata';
 
 connectToDatabase();
 
@@ -70,7 +71,17 @@ const SHEET_MATCH_MAP: { [K in keyof IProduct] } = {
   },
 };
 
-const serializeSheetToObjectForMongo = (
+const serializeSheetToObjectForProductMeta = (
+  sheetData: Array<Array<string>>
+) => {
+  const storageNames = sheetData[0]
+    .slice(SHEET_MATCH_MAP.storages.startRowNum - 1)
+    .filter(name => name);
+
+  return updateStorageNames(storageNames);
+};
+
+const serializeSheetToObjectForProduct = (
   sheetData: Array<Array<string>>
 ): IProduct[] => {
   const results: IProduct[] = [];
@@ -219,15 +230,21 @@ export async function POST() {
         sheetRange.startCell,
         sheetRange.endCell
       )) ?? [];
-    const serializedProducts = serializeSheetToObjectForMongo(spreadSheetData);
+    const serializedProducts =
+      serializeSheetToObjectForProduct(spreadSheetData);
 
     const isDropAndBulkInsertSuccess = await dropAndBulkInsertProducts(
       serializedProducts
     );
 
+    const meta = await serializeSheetToObjectForProductMeta(spreadSheetData);
+
     return NextResponse.json({
       message: 'success',
-      data: isDropAndBulkInsertSuccess,
+      data: {
+        isDropAndBulkInsertSuccess,
+        meta,
+      },
       status: 201,
     });
   } catch (error) {

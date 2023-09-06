@@ -4,6 +4,6 @@
 module.exports = {
   reactStrictMode: false,
   experimental: {
-    serverComponentsExternalPackages: ['mongoose']
+    serverComponentsExternalPackages: ['mongoose'],
   }
 }

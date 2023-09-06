@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+import ProductTable from 'components/product-table';
 
 const BRANDS = [
   '',
@@ -21,35 +22,6 @@ const BRANDS = [
   'BFG',
   '라우펜',
 ];
-
-// Replace this component with your actual ProductTable implementation
-function ProductTable({ products }) {
-  return (
-    <div className='overflow-x-auto'>
-      <table className='table'>
-        {/* head */}
-        <thead>
-          <tr>
-            <th>브랜드</th>
-            <th>Pattern</th>
-            <th>Size</th>
-            <th>Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((product, index) => (
-            <tr key={index}>
-              <td>{product.brand}</td>
-              <td>{product.pattern}</td>
-              <td>{product.size}</td>
-              <td>{product.factoryPrice}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
 
 export default function ProductPage() {
   const [products, setProducts] = useState([]);

@@ -11,12 +11,12 @@ const options: any = {
   useNewUrlParser: true,
 };
 
-const connection: {
-  isConnected?: number;
-} = {};
+// const connection: {
+//   isConnected?: number;
+// } = {};
 
 export const connectToDatabase = async () => {
-  if (!connection.isConnected) {
+  if (mongoose.connection.readyState >= 1) {
     console.log('=> using existing database connection');
     return;
   }
@@ -25,8 +25,7 @@ export const connectToDatabase = async () => {
 
   if (MONGO_URI) {
     const db = await mongoose.connect(MONGO_URI, options);
-
-    connection.isConnected = db.connections[0].readyState;
+    // connection.isConnected = db.connections[0].readyState;
     console.log('=> using new database connection');
   }
 };
