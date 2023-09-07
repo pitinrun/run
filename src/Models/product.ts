@@ -29,6 +29,7 @@ export interface IProduct {
   patternKr: string;
   productCode: string;
   size: string;
+  sizeSearchKeyword: string;
   speedSymbolLoadIndex: string;
   marking?: string;
   origin?: string;
@@ -65,6 +66,10 @@ const ProductSchema: Schema = new Schema({
     require: true,
   },
   size: {
+    type: String,
+    require: true,
+  },
+  sizeSearchKeyword: {
     type: String,
     require: true,
   },

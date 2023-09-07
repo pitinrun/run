@@ -11,10 +11,6 @@ const options: any = {
   useNewUrlParser: true,
 };
 
-// const connection: {
-//   isConnected?: number;
-// } = {};
-
 export const connectToDatabase = async () => {
   if (mongoose.connection.readyState >= 1) {
     console.log('=> using existing database connection');

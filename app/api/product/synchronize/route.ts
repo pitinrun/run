@@ -34,40 +34,44 @@ const SHEET_MATCH_MAP: { [K in keyof IProduct] } = {
     row: 'E',
     rowNum: 5,
   },
-  speedSymbolLoadIndex: {
+  sizeSearchKeyword: {
     row: 'F',
     rowNum: 6,
   },
-  marking: {
+  speedSymbolLoadIndex: {
     row: 'G',
     rowNum: 7,
   },
-  origin: {
+  marking: {
     row: 'H',
     rowNum: 8,
   },
-  season: {
+  origin: {
     row: 'I',
     rowNum: 9,
   },
-  special: {
+  season: {
     row: 'J',
     rowNum: 10,
   },
-  etc: {
-    row: 'K',
+  special: {
+    row: 'L',
     rowNum: 11,
   },
-  specialDiscountRate: {
+  etc: {
     row: 'L',
     rowNum: 12,
   },
-  factoryPrice: {
+  specialDiscountRate: {
     row: 'M',
     rowNum: 13,
   },
+  factoryPrice: {
+    row: 'N',
+    rowNum: 14,
+  },
   storages: {
-    startRowNum: 15, // 첫번째 sto-a가 시작하는 칼럼의 번호
+    startRowNum: 16, // 첫번째 sto-a가 시작하는 칼럼의 번호
   },
 };
 
@@ -93,6 +97,7 @@ const serializeSheetToObjectForProduct = (
       patternKr: '',
       productCode: '',
       size: '',
+      sizeSearchKeyword: '',
       speedSymbolLoadIndex: '',
       factoryPrice: 0,
       storages: [],
