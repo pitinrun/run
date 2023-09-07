@@ -241,11 +241,9 @@ export async function POST() {
 
     return NextResponse.json({
       message: 'success',
-      data: {
-        isDropAndBulkInsertSuccess,
-        meta,
-      },
       status: 201,
+      success: isDropAndBulkInsertSuccess,
+      meta,
     });
   } catch (error) {
     if (error instanceof Error) {

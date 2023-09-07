@@ -36,14 +36,19 @@ export async function GET(req: Request) {
     const limit = Number(perPage);
 
     // Fetch products with filter and pagination
-    const products = await Product.find(filter).skip(skip).limit(limit);
+    const products = await Product.find(filter)
+      .sort({
+        _id: -1,
+      })
+      .skip(skip)
+      .limit(limit);
 
     // Fetch total product count with filter
     const total = await Product.countDocuments(filter);
 
     // Response
     return NextResponse.json({
-      products: products.reverse(),
+      products: products,
       pagination: {
         current: Number(page),
         pages: Math.ceil(total / limit),
