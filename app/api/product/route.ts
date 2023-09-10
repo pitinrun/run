@@ -24,7 +24,7 @@ export async function GET(req: Request) {
     }
 
     if (pattern) {
-      filter.pattern = pattern;
+      filter.patternKr = pattern;
     }
 
     if (onlySpecialDiscount === 'true') {

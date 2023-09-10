@@ -1,7 +1,11 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import axios, { isAxiosError } from 'axios';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  MagnifyingGlassIcon,
+} from '@heroicons/react/24/solid';
 import ProductTable from 'components/product-table';
 
 const BRANDS = [
@@ -28,14 +32,16 @@ export default function ProductPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [brand, setBrand] = useState('');
+  const [pattern, setPattern] = useState('');
   const [total, setTotal] = useState(0);
   const [maxPage, setMaxPage] = useState(0);
   const [syncLoading, setSyncLoading] = useState(false);
 
-  useEffect(() => {
-    // Replace with your actual API endpoint
-    axios
-      .get(`/api/product?page=${page}&perPage=${perPage}&brand=${brand}`)
+  async function fetchProducts() {
+    return axios
+      .get(
+        `/api/product?page=${page}&perPage=${perPage}&brand=${brand}&pattern=${pattern}`
+      )
       .then(response => {
         setProducts(response.data.products);
         setTotal(response.data.pagination.total);
@@ -44,6 +50,11 @@ export default function ProductPage() {
       .catch(error => {
         console.error('There was an error fetching data', error);
       });
+  }
+
+  useEffect(() => {
+    // Replace with your actual API endpoint
+    fetchProducts();
   }, [page, perPage, brand]);
 
   const handleClickSynchronize = async () => {
@@ -81,25 +92,53 @@ export default function ProductPage() {
   return (
     <div className='container'>
       <h1 className='text-3xl font-bold mb-4'>상품 관리</h1>
-      <div className='mb-4'>
-        <h6 className='mb-2'>브랜드</h6>
-        <select
-          className='select select-bordered w-full max-w-xs'
-          value={brand}
-          onChange={e => {
-            setBrand(e.target.value);
-            setPage(1);
-          }}
-        >
-          {BRANDS.map((brandName, index) => (
-            <option key={index} value={brandName}>
-              {brandName || '전체'}
-            </option>
-          ))}
-        </select>
+      <div className='mb-4 flex gap-4'>
+        <div>
+          <h6 className='mb-2'>브랜드</h6>
+          <select
+            className='select select-bordered w-full max-w-xs select-xs sm:select-md'
+            style={{
+              minWidth: '6rem',
+            }}
+            value={brand}
+            onChange={e => {
+              setBrand(e.target.value);
+              setPage(1);
+            }}
+          >
+            {BRANDS.map((brandName, index) => (
+              <option key={index} value={brandName}>
+                {brandName || '전체'}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <h6 className='mb-2'>제품명(한글)</h6>
+          <div className='flex gap-2'>
+            <input
+              type='text'
+              className='input input-bordered w-full input-xs sm:input-md'
+              value={pattern}
+              onChange={e => {
+                setPattern(e.target.value);
+                setPage(1);
+              }}
+            />
+            <button
+              className='btn btn-xs sm:btn-md'
+              onClick={() => {
+                setPage(1);
+                fetchProducts();
+              }}
+            >
+              <MagnifyingGlassIcon className='w-4 h-4 sm:w-8 sm:h-8' />
+            </button>
+          </div>
+        </div>
       </div>
       <ProductTable products={products} />
-      <div className='flex items-center'>
+      <div className='flex sm:items-center flex-col sm:flex-row'>
         <div>
           <span className='mr-2'>Rows per page: </span>
           <select
