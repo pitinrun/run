@@ -117,14 +117,17 @@ const serializeSheetToObjectForProduct = (
             (product[key as keyof IProduct] as number) =
               parseInt(row[map.rowNum - 1].replace('%', ''), 10) / 100;
           } else if (key == 'season') {
-            if (row[map.rowNum - 1] === '겨울용') {
+            if (row[map.rowNum - 1] === '겨울용' || row[map.rowNum - 1] === '겨울') {
               (product[key as keyof IProduct] as string) = 'winter';
-            } else if (row[map.rowNum - 1] === '썸머용') {
+            } else if (
+              row[map.rowNum - 1] === '썸머용' ||
+              row[map.rowNum - 1] === '썸머'
+            ) {
               (product[key as keyof IProduct] as string) = 'summer';
             } else if (row[map.rowNum - 1] === '사계절') {
               (product[key as keyof IProduct] as string) = 'all-weathers';
             } else {
-              (product[key as keyof IProduct] as string) = '';
+              (product[key as keyof IProduct] as string) = 'ERROR';
             }
           } else {
             (product[key as keyof IProduct] as string) = row[map.rowNum - 1];
@@ -140,7 +143,7 @@ const serializeSheetToObjectForProduct = (
                 ...acc,
                 {
                   name,
-                  stock: parseInt(storageRows[index], 10),
+                  stock: parseInt(storageRows[index], 10) || 0,
                   dot: storageRows[index + 1]
                     ? storageRows[index + 1].split('\n')
                     : [],
