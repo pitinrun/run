@@ -5,7 +5,7 @@ module.exports = {
   theme: {
     container: {
       center: true,
-    }
+    },
   },
   purge: ['./app/**/*.tsx', './components/**/*.tsx'],
   darkMode: false,
@@ -16,5 +16,5 @@ module.exports = {
     margin: ['responsive', 'hover', 'focus', 'active'],
     align: ['responsive', 'hover', 'focus', 'active'],
   },
-  plugins: [require('daisyui')]
-}
+  plugins: [require('daisyui')],
+};

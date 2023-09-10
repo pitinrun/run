@@ -11,3 +11,8 @@
 .table th:first-child {
   position: static;
 }
+
+:root {
+  --run-red-1: #ff1616;
+  --run-red-2: #ff5151;
+}

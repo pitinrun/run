@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     const page = searchParams.get('page');
     const perPage = searchParams.get('perPage');
     const brand = searchParams.get('brand');
-    const onlyDiscountRate = searchParams.get('onlyDiscountRate');
+    const onlySpecialDiscount = searchParams.get('onlySpecialDiscount');
     const pattern = searchParams.get('pattern');
 
     // MongoDB filter object
@@ -27,7 +27,7 @@ export async function GET(req: Request) {
       filter.pattern = pattern;
     }
 
-    if (onlyDiscountRate === 'true') {
+    if (onlySpecialDiscount === 'true') {
       filter.specialDiscountRate = { $exists: true, $ne: null };
     }
 

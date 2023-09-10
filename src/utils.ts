@@ -1,4 +1,5 @@
 import mongoose, { connect, mongo } from 'mongoose';
+import { IProduct } from './models/product';
 
 const {
   // Attempts to connect to MongoDB and then tries to connect locally:)
@@ -24,4 +25,16 @@ export const connectToDatabase = async () => {
     // connection.isConnected = db.connections[0].readyState;
     console.log('=> using new database connection');
   }
+};
+
+export const getTotalStock = (storages: IProduct['storages']) =>
+  storages.reduce((acc, currentValue) => {
+    return acc + currentValue.stock;
+  }, 0);
+
+export const convertNumberToKRW = (price: number) => {
+  // 10원 단위로 올림 처리
+  price = Math.ceil(price / 100) * 100;
+
+  return `${price.toLocaleString()}`;
 };
