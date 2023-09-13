@@ -1,33 +1,25 @@
 'use client';
-import { useSearchParams } from 'next/navigation';
+
+import { IProduct } from '@/src/models/product';
+import axios from 'axios';
 import NoticeList from 'components/notice-list';
 import ProductCardDashboard from 'components/product-card-dashboard';
 import ProductSearchBar from 'components/product-search-bar';
 import { useEffect, useState } from 'react';
-import { IProduct, SeasonType } from '@/src/models/product';
-import axios from 'axios';
 
 const PER_PAGE = 10;
 
-export default function Home() {
-  const searchParams = useSearchParams();
-
+export default function ProductPage() {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [maxPage, setMaxPage] = useState(0);
-  const [brand, setBrand] = useState(searchParams.get('brand') || '');
-  const [onlySpecialDiscount, setOnlySpecialDiscount] = useState(
-    searchParams.get('onlySpecialDiscount') || false
-  );
-  const [season, setSeason] = useState(searchParams.get('season') || '');
+  const [brand, setBrand] = useState('');
 
   useEffect(() => {
     // Replace with your actual API endpoint
     axios
-      .get(
-        `/api/product?page=${page}&perPage=${PER_PAGE}&brand=${brand}&onlySpecialDiscount=true`
-      )
+      .get(`/api/product?page=${page}&perPage=${PER_PAGE}`)
       .then(response => {
         setProducts([...products, ...response.data.products]);
         setTotal(response.data.pagination.total);
@@ -40,21 +32,7 @@ export default function Home() {
 
   return (
     <div className='container'>
-      <div className='mb-4'>
-        <h2 className='text-3xl	font-bold text-center'>
-          원하는{' '}
-          <span
-            style={{
-              color: 'var(--run-red-1)',
-            }}
-          >
-            사이즈
-          </span>
-          를 입력해주세요.
-        </h2>
-      </div>
-      <ProductSearchBar className='mb-12' />
-      <NoticeList />
+      <ProductSearchBar className='mb-12 ml-0' />
       <ProductCardDashboard products={products} />
       {page < maxPage && (
         <button

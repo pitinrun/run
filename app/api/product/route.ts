@@ -29,6 +29,12 @@ export async function GET(req: Request) {
 
     if (onlySpecialDiscount === 'true') {
       filter.specialDiscountRate = { $exists: true, $ne: null };
+    } else {
+      filter.$or = [
+        { specialDiscountRate: { $exists: false } },
+        { specialDiscountRate: 0 },
+        { specialDiscountRate: null },
+      ];
     }
 
     // Pagination
@@ -56,6 +62,7 @@ export async function GET(req: Request) {
       },
     });
   } catch (error) {
+    console.error('!! ERROR:', error);
     return NextResponse.json('error', {
       status: 500,
     });

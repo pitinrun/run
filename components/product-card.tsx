@@ -7,6 +7,13 @@ function DividerHorizon() {
   );
 }
 
+const displaySeasonMap = {
+  summer: '여름용',
+  winter: '겨울용',
+  'all-weathers': '사계절용',
+  ERROR: '-',
+};
+
 export default function ProductCard({
   brand,
   pattern,
@@ -22,22 +29,12 @@ export default function ProductCard({
   specialDiscountRate,
   storages,
 }: IProduct) {
-  const displayPrice =
-    (factoryPrice || 0) * (1 - (specialDiscountRate || 0) / 100);
-
-  const displaySeasonMap = {
-    summer: '여름용',
-    winter: '겨울용',
-    'all-weather': '사계절용',
-  };
-
   return (
     <div className='card border border-solid border-neutral-200'>
       <div
-        className='flex justify-between text-white items-center px-4 py-2 rounded-t-lg'
-        style={{
-          backgroundColor: 'var(--run-red-2)',
-        }}
+        className={`flex justify-between text-white items-center px-4 py-2 rounded-t-lg ${
+          specialDiscountRate ? 'bg-[var(--run-red-2)]' : 'bg-neutral-500'
+        }`}
       >
         {/* TOP */}
         <div>
