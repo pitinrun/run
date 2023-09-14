@@ -10,8 +10,6 @@ import { IProduct } from '@/src/types';
 const PER_PAGE = 10;
 
 export default function Home() {
-  const searchParams = useSearchParams();
-
   const [products, setProducts] = useState<IProduct[]>([]);
   const [page, setPage] = useState(1);
   // const [total, setTotal] = useState(0);
