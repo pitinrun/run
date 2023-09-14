@@ -16,13 +16,13 @@ const EmptyProducts = () => (
 );
 
 export default function ProductCardDashboard__V2({
-  brand = '',
+  selectedBrands = [],
   season = '',
   onlySpecialDiscount = false,
   sizeSearchKeyword = '',
   perPage = 10,
 }: {
-  brand?: BrandType;
+  selectedBrands?: BrandType[];
   season?: SeasonType | '';
   onlySpecialDiscount?: boolean;
   sizeSearchKeyword?: string;
@@ -36,7 +36,7 @@ export default function ProductCardDashboard__V2({
   useEffect(() => {
     setProducts([]);
     setPage(1);
-  }, [season, onlySpecialDiscount, brand, sizeSearchKeyword]);
+  }, [season, onlySpecialDiscount, selectedBrands, sizeSearchKeyword]);
 
   useEffect(() => {
     let isMounted = true; // 이 플래그로 컴포넌트가 마운트 상태인지 확인
@@ -48,7 +48,7 @@ export default function ProductCardDashboard__V2({
           `/api/product?${new URLSearchParams({
             page: page.toString(),
             perPage: perPage.toString(),
-            brand,
+            brands: selectedBrands.join(','),
             season,
             onlySpecialDiscount: onlySpecialDiscount.toString(),
             sizeSearchKeyword,
@@ -76,7 +76,7 @@ export default function ProductCardDashboard__V2({
     return () => {
       isMounted = false; // 컴포넌트 언마운트 시 플래그를 false로 설정
     };
-  }, [page, brand, season, onlySpecialDiscount, sizeSearchKeyword]);
+  }, [page, season, onlySpecialDiscount, selectedBrands, sizeSearchKeyword]);
 
   if (isLoading && page === 1) {
     return (

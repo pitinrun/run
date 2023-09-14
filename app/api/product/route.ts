@@ -12,7 +12,7 @@ export async function GET(req: Request) {
     // Query parameters
     const page = searchParams.get('page');
     const perPage = searchParams.get('perPage');
-    const brand = searchParams.get('brand');
+    const brands = searchParams.get('brands');
     const onlySpecialDiscount = searchParams.get('onlySpecialDiscount');
     const pattern = searchParams.get('pattern');
     const season = searchParams.get('season');
@@ -21,8 +21,8 @@ export async function GET(req: Request) {
     // MongoDB filter object
     const filter: any = {};
 
-    if (brand) {
-      filter.brand = brand;
+    if (brands) {
+      filter.brand = { $in: brands.split(',') };
     }
 
     if (pattern) {

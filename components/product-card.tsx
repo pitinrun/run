@@ -152,7 +152,7 @@ export default function ProductCard({
             <span>%</span>
           </div>
           <div>
-            <button className='btn btn-sm btn-primary w-full mt-4'>
+            <button className='btn btn-sm btn-neutral w-full mt-4'>
               구매하기
             </button>
           </div>

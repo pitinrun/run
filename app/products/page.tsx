@@ -3,40 +3,11 @@
 import { BRANDS, BrandType, IProduct, SeasonType } from '@/src/types';
 import ProductCardDashboard__V2 from 'components/product-card-dashboard-v2';
 import ProductSearchBar from 'components/product-search-bar';
+import BrandFilter from 'components/products/brand-filter';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const PER_PAGE = 10;
-
-function BrandFilter({
-  brands,
-  selectedBrand,
-  setBrand,
-  className,
-}: {
-  brands: BrandType[];
-  selectedBrand: BrandType;
-  setBrand: (brand: BrandType) => void;
-  className?: string;
-}) {
-  return (
-    <div>
-      {brands.map((item, index) => (
-        <button
-          className={`btn btn-sm sm:btn-md ${
-            selectedBrand === item ? 'btn-primary' : 'btn-ghost'
-          } ${className}`}
-          name='options'
-          aria-label={item}
-          key={index}
-          onClick={() => setBrand(item)}
-        >
-          {item || '전체'}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 const SeasonFilter = ({
   season: selectedSeason,
@@ -83,11 +54,11 @@ const SeasonFilter = ({
 };
 
 function ProductDashboard({
-  brand,
+  selectedBrands,
   season,
   sizeSearchKeyword,
 }: {
-  brand: BrandType;
+  selectedBrands: BrandType[];
   season: SeasonType;
   sizeSearchKeyword: string;
 }) {
@@ -95,7 +66,7 @@ function ProductDashboard({
     <div>
       <h2 className='text-lg sm:text-2xl font-bold mb-2'>특가 상품</h2>
       <ProductCardDashboard__V2
-        brand={brand}
+        selectedBrands={selectedBrands}
         season={season}
         onlySpecialDiscount={true}
         sizeSearchKeyword={sizeSearchKeyword}
@@ -103,7 +74,7 @@ function ProductDashboard({
       />
       <h2 className='text-lg sm:text-2xl font-bold my-2'>상품</h2>
       <ProductCardDashboard__V2
-        brand={brand as any as BrandType}
+        selectedBrands={selectedBrands}
         season={season as any as SeasonType}
         onlySpecialDiscount={false}
         sizeSearchKeyword={sizeSearchKeyword}
@@ -118,7 +89,13 @@ export default function ProductPage() {
   const route = useRouter();
   const pathname = usePathname();
 
-  const [brand, setBrand] = useState(searchParams.get('brand') || '');
+  const initialBrand = searchParams.get('brands')
+    ? ((searchParams.get('brands') || '').split(',') as BrandType[])
+    : [];
+
+  const [selectedBrands, setSelectedBrands] =
+    useState<BrandType[]>(initialBrand);
+
   const [season, setSeason] = useState(searchParams.get('season') || '');
   const [sizeSearchKeyword, setSizeSearchKeyword] = useState(
     searchParams.get('sizeSearchKeyword') || ''
@@ -128,15 +105,14 @@ export default function ProductPage() {
   );
 
   useEffect(() => {
-    route.replace(
-      `${pathname}?${new URLSearchParams({
-        brand,
-        season,
-        sizeSearchKeyword,
-      }).toString()}`,
-      { scroll: false }
-    );
-  }, [season, brand, sizeSearchKeyword]);
+    const updatedParams = new URLSearchParams({
+      brands: selectedBrands.join(','),
+      season,
+      sizeSearchKeyword,
+    });
+
+    route.replace(`${pathname}?${updatedParams.toString()}`, { scroll: false });
+  }, [season, selectedBrands, sizeSearchKeyword]);
 
   return (
     <div className='container'>
@@ -154,13 +130,13 @@ export default function ProductPage() {
       </div>
       <BrandFilter
         brands={BRANDS as any as BrandType[]}
-        selectedBrand={brand as any as BrandType}
-        setBrand={setBrand}
+        selectedBrands={selectedBrands}
+        setSelectedBrands={setSelectedBrands}
         className='mb-2 sm:my-2'
       />
 
       <ProductDashboard
-        brand={brand as any as BrandType}
+        selectedBrands={selectedBrands}
         season={season as any as SeasonType}
         sizeSearchKeyword={sizeSearchKeyword}
       />
@@ -171,7 +147,7 @@ export default function ProductPage() {
         setValue={setSizeSearchKeyword2}
       />
       <ProductDashboard
-        brand={brand as any as BrandType}
+        selectedBrands={selectedBrands}
         season={season as any as SeasonType}
         sizeSearchKeyword={sizeSearchKeyword2}
       />

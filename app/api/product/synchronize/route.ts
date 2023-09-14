@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from 'src/utils';
 import { google } from 'googleapis';
 import { client_email, private_key } from '.meta/google-credentials.json';
-import { IProduct, Product } from '@/src/models/product';
 import { toColumnName } from './utils';
 import { dropAndBulkInsertProducts } from '@/src/services/product';
 import { updateStorageNames } from '@/src/services/metadata';
+import { IProduct } from '@/src/types';
 
 connectToDatabase();
 
@@ -117,7 +117,10 @@ const serializeSheetToObjectForProduct = (
             (product[key as keyof IProduct] as number) =
               parseInt(row[map.rowNum - 1].replace('%', ''), 10) / 100;
           } else if (key == 'season') {
-            if (row[map.rowNum - 1] === '겨울용' || row[map.rowNum - 1] === '겨울') {
+            if (
+              row[map.rowNum - 1] === '겨울용' ||
+              row[map.rowNum - 1] === '겨울'
+            ) {
               (product[key as keyof IProduct] as string) = 'winter';
             } else if (
               row[map.rowNum - 1] === '썸머용' ||
