@@ -4,8 +4,8 @@ import NoticeList from 'components/notice-list';
 import ProductCardDashboard from 'components/product-card-dashboard';
 import ProductSearchBar from 'components/product-search-bar';
 import { useEffect, useState } from 'react';
-import { IProduct, SeasonType } from '@/src/models/product';
 import axios from 'axios';
+import { IProduct } from '@/src/types';
 
 const PER_PAGE = 10;
 

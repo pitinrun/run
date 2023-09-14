@@ -1,6 +1,6 @@
 'use client';
 
-import { IProduct } from '@/src/models/product';
+import { IProduct } from '@/src/types';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 

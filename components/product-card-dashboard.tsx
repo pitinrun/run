@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import ProductCard from './product-card';
 import axios from 'axios';
-import { IProduct } from '@/src/models/product';
+import { IProduct } from '@/src/types';
 
 export default function ProductCardDashboard({
   products,

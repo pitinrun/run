@@ -1,4 +1,4 @@
-import { IProduct } from '@/src/models/product';
+import { IProduct } from '@/src/types';
 import { convertNumberToKRW, getTotalStock } from '@/src/utils';
 
 function DividerHorizon() {

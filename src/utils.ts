@@ -1,5 +1,5 @@
 import mongoose, { connect, mongo } from 'mongoose';
-import { IProduct } from './models/product';
+import { IProduct } from './types';
 
 const {
   // Attempts to connect to MongoDB and then tries to connect locally:)

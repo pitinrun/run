@@ -1,11 +1,12 @@
 'use client';
 
-import { BRANDS, IProduct } from '@/src/models/product';
+import { BRANDS, IProduct } from '@/src/types';
 import axios from 'axios';
 import NoticeList from 'components/notice-list';
 import ProductCardDashboard from 'components/product-card-dashboard';
 import ProductSearchBar from 'components/product-search-bar';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+// import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 
 const PER_PAGE = 10;
@@ -48,6 +49,8 @@ const SeasonFilter = ({ season, setSeason }) => {
 
 export default function ProductPage() {
   const searchParams = useSearchParams();
+  const route = useRouter();
+  const pathname = usePathname();
 
   const [products, setProducts] = useState<IProduct[]>([]);
   const [page, setPage] = useState(1);
@@ -59,10 +62,19 @@ export default function ProductPage() {
   );
   const [season, setSeason] = useState(searchParams.get('season') || '');
 
+  console.log('$$ BRANDS', BRANDS);
+
   useEffect(() => {
     // Replace with your actual API endpoint
     setProducts([]);
     setPage(1);
+    route.replace(
+      `${pathname}?${brand ? `&brand=${brand}` : ''}
+    ${season ? `&season=${season}` : ''}${
+        onlySpecialDiscount ? `&onlySpecialDiscount=${onlySpecialDiscount}` : ''
+      }`,
+      { scroll: false }
+    );
   }, [season, onlySpecialDiscount, brand]);
 
   useEffect(() => {

@@ -1,4 +1,5 @@
-import { IProduct, Product } from '../models/product';
+import { Product } from '../models/product';
+import { IProduct } from '../types';
 
 export const dropAndBulkInsertProducts = async (products: IProduct[]) => {
   try {
