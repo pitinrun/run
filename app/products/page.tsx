@@ -69,7 +69,7 @@ const SeasonFilter = ({
     <div className={'join w-full sm:w-auto ' + className}>
       {seasons.map((item, index) => (
         <input
-          className='join-item btn btn-sm sm:btn-md sm:flex-inherit flex-1'
+          className='join-item btn btn-sm sm:btn-md sm:flex-inherit flex-1 sm:flex-none'
           type='radio'
           name='options'
           aria-label={item.label}
@@ -88,30 +88,35 @@ export default function ProductPage() {
   const pathname = usePathname();
 
   const [brand, setBrand] = useState(searchParams.get('brand') || '');
-  const [onlySpecialDiscount, setOnlySpecialDiscount] = useState(
-    (searchParams.get('onlySpecialDiscount') as unknown as boolean) || false
-  );
   const [season, setSeason] = useState(searchParams.get('season') || '');
+  const [sizeSearchKeyword, setSizeSearchKeyword] = useState(
+    searchParams.get('sizeSearchKeyword') || ''
+  );
 
   useEffect(() => {
     route.replace(
       `${pathname}?${new URLSearchParams({
         brand,
         season,
-        onlySpecialDiscount: onlySpecialDiscount.toString(),
+        // onlySpecialDiscount: onlySpecialDiscount.toString(),
+        sizeSearchKeyword,
       }).toString()}`,
       { scroll: false }
     );
-  }, [season, onlySpecialDiscount, brand]);
+  }, [season, brand, sizeSearchKeyword]);
 
   return (
     <div className='container'>
       <div className='sm:flex sm:gap-4'>
-        <ProductSearchBar className='mb-4 ml-0 flex-1' />
+        <ProductSearchBar
+          className='mb-4 sm:mb-0 ml-0 sm:flex-1'
+          value={sizeSearchKeyword}
+          setValue={setSizeSearchKeyword}
+        />
         <SeasonFilter
           season={season as SeasonType}
           setSeason={setSeason}
-          className='mb-2 sm:mb-0'
+          className='mb-2 sm:mb-0 sm:mb-0'
         />
       </div>
       <BrandFilter
@@ -122,11 +127,23 @@ export default function ProductPage() {
       />
 
       <div>
-        <h2 className='text-lg sm:text-3xl font-bold mb-2'>특가 상품</h2>
+        <h2 className='text-lg sm:text-2xl font-bold mb-2'>특가 상품</h2>
         <ProductCardDashboard__V2
           brand={brand as any as BrandType}
           season={season as any as SeasonType}
-          onlySpecialDiscount={onlySpecialDiscount}
+          onlySpecialDiscount={true}
+          sizeSearchKeyword={sizeSearchKeyword}
+          perPage={PER_PAGE}
+        />
+      </div>
+
+      <div>
+        <h2 className='text-lg sm:text-2xl font-bold my-2'>상품</h2>
+        <ProductCardDashboard__V2
+          brand={brand as any as BrandType}
+          season={season as any as SeasonType}
+          onlySpecialDiscount={false}
+          sizeSearchKeyword={sizeSearchKeyword}
           perPage={PER_PAGE}
         />
       </div>

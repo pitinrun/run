@@ -107,20 +107,19 @@ export default function ProductCard({
           <span className='text-xs sm:text-sm mr-2'>매입가</span>
           <br className='sm:hidden' />
           <span className='text-lg sm:text-3xl relative'>
-            {convertNumberToKRW(
-              Math.round(
-                (factoryPrice || 0) * (1 - (specialDiscountRate || 0) / 100)
-              )
+            {specialDiscountRate ? (
+              <>
+                {convertNumberToKRW(
+                  Math.round(factoryPrice * (1 - specialDiscountRate))
+                )}
+                원
+                <del className='absolute right-[-1.5rem] sm:right-0 text-sm sm:text-base text-neutral-400 font-normal bottom-[1.5rem] sm:bottom-[2rem]'>
+                  {convertNumberToKRW(Math.round(factoryPrice)).split(' ')[0]}원
+                </del>
+              </>
+            ) : (
+              <>{convertNumberToKRW(Math.round(factoryPrice))}원</>
             )}
-            원
-            <del className='absolute right-[-0.5rem] sm:right-0 text-sm sm:text-base text-neutral-400 font-normal bottom-[1.5rem] sm:bottom-[2rem]'>
-              {
-                convertNumberToKRW(
-                  Math.round((factoryPrice || 0) * (1 - (0 || 0) / 100))
-                ).split(' ')[0]
-              }
-              원
-            </del>
           </span>
         </div>
         <div>

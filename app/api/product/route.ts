@@ -16,6 +16,7 @@ export async function GET(req: Request) {
     const onlySpecialDiscount = searchParams.get('onlySpecialDiscount');
     const pattern = searchParams.get('pattern');
     const season = searchParams.get('season');
+    const sizeSearchKeyword = searchParams.get('sizeSearchKeyword');
 
     // MongoDB filter object
     const filter: any = {};
@@ -40,6 +41,10 @@ export async function GET(req: Request) {
         { specialDiscountRate: 0 },
         { specialDiscountRate: null },
       ];
+    }
+
+    if (sizeSearchKeyword) {
+      filter.sizeSearchKeyword = sizeSearchKeyword;
     }
 
     // Pagination

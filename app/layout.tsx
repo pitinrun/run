@@ -12,7 +12,7 @@ function MainLayout({ children }) {
           <meta name='description' content='A Starter with Next.js' />
         </head>
         <body>
-          <div className='p-8'>{children}</div>
+          <div className='p-3 sm:p-8'>{children}</div>
           <Link
             href='https://github.com/danybeltran/nextjs-typescript-and-mongodb'
             target='_blank'
