@@ -14,7 +14,7 @@ export default function Home() {
 
   const [products, setProducts] = useState<IProduct[]>([]);
   const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
+  // const [total, setTotal] = useState(0);
   const [maxPage, setMaxPage] = useState(0);
   const [brand, setBrand] = useState('');
 
@@ -26,7 +26,7 @@ export default function Home() {
       )
       .then(response => {
         setProducts([...products, ...response.data.products]);
-        setTotal(response.data.pagination.total);
+        // setTotal(response.data.pagination.total);
         setMaxPage(response.data.pagination.pages);
       })
       .catch(error => {

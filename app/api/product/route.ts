@@ -15,6 +15,7 @@ export async function GET(req: Request) {
     const brand = searchParams.get('brand');
     const onlySpecialDiscount = searchParams.get('onlySpecialDiscount');
     const pattern = searchParams.get('pattern');
+    const season = searchParams.get('season');
 
     // MongoDB filter object
     const filter: any = {};
@@ -25,6 +26,10 @@ export async function GET(req: Request) {
 
     if (pattern) {
       filter.patternKr = pattern;
+    }
+
+    if (season) {
+      filter.season = season;
     }
 
     if (onlySpecialDiscount === 'true') {
