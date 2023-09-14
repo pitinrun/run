@@ -16,17 +16,17 @@ const EmptyProducts = () => (
 );
 
 export default function ProductCardDashboard__V2({
-  brand,
-  season,
-  onlySpecialDiscount,
+  brand = '',
+  season = '',
+  onlySpecialDiscount = false,
   sizeSearchKeyword = '',
-  perPage,
+  perPage = 10,
 }: {
-  brand: BrandType;
-  season: SeasonType | '';
-  onlySpecialDiscount: boolean;
+  brand?: BrandType;
+  season?: SeasonType | '';
+  onlySpecialDiscount?: boolean;
   sizeSearchKeyword?: string;
-  perPage: number;
+  perPage?: number;
 }) {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [page, setPage] = useState(1);

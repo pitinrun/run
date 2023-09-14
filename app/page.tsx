@@ -1,36 +1,29 @@
 'use client';
-import { useSearchParams } from 'next/navigation';
-import NoticeList from 'components/notice-list';
-import ProductCardDashboard from 'components/product-card-dashboard';
-import ProductSearchBar from 'components/product-search-bar';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { IProduct } from '@/src/types';
 
-const PER_PAGE = 10;
+import NoticeList from 'components/notice-list';
+import ProductSearchBar from 'components/product-search-bar';
+import ProductCardDashboard__V2 from 'components/product-card-dashboard-v2';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
-  const [products, setProducts] = useState<IProduct[]>([]);
-  const [page, setPage] = useState(1);
-  // const [total, setTotal] = useState(0);
-  const [maxPage, setMaxPage] = useState(0);
-  const [brand, setBrand] = useState('');
+  const router = useRouter();
+
+  const [sizeSearchKeyword, setSizeSearchKeyword] = useState('');
+
+  const handle = () => {
+    router.push(
+      `/products?${new URLSearchParams({
+        sizeSearchKeyword,
+      }).toString()}`
+    );
+  };
 
   useEffect(() => {
-    // Replace with your actual API endpoint
-    axios
-      .get(
-        `/api/product?page=${page}&perPage=${PER_PAGE}&brand=${brand}&onlySpecialDiscount=true`
-      )
-      .then(response => {
-        setProducts([...products, ...response.data.products]);
-        // setTotal(response.data.pagination.total);
-        setMaxPage(response.data.pagination.pages);
-      })
-      .catch(error => {
-        console.error('There was an error fetching data', error);
-      });
-  }, [page, brand]);
+    if (sizeSearchKeyword) {
+      handle();
+    }
+  }, [sizeSearchKeyword]);
 
   return (
     <div className='container'>
@@ -47,17 +40,12 @@ export default function Home() {
           를 입력해주세요.
         </h2>
       </div>
-      <ProductSearchBar className='mb-12' />
+      <ProductSearchBar
+        className='mb-12 mx-auto'
+        setValue={setSizeSearchKeyword}
+      />
       <NoticeList />
-      <ProductCardDashboard products={products} />
-      {page < maxPage && (
-        <button
-          className='btn btn-outline w-full btn-ghost btn-block text-2xl my-4'
-          onClick={() => setPage(page + 1)}
-        >
-          + 더보기
-        </button>
-      )}
+      <ProductCardDashboard__V2 onlySpecialDiscount />
     </div>
   );
 }

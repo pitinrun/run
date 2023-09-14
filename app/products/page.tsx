@@ -82,6 +82,37 @@ const SeasonFilter = ({
   );
 };
 
+function ProductDashboard({
+  brand,
+  season,
+  sizeSearchKeyword,
+}: {
+  brand: BrandType;
+  season: SeasonType;
+  sizeSearchKeyword: string;
+}) {
+  return (
+    <div>
+      <h2 className='text-lg sm:text-2xl font-bold mb-2'>특가 상품</h2>
+      <ProductCardDashboard__V2
+        brand={brand}
+        season={season}
+        onlySpecialDiscount={true}
+        sizeSearchKeyword={sizeSearchKeyword}
+        perPage={PER_PAGE}
+      />
+      <h2 className='text-lg sm:text-2xl font-bold my-2'>상품</h2>
+      <ProductCardDashboard__V2
+        brand={brand as any as BrandType}
+        season={season as any as SeasonType}
+        onlySpecialDiscount={false}
+        sizeSearchKeyword={sizeSearchKeyword}
+        perPage={PER_PAGE}
+      />
+    </div>
+  );
+}
+
 export default function ProductPage() {
   const searchParams = useSearchParams();
   const route = useRouter();
@@ -92,13 +123,15 @@ export default function ProductPage() {
   const [sizeSearchKeyword, setSizeSearchKeyword] = useState(
     searchParams.get('sizeSearchKeyword') || ''
   );
+  const [sizeSearchKeyword2, setSizeSearchKeyword2] = useState(
+    searchParams.get('sizeSearchKeyword') || ''
+  );
 
   useEffect(() => {
     route.replace(
       `${pathname}?${new URLSearchParams({
         brand,
         season,
-        // onlySpecialDiscount: onlySpecialDiscount.toString(),
         sizeSearchKeyword,
       }).toString()}`,
       { scroll: false }
@@ -123,30 +156,25 @@ export default function ProductPage() {
         brands={BRANDS as any as BrandType[]}
         selectedBrand={brand as any as BrandType}
         setBrand={setBrand}
-        className='mb-2 sm:mb-0'
+        className='mb-2 sm:my-2'
       />
 
-      <div>
-        <h2 className='text-lg sm:text-2xl font-bold mb-2'>특가 상품</h2>
-        <ProductCardDashboard__V2
-          brand={brand as any as BrandType}
-          season={season as any as SeasonType}
-          onlySpecialDiscount={true}
-          sizeSearchKeyword={sizeSearchKeyword}
-          perPage={PER_PAGE}
-        />
-      </div>
+      <ProductDashboard
+        brand={brand as any as BrandType}
+        season={season as any as SeasonType}
+        sizeSearchKeyword={sizeSearchKeyword}
+      />
 
-      <div>
-        <h2 className='text-lg sm:text-2xl font-bold my-2'>상품</h2>
-        <ProductCardDashboard__V2
-          brand={brand as any as BrandType}
-          season={season as any as SeasonType}
-          onlySpecialDiscount={false}
-          sizeSearchKeyword={sizeSearchKeyword}
-          perPage={PER_PAGE}
-        />
-      </div>
+      <ProductSearchBar
+        className='my-2 ml-0 sm:flex-1'
+        value={sizeSearchKeyword2}
+        setValue={setSizeSearchKeyword2}
+      />
+      <ProductDashboard
+        brand={brand as any as BrandType}
+        season={season as any as SeasonType}
+        sizeSearchKeyword={sizeSearchKeyword2}
+      />
     </div>
   );
 }
