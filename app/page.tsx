@@ -16,11 +16,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [maxPage, setMaxPage] = useState(0);
-  const [brand, setBrand] = useState(searchParams.get('brand') || '');
-  const [onlySpecialDiscount, setOnlySpecialDiscount] = useState(
-    searchParams.get('onlySpecialDiscount') || false
-  );
-  const [season, setSeason] = useState(searchParams.get('season') || '');
+  const [brand, setBrand] = useState('');
 
   useEffect(() => {
     // Replace with your actual API endpoint

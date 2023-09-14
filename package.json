@@ -12,7 +12,7 @@
     "autoprefixer": "^10.4.14",
     "axios": "^1.5.0",
     "bs-icon": "^0.0.5",
-    "daisyui": "^2.51.6",
+    "daisyui": "^3.7.4",
     "googleapis": "^126.0.0",
     "http-react": "^3.0.5",
     "mongoose": "^7.1.0",
