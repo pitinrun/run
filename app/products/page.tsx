@@ -1,6 +1,6 @@
 'use client';
 
-import { BRANDS, IProduct } from '@/src/types';
+import { BRANDS, BrandType, IProduct } from '@/src/types';
 import axios from 'axios';
 import NoticeList from 'components/notice-list';
 import ProductCardDashboard from 'components/product-card-dashboard';
@@ -11,7 +11,35 @@ import { useEffect, useRef, useState } from 'react';
 
 const PER_PAGE = 10;
 
-const SeasonFilter = ({ season, setSeason }) => {
+function BrandFilter({
+  brands,
+  selectedBrand,
+  setBrand,
+}: {
+  brands: BrandType[];
+  selectedBrand: BrandType;
+  setBrand: (brand: BrandType) => void;
+}) {
+  return (
+    <div>
+      {brands.map((item, index) => (
+        <button
+          className={`btn ${
+            selectedBrand === item ? 'btn-primary' : 'btn-ghost'
+          }`}
+          name='options'
+          aria-label={item}
+          key={index}
+          onClick={() => setBrand(item)}
+        >
+          {item || '전체'}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+const SeasonFilter = ({ season: selectedSeason, setSeason }) => {
   const seasons = [
     {
       label: '전체',
@@ -40,7 +68,7 @@ const SeasonFilter = ({ season, setSeason }) => {
           aria-label={item.label}
           key={index}
           onClick={() => setSeason(item.value)}
-          checked={season === item.value}
+          checked={selectedSeason === item.value}
         />
       ))}
     </div>
@@ -62,17 +90,24 @@ export default function ProductPage() {
   );
   const [season, setSeason] = useState(searchParams.get('season') || '');
 
-  console.log('$$ BRANDS', BRANDS);
-
   useEffect(() => {
     // Replace with your actual API endpoint
     setProducts([]);
     setPage(1);
+    console.log(
+      '$$ ',
+      new URLSearchParams({
+        brand,
+        season,
+        onlySpecialDiscount: onlySpecialDiscount.toString(),
+      }).toString()
+    );
     route.replace(
-      `${pathname}?${brand ? `&brand=${brand}` : ''}
-    ${season ? `&season=${season}` : ''}${
-        onlySpecialDiscount ? `&onlySpecialDiscount=${onlySpecialDiscount}` : ''
-      }`,
+      `${pathname}?${new URLSearchParams({
+        brand,
+        season,
+        onlySpecialDiscount: onlySpecialDiscount.toString(),
+      }).toString()}`,
       { scroll: false }
     );
   }, [season, onlySpecialDiscount, brand]);
@@ -83,9 +118,16 @@ export default function ProductPage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `/api/product?page=${page}&perPage=${PER_PAGE}
-          ${brand ? `&brand=${brand}` : ''}
-          ${season ? `&season=${season}` : ''}`
+          // `/api/product?page=${page}&perPage=${PER_PAGE}
+          // ${brand ? `&brand=${brand}` : ''}
+          // ${season ? `&season=${season}` : ''}`
+          `/api/product?${new URLSearchParams({
+            page: page.toString(),
+            perPage: PER_PAGE.toString(),
+            brand,
+            season,
+            onlySpecialDiscount: onlySpecialDiscount.toString(),
+          }).toString()}`
         );
 
         if (isMounted) {
@@ -115,6 +157,11 @@ export default function ProductPage() {
         <ProductSearchBar className='mb-12 ml-0 flex-1' />
         <SeasonFilter season={season} setSeason={setSeason} />
       </div>
+      <BrandFilter
+        brands={BRANDS as any as BrandType[]}
+        selectedBrand={brand as any as BrandType}
+        setBrand={setBrand}
+      />
 
       <ProductCardDashboard products={products} />
       {page < maxPage && (
