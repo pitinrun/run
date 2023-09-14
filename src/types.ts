@@ -1,4 +1,5 @@
 export const BRANDS = [
+  '',
   '금호',
   '한국',
   '넥센',
@@ -14,7 +15,6 @@ export const BRANDS = [
   '트라이앵글',
   'BFG',
   '라우펜',
-  '',
 ] as const;
 export type BrandType = (typeof BRANDS)[number];
 

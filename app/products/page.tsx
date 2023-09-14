@@ -1,12 +1,11 @@
 'use client';
 
-import { BRANDS, BrandType, IProduct } from '@/src/types';
+import { BRANDS, BrandType, IProduct, SeasonType } from '@/src/types';
 import axios from 'axios';
-import NoticeList from 'components/notice-list';
 import ProductCardDashboard from 'components/product-card-dashboard';
+import ProductCardDashboard__V2 from 'components/product-card-dashboard-v2';
 import ProductSearchBar from 'components/product-search-bar';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-// import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 
 const PER_PAGE = 10;
@@ -80,28 +79,13 @@ export default function ProductPage() {
   const route = useRouter();
   const pathname = usePathname();
 
-  const [products, setProducts] = useState<IProduct[]>([]);
-  const [page, setPage] = useState(1);
-  // const [total, setTotal] = useState(0);
-  const [maxPage, setMaxPage] = useState(0);
   const [brand, setBrand] = useState(searchParams.get('brand') || '');
   const [onlySpecialDiscount, setOnlySpecialDiscount] = useState(
-    searchParams.get('onlySpecialDiscount') || false
+    (searchParams.get('onlySpecialDiscount') as unknown as boolean) || false
   );
   const [season, setSeason] = useState(searchParams.get('season') || '');
 
   useEffect(() => {
-    // Replace with your actual API endpoint
-    setProducts([]);
-    setPage(1);
-    console.log(
-      '$$ ',
-      new URLSearchParams({
-        brand,
-        season,
-        onlySpecialDiscount: onlySpecialDiscount.toString(),
-      }).toString()
-    );
     route.replace(
       `${pathname}?${new URLSearchParams({
         brand,
@@ -112,49 +96,10 @@ export default function ProductPage() {
     );
   }, [season, onlySpecialDiscount, brand]);
 
-  useEffect(() => {
-    let isMounted = true; // 이 플래그로 컴포넌트가 마운트 상태인지 확인
-
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          // `/api/product?page=${page}&perPage=${PER_PAGE}
-          // ${brand ? `&brand=${brand}` : ''}
-          // ${season ? `&season=${season}` : ''}`
-          `/api/product?${new URLSearchParams({
-            page: page.toString(),
-            perPage: PER_PAGE.toString(),
-            brand,
-            season,
-            onlySpecialDiscount: onlySpecialDiscount.toString(),
-          }).toString()}`
-        );
-
-        if (isMounted) {
-          setProducts(prevProducts => [
-            ...prevProducts,
-            ...response.data.products,
-          ]);
-          setMaxPage(response.data.pagination.pages);
-        }
-      } catch (error) {
-        if (isMounted) {
-          console.error('There was an error fetching data', error);
-        }
-      }
-    };
-
-    fetchData(); // 아니면, 기존 로직대로 fetchData를 호출합니다.
-
-    return () => {
-      isMounted = false; // 컴포넌트 언마운트 시 플래그를 false로 설정
-    };
-  }, [page, brand, season, onlySpecialDiscount]);
-
   return (
     <div className='container'>
       <div className='sm:flex sm:gap-4'>
-        <ProductSearchBar className='mb-12 ml-0 flex-1' />
+        <ProductSearchBar className='mb-4 ml-0 flex-1' />
         <SeasonFilter season={season} setSeason={setSeason} />
       </div>
       <BrandFilter
@@ -163,15 +108,15 @@ export default function ProductPage() {
         setBrand={setBrand}
       />
 
-      <ProductCardDashboard products={products} />
-      {page < maxPage && (
-        <button
-          className='btn btn-outline w-full btn-ghost btn-block text-2xl my-4'
-          onClick={() => setPage(page + 1)}
-        >
-          + 더보기
-        </button>
-      )}
+      <div>
+        <h2 className='text-xl sm:text-3xl font-bold'>특가 상품</h2>
+        <ProductCardDashboard__V2
+          brand={brand as any as BrandType}
+          season={season as any as SeasonType}
+          onlySpecialDiscount={onlySpecialDiscount}
+          perPage={PER_PAGE}
+        />
+      </div>
     </div>
   );
 }
