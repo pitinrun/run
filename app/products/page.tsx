@@ -18,6 +18,7 @@ const SeasonFilter = ({
   setSeason: (season: SeasonType) => void;
   className?: string;
 }) => {
+  // console.log('$$ season', selectedSeason);
   const seasons = [
     {
       label: '전체',
@@ -38,17 +39,20 @@ const SeasonFilter = ({
   ];
   return (
     <div className={'join w-full sm:w-auto ' + className}>
-      {seasons.map((item, index) => (
-        <input
-          className='join-item btn btn-sm sm:btn-md sm:flex-inherit flex-1 sm:flex-none'
-          type='radio'
-          name='options'
-          aria-label={item.label}
-          key={index}
-          onClick={() => setSeason(item.value as SeasonType)}
-          checked={selectedSeason === item.value}
-        />
-      ))}
+      {seasons.map((item, index) => {
+        // console.log('$$ selectedSeason item.value', selectedSeason, item.value);
+        return (
+          <input
+            className='join-item btn btn-sm sm:btn-md sm:flex-inherit flex-1 sm:flex-none'
+            type='radio'
+            name='options'
+            aria-label={item.label}
+            key={index}
+            onChange={() => setSeason(item.value as SeasonType)}
+            checked={selectedSeason === item.value}
+          />
+        );
+      })}
     </div>
   );
 };

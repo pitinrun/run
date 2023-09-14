@@ -141,7 +141,7 @@ export default function ProductCard({
               type='number'
               className={`input input-xs input-bordered w-full mx-2 text-right`}
               disabled={!!specialDiscountRate}
-              value={
+              defaultValue={
                 specialDiscountRate ? Math.floor(specialDiscountRate * 100) : 0
               }
               style={{
