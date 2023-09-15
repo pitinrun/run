@@ -20,6 +20,10 @@ module.exports = {
   theme: {
     container: {
       center: true,
+      padding: {
+        DEFAULT: '0.5rem',
+        sm: '1.5rem',
+      },
     },
     screens: {
       // base: '0px',
@@ -28,6 +32,9 @@ module.exports = {
       lg: '1024px',
       xl: '1280px',
       '2xl': '1536px',
+    },
+    backgroundImage: {
+      'hero-tire': 'url("/assets/images/tire-hero.png")',
     },
   },
   purge: ['./app/**/*.tsx', './components/**/*.tsx'],

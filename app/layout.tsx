@@ -1,7 +1,8 @@
-import { FetchConfig } from 'http-react'
-import './globals.css'
-import Link from 'next/link'
-import Icon from 'bs-icon'
+import { FetchConfig } from 'http-react';
+import './globals.css';
+import AuthSession from 'components/common/auth-session';
+import { ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 function MainLayout({ children }) {
   return (
@@ -12,18 +13,28 @@ function MainLayout({ children }) {
           <meta name='description' content='A Starter with Next.js' />
         </head>
         <body>
-          <div className='p-3 sm:p-8'>{children}</div>
-          <Link
-            href='https://github.com/danybeltran/nextjs-typescript-and-mongodb'
-            target='_blank'
-            className='fixed bottom-2 left-2 btn btn-sm gap-x-2'
-          >
-            <Icon name='github' /> <span>Github</span>
-          </Link>
+          <div className=''>
+            <AuthSession>
+              <ToastContainer
+              // position="top-right"
+              // autoClose={5000}
+              // hideProgressBar={false}
+              // newestOnTop={false}
+              // closeOnClick
+              // rtl={false}
+              // pauseOnFocusLoss
+              // draggable
+              // pauseOnHover
+              // theme="light"
+              />
+              {children}
+              <ToastContainer />
+            </AuthSession>
+          </div>
         </body>
       </html>
     </FetchConfig>
-  )
+  );
 }
 
-export default MainLayout
+export default MainLayout;
