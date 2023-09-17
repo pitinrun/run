@@ -1,12 +1,19 @@
 // app/manage/users/register/page.tsx
 'use client';
 
-import axios from 'axios';
+import { createUserRequest } from '@/app/requests/user';
+import { IUser } from '@/src/types';
+import { isAxiosError } from 'axios';
 import { useState } from 'react';
+import DaumPostcodeEmbed, { type Address } from 'react-daum-postcode';
 import { toast } from 'react-toastify';
 
 export default function UserRegisterPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<
+    IUser & {
+      confirmPassword: string;
+    }
+  >({
     businessName: '',
     ownerName: '',
     password: '',
@@ -14,7 +21,8 @@ export default function UserRegisterPage() {
     userId: '',
     tel: '',
     email: '',
-    // businessAddress: '', // 주석 처리
+    businessAddress: null, // 주석 처리
+    businessAddressDetail: '',
   });
 
   const handleChange = e => {
@@ -33,14 +41,21 @@ export default function UserRegisterPage() {
       return;
     }
 
+    if (formData.password.length < 4) {
+      toast.error('비밀번호는 4자리 이상이어야 합니다.');
+      return;
+    }
+
     try {
-      const response = await axios.post('/api/users', {
-        ...formData,
-      });
+      await createUserRequest(formData);
       toast.success('성공적으로 등록되었습니다.');
-      console.log('Server Response:', response.data);
     } catch (error) {
-      toast.error(`에러 발생: ${error.response?.data || '알 수 없는 오류'}`);
+      console.log('$$ error', error);
+      if (isAxiosError(error)) {
+        toast.error(
+          `에러 발생: ${error.response?.data.message || '알 수 없는 오류'}`
+        );
+      }
     }
   };
 
@@ -53,66 +68,96 @@ export default function UserRegisterPage() {
           <input
             type='text'
             name='businessName'
-            className='w-full max-w-xs p-4 border rounded-md'
+            className='input w-full max-w-xs p-4 border rounded-md'
             placeholder='사업자명 입력'
+            required
             onChange={handleChange}
           />
           <h6>대표자명</h6>
           <input
             type='text'
-            className='w-full max-w-xs p-4 border rounded-md'
+            className='input w-full max-w-xs p-4 border rounded-md'
             placeholder='사업자명 입력'
             name='ownerName'
+            required
             onChange={handleChange}
           />
           <h6>비밀번호</h6>
           <input
             type='password'
-            className='w-full max-w-xs p-4 border rounded-md'
+            className='input w-full max-w-xs p-4 border rounded-md'
             placeholder='4자리 이상'
             name='password'
+            required
             onChange={handleChange}
           />
           <h6>비밀번호 확인</h6>
           <input
             type='password'
-            className='w-full max-w-xs p-4 border rounded-md'
+            className='input w-full max-w-xs p-4 border rounded-md'
             placeholder='비밀번호 재입력'
             name='confirmPassword'
+            required
             onChange={handleChange}
           />
           <h6>사업자번호</h6>
           <input
             type='text'
-            className='w-full max-w-xs p-4 border rounded-md'
+            className='input w-full max-w-xs p-4 border rounded-md'
             placeholder={`'-' 없이 숫자만 입력`}
             name='userId'
+            required
             onChange={handleChange}
           />
           <h6>담당자 휴대폰 번호</h6>
           <input
             type='tel'
-            className='w-full max-w-xs p-4 border rounded-md'
+            className='input w-full max-w-xs p-4 border rounded-md'
             placeholder={`'-' 없이 숫자만 입력`}
             name='tel'
+            required
             onChange={handleChange}
           />
           <h6>이메일</h6>
           <input
             type='email'
-            className='w-full max-w-xs p-4 border rounded-md'
+            className='input w-full max-w-xs p-4 border rounded-md'
             placeholder={`이메일 입력`}
             name='email'
+            required
             onChange={handleChange}
           />
-          {/* <h6>사업장 주소</h6>
-          <input
-            type='text'
-            className='w-full max-w-xs p-4 border rounded-md'
-            placeholder={`이메일 입력`}
-            name='businessAddress'
-            onChange={handleChange}
-          /> */}
+          <div className='mb-4'>
+            <h6>사업장 주소</h6>
+            <input
+              type='text'
+              className='input w-full max-w-xs p-4 border rounded-md mr-4'
+              placeholder={`사업장 주소 입력`}
+              disabled
+              required
+              // name='businessAddress'
+              // onChange={handleChange}
+              value={formData.businessAddress?.address || ''}
+            />
+            {/* businessAddressDetail */}
+            <input
+              type='text'
+              className='input w-full max-w-xs p-4 border rounded-md'
+              placeholder={`상세 주소 입력`}
+              name='businessAddressDetail'
+              onChange={handleChange}
+            />
+          </div>
+          <DaumPostcodeEmbed
+            autoClose={false}
+            className='h-96'
+            onComplete={data => {
+              setFormData(prev => ({
+                ...prev,
+                businessAddress: data,
+              }));
+            }}
+          />
         </div>
         <div className='text-right'>
           <button className='btn btn-primary w-full max-w-xs'>등록</button>

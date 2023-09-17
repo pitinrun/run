@@ -15,6 +15,17 @@ const generatePassword = (password: string) => {
   return hashedPassword;
 };
 
+export async function GET() {
+  try {
+    const users = await User.find();
+    return NextResponse.json(users.reverse());
+  } catch {
+    return NextResponse.json('error', {
+      status: 500,
+    });
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body: IUserDocument = await req.json();
@@ -32,6 +43,16 @@ export async function POST(req: Request) {
     return NextResponse.json(saved);
   } catch (error) {
     console.error('!! ERROR', error);
+    if (error.code === 11000) {
+      return NextResponse.json(
+        {
+          message: '이미 존재하는 아이디입니다.',
+        },
+        {
+          status: 400,
+        }
+      );
+    }
     return NextResponse.json('error', {
       status: 500,
     });

@@ -1,30 +1,43 @@
-const dummyUsers = [
-  {
-    id: '1',
-    company: '삼호타이어',
-    phone: '010-1234-1234',
-    email: 'alfkzmf@namver.com',
-    address: '서울시 강남구'
-  },
-  {
-    id: '2',
-    company: '삼호타이어',
-    phone: '010-1234-1234',
-    email: 'alfkzmf@namver.com',
-    address: '서울시 강남구'
-  }
-]
+import { User } from '@/src/models/user';
+import { IUser } from '@/src/types';
 
-export default function UserPage() {
+export default async function UserPage({
+  params,
+  searchParams,
+}: {
+  params: { slug: string };
+  searchParams: { businessName: string };
+}) {
+  const getUser = async () => {
+    let users = [] as IUser[];
+    if (searchParams.businessName) {
+      users = await User.find({
+        businessName: {
+          $regex: searchParams.businessName,
+        },
+      });
+    } else users = await User.find({});
+
+    return users;
+  };
+
+  const users = await getUser();
+
   return (
     <div className='container'>
       <h1 className='text-3xl font-bold mb-2'>회원 관리</h1>
       <div className='text-right mb-4'>
-        <input
-          type='text'
-          placeholder='사업자명'
-          className='input input-bordered w-full max-w-xs'
-        />
+        <form action='/manage/users' method='GET'>
+          <input
+            type='text'
+            placeholder='사업자명'
+            className='input input-bordered w-full max-w-xs mr-2'
+            name='businessName'
+            defaultValue={searchParams?.businessName ?? ''}
+            autoFocus
+          />
+          <input type='submit' value='검색' className='btn btn-primary' />
+        </form>
       </div>
       <div className='overflow-x-auto'>
         <table className='table w-full'>
@@ -38,20 +51,22 @@ export default function UserPage() {
             </tr>
           </thead>
           <tbody>
-            {/* row 1 */}
-            {dummyUsers.map(user => {
+            {users.map(user => {
               return (
-                <tr key={`user-${user.id}`}>
-                  <td>{user.company}</td>
-                  <td>{user.phone}</td>
+                <tr key={`user-${user}`}>
+                  <td>{user.businessName}</td>
+                  <td>{user.tel}</td>
                   <td>{user.email}</td>
-                  <td>{user.address}</td>
+                  <td>
+                    {user.businessAddress?.address +
+                      (user.businessAddressDetail ?? '')}
+                  </td>
                 </tr>
-              )
+              );
             })}
           </tbody>
         </table>
       </div>
     </div>
-  )
+  );
 }

@@ -1,3 +1,5 @@
+import { type Address } from 'react-daum-postcode';
+
 export const BRANDS = [
   '',
   '금호',
@@ -50,33 +52,34 @@ export interface IUser {
   userId: string; // NOTE: 기본적으로 사업자 번호
   tel: string;
   email: string;
-  businessAddress: Address;
+  businessAddress: Address | null;
+  businessAddressDetail: string;
 }
 
-export interface Address {
-  zonecode: { type: String; required: false };
-  address: { type: String; required: false };
-  addressEnglish: { type: String; required: false };
-  addressType: { type: String; required: false };
-  userSelectedType: { type: String; required: false };
-  noSelected: { type: String; required: false };
-  roadAddress: { type: String; required: false };
-  roadAddressEnglish: { type: String; required: false };
-  jibunAddress: { type: String; required: false };
-  jibunAddressEnglish: { type: String; required: false };
-  autoRoadAddress: { type: String; required: false };
-  autoRoadAddressEnglish: { type: String; required: false };
-  autoJibunAddress: { type: String; required: false };
-  autoJibunAddressEnglish: { type: String; required: false };
-  buildingCode: { type: String; required: false };
-  buildingName: { type: String; required: false };
-  apartment: { type: String; required: false };
-  sido: { type: String; required: false };
-  sigungu: { type: String; required: false };
-  sigunguCode: { type: String; required: false };
-  bname: { type: String; required: false };
-  bcode: { type: String; required: false };
-  roadname: { type: String; required: false };
-  roadnameCode: { type: String; required: false };
-  zoneNo: { type: String; required: false };
-}
+// export interface IAddress {
+//   zonecode: { type: String; required: false };
+//   address: { type: String; required: false };
+//   addressEnglish: { type: String; required: false };
+//   addressType: { type: String; required: false };
+//   userSelectedType: { type: String; required: false };
+//   noSelected: { type: String; required: false };
+//   roadAddress: { type: String; required: false };
+//   roadAddressEnglish: { type: String; required: false };
+//   jibunAddress: { type: String; required: false };
+//   jibunAddressEnglish: { type: String; required: false };
+//   autoRoadAddress: { type: String; required: false };
+//   autoRoadAddressEnglish: { type: String; required: false };
+//   autoJibunAddress: { type: String; required: false };
+//   autoJibunAddressEnglish: { type: String; required: false };
+//   buildingCode: { type: String; required: false };
+//   buildingName: { type: String; required: false };
+//   apartment: { type: String; required: false };
+//   sido: { type: String; required: false };
+//   sigungu: { type: String; required: false };
+//   sigunguCode: { type: String; required: false };
+//   bname: { type: String; required: false };
+//   bcode: { type: String; required: false };
+//   roadname: { type: String; required: false };
+//   roadnameCode: { type: String; required: false };
+//   // zoneNo: { type: String; required: false };
+// }
