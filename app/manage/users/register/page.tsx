@@ -4,11 +4,13 @@
 import { createUserRequest } from '@/app/requests/user';
 import { IUser } from '@/src/types';
 import { isAxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import DaumPostcodeEmbed, { type Address } from 'react-daum-postcode';
 import { toast } from 'react-toastify';
 
 export default function UserRegisterPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState<
     IUser & {
       confirmPassword: string;
@@ -49,8 +51,10 @@ export default function UserRegisterPage() {
     try {
       await createUserRequest(formData);
       toast.success('성공적으로 등록되었습니다.');
+
+      router.push('/manage/users');
     } catch (error) {
-      console.log('$$ error', error);
+      console.error('!! ERROR', error);
       if (isAxiosError(error)) {
         toast.error(
           `에러 발생: ${error.response?.data.message || '알 수 없는 오류'}`
@@ -135,11 +139,8 @@ export default function UserRegisterPage() {
               placeholder={`사업장 주소 입력`}
               disabled
               required
-              // name='businessAddress'
-              // onChange={handleChange}
               value={formData.businessAddress?.address || ''}
             />
-            {/* businessAddressDetail */}
             <input
               type='text'
               className='input w-full max-w-xs p-4 border rounded-md'
