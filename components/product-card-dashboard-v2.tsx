@@ -16,13 +16,13 @@ const EmptyProducts = () => (
 );
 
 export default function ProductCardDashboard__V2({
-  selectedBrands = [],
+  selectedBrands = null,
   season = '',
   onlySpecialDiscount = false,
   sizeSearchKeyword = '',
   perPage = 10,
 }: {
-  selectedBrands?: BrandType[];
+  selectedBrands?: BrandType[] | null;
   season?: SeasonType | '';
   onlySpecialDiscount?: boolean;
   sizeSearchKeyword?: string;
@@ -48,7 +48,7 @@ export default function ProductCardDashboard__V2({
           `/api/product?${new URLSearchParams({
             page: page.toString(),
             perPage: perPage.toString(),
-            brands: selectedBrands.join(','),
+            brands: selectedBrands ? selectedBrands.join(',') : '', // NOTE: 배열 무한 호출 방지
             season,
             onlySpecialDiscount: onlySpecialDiscount.toString(),
             sizeSearchKeyword,

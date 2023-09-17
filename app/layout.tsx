@@ -2,7 +2,8 @@ import { FetchConfig } from 'http-react';
 import './globals.css';
 import AuthSession from 'components/common/auth-session';
 import { ToastContainer } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css";
+import 'react-toastify/dist/ReactToastify.css';
+import { LayoutProvider } from 'components/common/layout-provider';
 
 function MainLayout({ children }) {
   return (
@@ -15,20 +16,22 @@ function MainLayout({ children }) {
         <body>
           <div className=''>
             <AuthSession>
-              <ToastContainer
-              // position="top-right"
-              // autoClose={5000}
-              // hideProgressBar={false}
-              // newestOnTop={false}
-              // closeOnClick
-              // rtl={false}
-              // pauseOnFocusLoss
-              // draggable
-              // pauseOnHover
-              // theme="light"
-              />
-              {children}
-              <ToastContainer />
+              <LayoutProvider>
+                <ToastContainer
+                // position="top-right"
+                // autoClose={5000}
+                // hideProgressBar={false}
+                // newestOnTop={false}
+                // closeOnClick
+                // rtl={false}
+                // pauseOnFocusLoss
+                // draggable
+                // pauseOnHover
+                // theme="light"
+                />
+                {children}
+                <ToastContainer />
+              </LayoutProvider>
             </AuthSession>
           </div>
         </body>

@@ -1,3 +1,4 @@
+// app/api/posts/route.ts
 import Validate from 'next-api-validation'
 import { NextResponse } from 'next/server'
 import { Post, IPost } from '@/src/models'

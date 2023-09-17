@@ -44,12 +44,13 @@ export interface IProduct {
 }
 
 export interface IUser {
-  userId: string; // NOTE: 기본적으로 사업자 번호
-  password: string;
   businessName: string;
-  businessAddress: Address;
+  ownerName: string;
+  password: string;
+  userId: string; // NOTE: 기본적으로 사업자 번호
   tel: string;
   email: string;
+  businessAddress: Address;
 }
 
 export interface Address {
