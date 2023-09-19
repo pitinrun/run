@@ -22,11 +22,11 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/api/product/:path*',
-    '/api/user/:path*',
-    '/api/metadata/:path*',
-    '/',
-    '/products/:path*',
-    '/manage/:path*',
+    // '/api/product/:path*',
+    // '/api/user/:path*',
+    // '/api/metadata/:path*',
+    // '/',
+    // '/products/:path*',
+    // '/manage/:path*',
   ],
 };

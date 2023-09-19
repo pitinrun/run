@@ -58,7 +58,7 @@ const masterContents: ContentItemType[] = [
   },
   {
     name: '상품 관리',
-    href: '',
+    href: '/manage/product',
     icon: <ArchiveBoxIcon className='w-6 h-6 mr-4' />,
   },
   {
@@ -97,12 +97,14 @@ export default function NavigationBar({ role }: { role?: UserType['role'] }) {
       <div className='drawer-content'>
         <nav className='navbar bg-base-100 lg:px-16 px-2'>
           <div className='flex-1'>
-            <Image
-              src='/assets/images/run-logo.png'
-              alt='logo'
-              width={105}
-              height={40}
-            />
+            <Link href='/'>
+              <Image
+                src='/assets/images/run-logo.png'
+                alt='logo'
+                width={105}
+                height={40}
+              />
+            </Link>
           </div>
           <div className='flex-none'>
             <label htmlFor='my-drawer' className='btn btn-ghost btn-circle'>

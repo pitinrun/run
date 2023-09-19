@@ -1,56 +1,29 @@
 // src/models/user.ts
 import mongoose, { Document, model, Model, Schema } from 'mongoose';
-import { IUser } from '../types';
+import { IOrder } from '../types';
 
-export interface IUserDocument extends Document, IUser {}
-
-const UserSchema: Schema = new Schema(
+export interface IOrderDocument extends Document, IOrder {}
+// createdAt: Date;
+//   state: 1 | 2 | 3 | 4; // 1: 주문 확인중, 2: 배송 대기, 3: 배송중, 4: 배송완료
+//   products: {
+//     productCode: string;
+//     quantity: number;
+//   }[]
+const OrderSchema: Schema = new Schema(
   {
-    businessName: {
-      // 사업자 명
-      type: String,
+    state: {
+      type: Number, // 1: 주문 확인중, 2: 배송 대기, 3: 배송중, 4: 배송완료
       required: true,
     },
-    ownerName: {
-      // 대표자 이름
-      type: String,
+    products: {
+      type: [
+        {
+          productCode: String,
+          quantity: Number,
+          discountRate: Number,
+        },
+      ],
       required: true,
-    },
-    password: {
-      //비밀번호
-      type: String,
-      required: true,
-    },
-    userId: {
-      // 사업자 번호
-      type: String,
-      unique: true,
-      required: true,
-    },
-    tel: {
-      // 담당자 휴대폰 번호
-      type: String,
-      required: true,
-    },
-    email: {
-      // 이메일
-      type: String,
-      required: true,
-    },
-    businessAddress: {
-      // 사업장 주소
-      type: Object,
-      required: true,
-    },
-    businessAddressDetail: {
-      // 사업장 상세 주소
-      type: String,
-    },
-    role: {
-      // 역할
-      // 10: 관리자
-      // 9: 매니저
-      type: Number,
     },
   },
   {
@@ -58,5 +31,5 @@ const UserSchema: Schema = new Schema(
   }
 );
 
-export const User = (mongoose.models.User ||
-  model('User', UserSchema)) as Model<IUserDocument>;
+export const Order = (mongoose.models.Order ||
+  model('Order', OrderSchema)) as Model<IOrderDocument>;
