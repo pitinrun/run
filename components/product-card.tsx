@@ -1,5 +1,11 @@
+'use client';
 import { IProduct } from '@/src/types';
-import { convertNumberToKRW, getTotalStock } from '@/src/utils';
+import {
+  convertNumberToKRW,
+  convertNumberToPercent,
+  getTotalStock,
+} from '@/src/utils';
+import { useEffect, useState } from 'react';
 
 function DividerHorizon() {
   return (
@@ -28,7 +34,33 @@ export default function ProductCard({
   factoryPrice,
   specialDiscountRate,
   storages,
-}: IProduct) {
+  productCode,
+  onPurchaseClick,
+}: IProduct & {
+  onPurchaseClick?: ({
+    productCode,
+    quantity,
+    discountRate,
+  }: {
+    productCode: string;
+    quantity: number;
+    discountRate: number;
+  }) => void;
+}) {
+  const [quantity, setQuantity] = useState(0);
+  const [discountRate, setDiscountRate] = useState(
+    (specialDiscountRate ?? 0) * 100 || 0
+  );
+
+  const handlePurchaseClick = () => {
+    onPurchaseClick &&
+      onPurchaseClick({
+        productCode,
+        quantity,
+        discountRate,
+      });
+  };
+
   return (
     <div className='card border border-solid border-neutral-200'>
       <div
@@ -107,10 +139,10 @@ export default function ProductCard({
           <span className='text-xs sm:text-sm mr-2'>매입가</span>
           <br className='sm:hidden' />
           <span className='text-lg sm:text-3xl relative'>
-            {specialDiscountRate ? (
+            {discountRate ? (
               <>
                 {convertNumberToKRW(
-                  Math.round(factoryPrice * (1 - specialDiscountRate))
+                  Math.round(factoryPrice * (1 - discountRate / 100))
                 )}
                 원
                 <del className='absolute right-[-1.5rem] sm:right-0 text-sm sm:text-base text-neutral-400 font-normal bottom-[1.5rem] sm:bottom-[2rem]'>
@@ -128,6 +160,8 @@ export default function ProductCard({
             <input
               type='number'
               className='input input-xs input-bordered w-full mx-2 text-right'
+              value={quantity}
+              onChange={e => setQuantity(parseInt(e.target.value, 10))}
               style={{
                 maxWidth: '5rem',
               }}
@@ -140,10 +174,9 @@ export default function ProductCard({
             <input
               type='number'
               className={`input input-xs input-bordered w-full mx-2 text-right`}
+              value={discountRate}
+              onChange={e => setDiscountRate(parseInt(e.target.value, 10))}
               disabled={!!specialDiscountRate}
-              defaultValue={
-                specialDiscountRate ? Math.floor(specialDiscountRate * 100) : 0
-              }
               style={{
                 maxWidth: '5rem',
               }}
@@ -151,11 +184,16 @@ export default function ProductCard({
             />
             <span>%</span>
           </div>
-          <div>
-            <button className='btn btn-sm btn-neutral w-full mt-4'>
-              구매하기
-            </button>
-          </div>
+          {onPurchaseClick && (
+            <div>
+              <button
+                className='btn btn-sm btn-neutral w-full mt-4'
+                onClick={handlePurchaseClick}
+              >
+                구매하기
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

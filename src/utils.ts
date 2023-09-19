@@ -38,3 +38,13 @@ export const convertNumberToKRW = (price: number) => {
 
   return `${price.toLocaleString()}`;
 };
+
+export const convertNumberToPercent = (percent: number) => {
+  return Math.round(percent * 100);
+};
+
+export const base64ToJSON = (base64: string) =>
+  JSON.parse(Buffer.from(base64, 'base64').toString());
+
+export const JSONToBase64 = (json: any) =>
+  Buffer.from(JSON.stringify(json)).toString('base64');

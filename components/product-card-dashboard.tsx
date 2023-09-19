@@ -12,9 +12,9 @@ export default function ProductCardDashboard({
   return (
     <div>
       <div className='grid grid-cols-2 gap-4'>
-        {products.map((product, index) => (
-          <ProductCard key={index} {...product} />
-        ))}
+        {/* {products.map((product, index) => (
+          // <ProductCard key={index} {...product} />
+        ))} */}
       </div>
     </div>
   );

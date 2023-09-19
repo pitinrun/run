@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import ProductCard from './product-card';
 import axios from 'axios';
 import { BrandType, IProduct, SeasonType } from '@/src/types';
+import OrderDialog from './products/order-dialog';
+import { JSONToBase64, base64ToJSON } from '@/src/utils';
+import { toast } from 'react-toastify';
 
 const EmptyProducts = () => (
   <div className='card border border-solid border-neutral-200'>
@@ -32,6 +35,7 @@ export default function ProductCardDashboard__V2({
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
   useEffect(() => {
     setProducts([]);
@@ -86,12 +90,47 @@ export default function ProductCardDashboard__V2({
     );
   }
 
+  function onPurchaseClick({
+    productCode,
+    quantity,
+    discountRate,
+  }: {
+    productCode: string;
+    quantity: number;
+    discountRate: number;
+  }) {
+    // Add to wishlist without duplication
+    const wishlistBase64 = localStorage.getItem('wishlist');
+    const wishlist = wishlistBase64 ? base64ToJSON(wishlistBase64) : [];
+
+    if (wishlist.some((item: any) => item.productCode === productCode)) {
+      toast.error('이미 위시리스트에 추가된 상품입니다.');
+      return;
+    }
+
+    const wishlistJson = JSONToBase64([
+      ...wishlist,
+      {
+        productCode,
+        quantity,
+        discountRate,
+      },
+    ]);
+    localStorage.setItem('wishlist', wishlistJson);
+
+    setOrderDialogOpen(true);
+  }
+
   return (
     <div>
       {!isLoading && products.length <= 0 && <EmptyProducts />}
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
         {products.map((product, index) => (
-          <ProductCard key={index} {...product} />
+          <ProductCard
+            key={`product-card-${index}-${product.pattern}`}
+            onPurchaseClick={onPurchaseClick}
+            {...product}
+          />
         ))}
       </div>
       {page < maxPage && (
@@ -102,6 +141,12 @@ export default function ProductCardDashboard__V2({
           + 더보기
         </button>
       )}
+      <OrderDialog
+        open={orderDialogOpen}
+        onClose={() => {
+          setOrderDialogOpen(false);
+        }}
+      />
     </div>
   );
 }
