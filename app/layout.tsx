@@ -4,31 +4,27 @@ import AuthSession from 'components/common/auth-session';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LayoutProvider } from 'components/common/layout-provider';
+import { getServerSession } from 'next-auth';
+import { authOptions } from './api/auth/[...nextauth]/route';
+import { getUser } from '@/src/services/user';
 
-function MainLayout({ children }) {
+async function MainLayout({ children }) {
+  const data = await getServerSession(authOptions);
+
+  const userData = data ? await getUser(data.user.id) : null;
+
   return (
     <FetchConfig baseUrl='/api'>
       <html data-theme='light'>
         <head>
-          <title>Next.js starter</title>
+          <title>Run</title>
           <meta name='description' content='A Starter with Next.js' />
         </head>
         <body>
           <div className=''>
             <AuthSession>
-              <LayoutProvider>
-                <ToastContainer
-                // position="top-right"
-                // autoClose={5000}
-                // hideProgressBar={false}
-                // newestOnTop={false}
-                // closeOnClick
-                // rtl={false}
-                // pauseOnFocusLoss
-                // draggable
-                // pauseOnHover
-                // theme="light"
-                />
+              <LayoutProvider role={userData?.role}>
+                <ToastContainer />
                 {children}
                 <ToastContainer />
               </LayoutProvider>

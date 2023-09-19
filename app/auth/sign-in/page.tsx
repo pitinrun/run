@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { useSession, signOut, signIn, getSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -31,7 +31,9 @@ export default function AuthSignInPage() {
       toast.error(response.error);
     } else {
       toast.success(`${userId}님 환영합니다!`);
-      router.push(response?.url || '/');
+      // router.push(response?.url || '/');
+      // NOTE: Navigation role issue
+      window.location.href = response?.url || '/';
     }
   };
 
@@ -47,7 +49,9 @@ export default function AuthSignInPage() {
             height={50}
             className='mb-4'
           />
-          <div className='mb-4 text-neutral-400'>서비스 이용을 위해 로그인을 해주세요.</div>
+          <div className='mb-4 text-neutral-400'>
+            서비스 이용을 위해 로그인을 해주세요.
+          </div>
           <div className='mb-4'>
             <div className='mb-4'>
               <h6 className='mb-1'>사업자번호</h6>

@@ -45,6 +45,7 @@ export interface IProduct {
   }[];
 }
 
+export type RoleType = 10 | 9;
 export interface IUser {
   businessName: string;
   ownerName: string;
@@ -54,7 +55,10 @@ export interface IUser {
   email: string;
   businessAddress: Address | null;
   businessAddressDetail: string;
+  role?: RoleType;
 }
+
+export type UserType = Omit<IUser, 'password'>;
 
 // export interface IAddress {
 //   zonecode: { type: String; required: false };

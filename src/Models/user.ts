@@ -46,6 +46,12 @@ const UserSchema: Schema = new Schema(
       // 사업장 상세 주소
       type: String,
     },
+    role: {
+      // 역할
+      // 10: 관리자
+      // 9: 매니저
+      type: Number,
+    },
   },
   {
     timestamps: true,
