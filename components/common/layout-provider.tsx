@@ -4,14 +4,14 @@
 // Use usePathname for catching route name.
 import { usePathname } from 'next/navigation';
 import NavigationBar from './navigation-bar';
-import { RoleType } from '@/src/types';
+import { UserType } from '@/src/types';
 
 export const LayoutProvider = ({
   children,
   role,
 }: {
   children: React.ReactNode;
-  role?: RoleType;
+  role?: UserType['role'];
 }) => {
   const pathname = usePathname();
   const isShowNav = pathname !== '/auth/sign-in';

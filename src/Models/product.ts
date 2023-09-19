@@ -1,5 +1,5 @@
 import mongoose, { Document, model, Model, Schema } from 'mongoose';
-import { BRANDS, IProduct, SEASONS } from '../types';
+import { BRANDS, type IProduct, SEASONS } from '../types';
 
 export interface IProductDocument extends Document, IProduct {}
 

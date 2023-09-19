@@ -1,6 +1,5 @@
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
 import HeadLabel from './head-label';
-import { IProduct } from '@/src/models/product';
 
 function NoticeItem() {
   return (
