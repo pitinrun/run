@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from 'src/utils';
 import { google } from 'googleapis';
-import { client_email, private_key } from '.meta/google-credentials.json';
+// import { client_email, private_key } from '.meta/google-credentials.json';
 import { toColumnName } from './utils';
 import { dropAndBulkInsertProducts } from '@/src/services/product';
 import { updateStorageNames } from '@/src/services/metadata';
 import { IProduct } from '@/src/types';
 
 connectToDatabase();
+
+const credential = JSON.parse(
+  Buffer.from(process.env.GOOGLE_CREDENTIALS ?? '', 'base64').toString()
+);
 
 const START_CELL = 'A6';
 
@@ -171,9 +175,12 @@ async function getSheetRange(
   spreadsheetId: string = SPREAD_SHEET_ID ?? '',
   sheetName: string = SPREAD_SHEET_PRODUCT_NAME ?? ''
 ) {
-  const authorize = new google.auth.JWT(client_email, undefined, private_key, [
-    'https://www.googleapis.com/auth/spreadsheets',
-  ]);
+  const authorize = new google.auth.JWT(
+    credential.client_email,
+    undefined,
+    credential.private_key,
+    ['https://www.googleapis.com/auth/spreadsheets']
+  );
 
   const googleSheet = google.sheets({
     version: 'v4',
@@ -215,9 +222,12 @@ async function getSpreadSheetData(
   startCell: string,
   endCell: string
 ) {
-  const authorize = new google.auth.JWT(client_email, undefined, private_key, [
-    'https://www.googleapis.com/auth/spreadsheets',
-  ]);
+  const authorize = new google.auth.JWT(
+    credential.client_email,
+    undefined,
+    credential.private_key,
+    ['https://www.googleapis.com/auth/spreadsheets']
+  );
   const googleSheet = google.sheets({
     version: 'v4',
     auth: authorize,
