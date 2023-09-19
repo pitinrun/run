@@ -104,7 +104,9 @@ export default function ProductCardDashboard__V2({
     const wishlist = wishlistBase64 ? base64ToJSON(wishlistBase64) : [];
 
     if (wishlist.some((item: any) => item.productCode === productCode)) {
+      // If the product is already in the wishlist, just open the order dialog
       toast.error('이미 위시리스트에 추가된 상품입니다.');
+      setOrderDialogOpen(true);
       return;
     }
 
