@@ -268,9 +268,8 @@ export async function POST() {
     });
   } catch (error) {
     if (error instanceof Error) {
-      console.error('!! ERROR: ', error.message);
+      console.error('!! ERROR: ', error);
       return NextResponse.json({
-        status: 500,
         message: error.message,
       });
     }

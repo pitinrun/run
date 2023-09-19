@@ -18,7 +18,7 @@ export const connectToDatabase = async () => {
     return;
   }
 
-  mongoose.set('debug', true);
+  if (process.env.NODE_ENV === 'development') mongoose.set('debug', true);
 
   if (MONGO_URI) {
     const db = await mongoose.connect(MONGO_URI, options);
