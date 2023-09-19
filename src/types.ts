@@ -45,7 +45,10 @@ export interface IProduct {
   }[];
 }
 
-export type RoleType = 10 | 9;
+export interface IOrder {
+  
+}
+
 export interface IUser {
   businessName: string;
   ownerName: string;
@@ -55,7 +58,7 @@ export interface IUser {
   email: string;
   businessAddress: Address | null;
   businessAddressDetail: string;
-  role?: RoleType;
+  role?: 10 | 9; // NOTE: 10: 관리자, 9: 매니저
 }
 
 export type UserType = Omit<IUser, 'password'>;
