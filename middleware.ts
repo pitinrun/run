@@ -10,6 +10,13 @@ export async function middleware(request: NextRequest) {
   if (!token) {
     return NextResponse.redirect(new URL('/auth/sign-in', request.url));
   }
+
+  if (request.nextUrl.pathname.startsWith('/manage')) {
+    if (!token.role) {
+      return NextResponse.redirect(new URL('/403', request.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
