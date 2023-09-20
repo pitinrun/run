@@ -2,7 +2,7 @@
 'use client';
 
 import { IProduct, IWishListItem } from '@/src/types';
-import { JSONToBase64, base64ToJSON } from '@/src/utils';
+import { JSONToBase64, base64ToJSON, roundUpToHundred } from '@/src/utils';
 import axios, { isAxiosError } from 'axios';
 import ConfirmDialog from 'components/common/confirm-dialog';
 import ProductCard from 'components/product-card';
@@ -84,6 +84,65 @@ export default function WishListPage({}) {
     setWishlist(newWishlist);
   };
 
+  const handleQuantityChange = (productCode: string, quantity: number) => {
+    const wishlistBase64 = localStorage.getItem('wishlist');
+    const localStorageWishlist = (
+      wishlistBase64 ? base64ToJSON(wishlistBase64) : []
+    ) as WishListItemWithProduct[];
+
+    const newWishlist = localStorageWishlist.map(item => {
+      if (item.productCode === productCode) {
+        item.quantity = quantity;
+      }
+      return item;
+    });
+
+    localStorage.setItem('wishlist', JSONToBase64(newWishlist));
+
+    const products = wishlist.map(item => item.product) as IProduct[]; // NOTE: product가 undefined일 수 있으므로, 타입 단언을 해줍니다.
+    injectProduct(localStorageWishlist, products);
+
+    // 새로운 배열로 상태를 업데이트
+    setWishlist(newWishlist);
+  };
+
+  const handleDiscountRateChange = (
+    productCode: string,
+    discountRate: number
+  ) => {
+    const wishlistBase64 = localStorage.getItem('wishlist');
+    const localStorageWishlist = (
+      wishlistBase64 ? base64ToJSON(wishlistBase64) : []
+    ) as WishListItemWithProduct[];
+
+    const newWishlist = localStorageWishlist.map(item => {
+      if (item.productCode === productCode) {
+        item.discountRate = discountRate / 100;
+      }
+      return item;
+    });
+
+    localStorage.setItem('wishlist', JSONToBase64(newWishlist));
+
+    const products = wishlist.map(item => item.product) as IProduct[]; // NOTE: product가 undefined일 수 있으므로, 타입 단언을 해줍니다.
+    injectProduct(localStorageWishlist, products);
+
+    // 새로운 배열로 상태를 업데이트
+    setWishlist(newWishlist);
+  };
+
+  const getTotalPrice = () => {
+    return wishlist.reduce((acc, cur) => {
+      if (!cur.product) return acc;
+
+      const value = roundUpToHundred(
+        cur.quantity * (cur.product?.factoryPrice * (1 - cur.discountRate))
+      );
+
+      return acc + value;
+    }, 0);
+  };
+
   return (
     <div className='container'>
       <div className='flex justify-between items-center mb-4'>
@@ -105,6 +164,8 @@ export default function WishListPage({}) {
               key={wishlistItem.productCode}
               defaultQuantity={wishlistItem.quantity}
               defaultDiscountRate={wishlistItem.discountRate}
+              onChangeQuantity={handleQuantityChange}
+              onChangeDiscountRate={handleDiscountRateChange}
               onRemoveWishlistClick={() => {
                 focusProductCode = wishlistItem.productCode;
                 setOpenRemoveItemDialog(true);
@@ -115,6 +176,20 @@ export default function WishListPage({}) {
         })}
       </div>
       <div className='divider' />
+      <div>
+        <div>
+          <span>총 수량</span>
+          <span>
+            {wishlist.reduce((acc, cur) => {
+              return acc + cur.quantity;
+            }, 0)}
+          </span>
+        </div>
+        <div>
+          <span>예상 매입가</span>
+          <span>{getTotalPrice()}</span>
+        </div>
+      </div>
       <ConfirmDialog
         title='장바구니 상품 지우기'
         open={openRemoveItemDialog}

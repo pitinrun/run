@@ -32,9 +32,13 @@ export const getTotalStock = (storages: IProduct['storages']) =>
     return acc + currentValue.stock;
   }, 0);
 
+export const roundUpToHundred = (num: number) => {
+  return Math.ceil(num / 100) * 100;
+}
+
 export const convertNumberToKRW = (price: number) => {
   // 10원 단위로 올림 처리
-  price = Math.ceil(price / 100) * 100;
+  price = roundUpToHundred(price);
 
   return `${price.toLocaleString()}`;
 };

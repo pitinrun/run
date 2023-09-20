@@ -23,8 +23,8 @@ const displaySeasonMap = {
 type ProductCardProps = {
   defaultQuantity?: number;
   defaultDiscountRate?: number;
-  onChangeQuantity?: (quantity: number) => void;
-  onChangeDiscountRate?: (discountRate: number) => void;
+  onChangeQuantity?: (productCode: string, quantity: number) => void;
+  onChangeDiscountRate?: (productCode: string, discountRate: number) => void;
   onRemoveWishlistClick?: (productCode: string) => void;
   onPurchaseClick?: ({
     productCode,
@@ -84,19 +84,22 @@ export default function ProductCard({
     if (value < 1) return;
 
     setQuantity(value);
-    onChangeQuantity && onChangeQuantity(value);
+    onChangeQuantity && onChangeQuantity(productCode, value);
   };
 
   const handleDiscountRateChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = parseInt(event.target.value, 10);
-
+    if (!value) {
+      setDiscountRate(0);
+      return;
+    }
     // NOTE: value가 0보다 작거나 100보다 크면, 무시합니다.
     if (value < 0 || value > 100) return;
 
     setDiscountRate(value);
-    onChangeDiscountRate && onChangeDiscountRate(value);
+    onChangeDiscountRate && onChangeDiscountRate(productCode, value);
   };
 
   return (
