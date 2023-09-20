@@ -6,6 +6,7 @@ import { BrandType, IProduct, SeasonType } from '@/src/types';
 import OrderDialog from './products/order-dialog';
 import { JSONToBase64, base64ToJSON } from '@/src/utils';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 const EmptyProducts = () => (
   <div className='card border border-solid border-neutral-200'>
@@ -31,6 +32,8 @@ export default function ProductCardDashboard__V2({
   sizeSearchKeyword?: string;
   perPage?: number;
 }) {
+  const router = useRouter();
+
   const [products, setProducts] = useState<IProduct[]>([]);
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(0);
@@ -114,8 +117,8 @@ export default function ProductCardDashboard__V2({
       ...wishlist,
       {
         productCode,
-        quantity,
-        discountRate,
+        quantity: quantity < 1 ? 1 : quantity,
+        discountRate: discountRate < 0 ? 0 : discountRate / 100,
       },
     ]);
     localStorage.setItem('wishlist', wishlistJson);
@@ -131,6 +134,7 @@ export default function ProductCardDashboard__V2({
           <ProductCard
             key={`product-card-${index}-${product.pattern}`}
             onPurchaseClick={onPurchaseClick}
+            defaultQuantity={1}
             {...product}
           />
         ))}
@@ -145,6 +149,10 @@ export default function ProductCardDashboard__V2({
       )}
       <OrderDialog
         open={orderDialogOpen}
+        onConfirm={() => {
+          router.push('/wishlist');
+          setOrderDialogOpen(false);
+        }}
         onClose={() => {
           setOrderDialogOpen(false);
         }}

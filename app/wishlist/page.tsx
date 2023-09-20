@@ -39,6 +39,8 @@ export default function WishListPage({}) {
   const [wishlist, setWishlist] = useState<WishListItemWithProduct[]>([]);
   const [openRemoveItemDialog, setOpenRemoveItemDialog] = useState(false);
   const [openRemoveAllDialog, setOpenRemoveAllDialog] = useState(false);
+  const [totalQuantity, setTotalQuantity] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
     const wishlistBase64 = localStorage.getItem('wishlist');
@@ -59,7 +61,6 @@ export default function WishListPage({}) {
         }
       }
     }
-    console.log('$$ run useEffect');
     fetchWishlist();
   }, []);
 
@@ -102,6 +103,8 @@ export default function WishListPage({}) {
           return (
             <ProductCard
               key={wishlistItem.productCode}
+              defaultQuantity={wishlistItem.quantity}
+              defaultDiscountRate={wishlistItem.discountRate}
               onRemoveWishlistClick={() => {
                 focusProductCode = wishlistItem.productCode;
                 setOpenRemoveItemDialog(true);
@@ -111,6 +114,7 @@ export default function WishListPage({}) {
           );
         })}
       </div>
+      <div className='divider' />
       <ConfirmDialog
         title='장바구니 상품 지우기'
         open={openRemoveItemDialog}
@@ -129,6 +133,7 @@ export default function WishListPage({}) {
         onConfirm={() => {
           localStorage.removeItem('wishlist');
           setWishlist([]);
+          setOpenRemoveAllDialog(false);
         }}
         open={openRemoveAllDialog}
         onClose={() => {

@@ -21,6 +21,8 @@ const displaySeasonMap = {
 };
 
 type ProductCardProps = {
+  defaultQuantity?: number;
+  defaultDiscountRate?: number;
   onRemoveWishlistClick?: (productCode: string) => void;
   onPurchaseClick?: ({
     productCode,
@@ -48,12 +50,14 @@ export default function ProductCard({
   specialDiscountRate,
   storages,
   productCode,
+  defaultQuantity,
+  defaultDiscountRate,
   onPurchaseClick,
   onRemoveWishlistClick,
 }: ProductCardProps) {
-  const [quantity, setQuantity] = useState(0);
+  const [quantity, setQuantity] = useState(defaultQuantity ?? 0);
   const [discountRate, setDiscountRate] = useState(
-    (specialDiscountRate ?? 0) * 100 || 0
+    (specialDiscountRate ?? defaultDiscountRate ?? 0) * 100 || 0
   );
 
   const handlePurchaseClick = () => {
@@ -146,15 +150,20 @@ export default function ProductCard({
             {discountRate ? (
               <>
                 {convertNumberToKRW(
-                  Math.round(factoryPrice * (1 - discountRate / 100))
+                  Math.round(factoryPrice * (1 - discountRate / 100) * quantity)
                 )}
                 원
                 <del className='absolute right-[-1.5rem] sm:right-0 text-sm sm:text-base text-neutral-400 font-normal bottom-[1.5rem] sm:bottom-[2rem]'>
-                  {convertNumberToKRW(Math.round(factoryPrice)).split(' ')[0]}원
+                  {
+                    convertNumberToKRW(
+                      Math.round(factoryPrice * quantity)
+                    ).split(' ')[0]
+                  }
+                  원
                 </del>
               </>
             ) : (
-              <>{convertNumberToKRW(Math.round(factoryPrice))}원</>
+              <>{convertNumberToKRW(Math.round(factoryPrice * quantity))}원</>
             )}
           </span>
         </div>
@@ -165,11 +174,20 @@ export default function ProductCard({
               type='number'
               className='input input-xs input-bordered w-full mx-2 text-right'
               value={quantity}
-              onChange={e => setQuantity(parseInt(e.target.value, 10))}
+              onChange={e => {
+                const value = parseInt(e.target.value, 10);
+                if (!value) {
+                  setQuantity(1);
+                  return;
+                }
+                if (value < 1) return;
+                setQuantity(value);
+              }}
               style={{
                 maxWidth: '5rem',
               }}
-              placeholder='0'
+              placeholder='1'
+              min={1}
             />
             <span>개</span>
           </div>
@@ -179,12 +197,18 @@ export default function ProductCard({
               type='number'
               className={`input input-xs input-bordered w-full mx-2 text-right`}
               value={discountRate}
-              onChange={e => setDiscountRate(parseInt(e.target.value, 10))}
+              onChange={e => {
+                const value = parseInt(e.target.value, 10);
+                if (value < 0 || value > 100) return;
+                setDiscountRate(value);
+              }}
               disabled={!!specialDiscountRate}
               style={{
                 maxWidth: '5rem',
               }}
               placeholder='0'
+              min={0}
+              max={100}
             />
             <span>%</span>
           </div>

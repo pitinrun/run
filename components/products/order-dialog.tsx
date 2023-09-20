@@ -1,8 +1,10 @@
 export default function OrderDialog({
   open = false,
+  onConfirm = () => {},
   onClose = () => {},
 }: {
   open?: boolean;
+  onConfirm?: () => void;
   onClose?: () => void;
 }) {
   const modalClass = open ? 'modal modal-open' : 'modal';
@@ -22,7 +24,7 @@ export default function OrderDialog({
           <button className='btn flex-1' onClick={onClose}>
             더 둘러보기
           </button>
-          <button className='btn flex-1 btn-primary' onClick={onClose}>
+          <button className='btn flex-1 btn-primary' onClick={onConfirm}>
             장바구니
           </button>
           {/* </form> */}
