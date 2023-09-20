@@ -20,6 +20,19 @@ const displaySeasonMap = {
   ERROR: '-',
 };
 
+type ProductCardProps = {
+  onRemoveWishlistClick?: (productCode: string) => void;
+  onPurchaseClick?: ({
+    productCode,
+    quantity,
+    discountRate,
+  }: {
+    productCode: string;
+    quantity: number;
+    discountRate: number;
+  }) => void;
+} & IProduct;
+
 export default function ProductCard({
   brand,
   pattern,
@@ -36,17 +49,8 @@ export default function ProductCard({
   storages,
   productCode,
   onPurchaseClick,
-}: IProduct & {
-  onPurchaseClick?: ({
-    productCode,
-    quantity,
-    discountRate,
-  }: {
-    productCode: string;
-    quantity: number;
-    discountRate: number;
-  }) => void;
-}) {
+  onRemoveWishlistClick,
+}: ProductCardProps) {
   const [quantity, setQuantity] = useState(0);
   const [discountRate, setDiscountRate] = useState(
     (specialDiscountRate ?? 0) * 100 || 0
@@ -191,6 +195,16 @@ export default function ProductCard({
                 onClick={handlePurchaseClick}
               >
                 구매하기
+              </button>
+            </div>
+          )}
+          {onRemoveWishlistClick && (
+            <div>
+              <button
+                className='btn btn-sm btn-neutral w-full mt-4'
+                onClick={() => onRemoveWishlistClick(productCode)}
+              >
+                삭제하기
               </button>
             </div>
           )}
