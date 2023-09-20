@@ -45,6 +45,12 @@ export interface IProduct {
   }[];
 }
 
+export interface IWishListItem {
+  productCode: string;
+  quantity: number;
+  discountRate: number;
+}
+
 export interface IOrder {
   createdAt: Date;
   state: 1 | 2 | 3 | 4; // 1: 주문 확인중, 2: 배송 대기, 3: 배송중, 4: 배송완료
@@ -52,7 +58,7 @@ export interface IOrder {
     productCode: string;
     quantity: number;
     discountRate: number;
-  }[]
+  }[];
 }
 
 export interface IUser {

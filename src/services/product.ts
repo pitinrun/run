@@ -1,6 +1,14 @@
 import { Product } from '../models/product';
 import { IProduct } from '../types';
 
+export const getProductsByProductCodes = async (productCodes: string[]) => {
+  return Product.find({
+    productCode: {
+      $in: productCodes,
+    },
+  });
+};
+
 export const dropAndBulkInsertProducts = async (products: IProduct[]) => {
   try {
     await Product.deleteMany({});

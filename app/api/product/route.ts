@@ -1,6 +1,4 @@
 import { Product } from '@/src/models/product';
-import Validate from 'next-api-validation';
-import { Post, IPost } from '@/src/models';
 import { connectToDatabase } from 'src/utils';
 import { NextResponse } from 'next/server';
 
