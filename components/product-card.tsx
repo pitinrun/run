@@ -23,6 +23,8 @@ const displaySeasonMap = {
 type ProductCardProps = {
   defaultQuantity?: number;
   defaultDiscountRate?: number;
+  onChangeQuantity?: (quantity: number) => void;
+  onChangeDiscountRate?: (discountRate: number) => void;
   onRemoveWishlistClick?: (productCode: string) => void;
   onPurchaseClick?: ({
     productCode,
@@ -52,6 +54,8 @@ export default function ProductCard({
   productCode,
   defaultQuantity,
   defaultDiscountRate,
+  onChangeDiscountRate,
+  onChangeQuantity,
   onPurchaseClick,
   onRemoveWishlistClick,
 }: ProductCardProps) {
@@ -67,6 +71,32 @@ export default function ProductCard({
         quantity,
         discountRate,
       });
+  };
+
+  const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value, 10);
+    // NOTE: value가 0이면, 1로 바꿔줍니다.
+    if (!value) {
+      setQuantity(1);
+      return;
+    }
+    // NOTE: value가 1보다 작으면, 무시합니다.
+    if (value < 1) return;
+
+    setQuantity(value);
+    onChangeQuantity && onChangeQuantity(value);
+  };
+
+  const handleDiscountRateChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = parseInt(event.target.value, 10);
+
+    // NOTE: value가 0보다 작거나 100보다 크면, 무시합니다.
+    if (value < 0 || value > 100) return;
+
+    setDiscountRate(value);
+    onChangeDiscountRate && onChangeDiscountRate(value);
   };
 
   return (
@@ -174,15 +204,7 @@ export default function ProductCard({
               type='number'
               className='input input-xs input-bordered w-full mx-2 text-right'
               value={quantity}
-              onChange={e => {
-                const value = parseInt(e.target.value, 10);
-                if (!value) {
-                  setQuantity(1);
-                  return;
-                }
-                if (value < 1) return;
-                setQuantity(value);
-              }}
+              onChange={handleQuantityChange}
               style={{
                 maxWidth: '5rem',
               }}
@@ -197,11 +219,7 @@ export default function ProductCard({
               type='number'
               className={`input input-xs input-bordered w-full mx-2 text-right`}
               value={discountRate}
-              onChange={e => {
-                const value = parseInt(e.target.value, 10);
-                if (value < 0 || value > 100) return;
-                setDiscountRate(value);
-              }}
+              onChange={handleDiscountRateChange}
               disabled={!!specialDiscountRate}
               style={{
                 maxWidth: '5rem',
