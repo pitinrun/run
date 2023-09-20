@@ -11,6 +11,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/sign-in', request.url));
   }
 
+  if (request.nextUrl.pathname.startsWith('/auth/sign-in')) {
+    if (token) {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  }
+
   if (request.nextUrl.pathname.startsWith('/manage')) {
     if (!token.role) {
       return NextResponse.redirect(new URL('/403', request.url));
@@ -26,6 +32,7 @@ export const config = {
     '/api/user/:path*',
     '/api/metadata/:path*',
     '/',
+    '/auth/sign-in',
     '/products/:path*',
     '/manage/:path*',
     '/wishlist/:path*',
