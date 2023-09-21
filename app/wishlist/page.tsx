@@ -49,19 +49,6 @@ export default function WishListPage({}) {
   const { data: session, status } = useSession()
 
   useEffect(() => {
-    // if (status === 'authenticated') {
-    //   console.log('$$ session', session);
-    // }
-
-    // if (status === 'loading') {
-    //   console.log('$$ loading');
-    // }
-
-    // if (status === 'unauthenticated') {
-    //   console.log('$$ unauthenticated');
-    // }
-    // // getUser
-
     const fetchUserMy = async () => {
       const userData = await getUserMy();
       console.log('$$ userData', userData);

@@ -29,7 +29,6 @@ export default function Home() {
     <div className='container'>
       <div className='mb-4'>
         <h2 className='text-3xl	font-bold text-center'>
-          원하는{' '}
           <span
             style={{
               color: 'var(--run-red-1)',

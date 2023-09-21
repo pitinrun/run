@@ -60,8 +60,8 @@ export default function ProductCard({
   onRemoveWishlistClick,
 }: ProductCardProps) {
   const [quantity, setQuantity] = useState<number | null>(defaultQuantity ?? 0);
-  const [discountRate, setDiscountRate] = useState(
-    (specialDiscountRate ?? defaultDiscountRate ?? 0) * 100 || 0
+  const [discountRate, setDiscountRate] = useState<number | null>(
+    Math.round((specialDiscountRate ?? defaultDiscountRate ?? 0) * 100) || 0
   );
 
   const handlePurchaseClick = () => {
@@ -69,16 +69,14 @@ export default function ProductCard({
       onPurchaseClick({
         productCode,
         quantity: quantity ?? 0,
-        discountRate,
+        discountRate: discountRate ?? 0,
       });
   };
 
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     let value: null | number = parseInt(event.target.value, 10);
     // NOTE: NaN이거나 1보다 작으면, null로 설정합니다.
-    if (!value || value < 1) {
-      value = null;
-    }
+    if (!value || value < 1) value = null;
 
     setQuantity(value);
     onChangeQuantity && onChangeQuantity(productCode, value ?? 1);
@@ -87,16 +85,16 @@ export default function ProductCard({
   const handleDiscountRateChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = parseInt(event.target.value, 10);
-    if (!value) {
-      setDiscountRate(0);
-      return;
-    }
+    let value: null | number = parseInt(event.target.value, 10);
+    // if (!value) {
+    //   setDiscountRate(0);
+    //   return;
+    // }
     // NOTE: value가 0보다 작거나 100보다 크면, 무시합니다.
-    if (value < 0 || value > 100) return;
+    if (value < 0 || value > 100 || !value) value = null;
 
     setDiscountRate(value);
-    onChangeDiscountRate && onChangeDiscountRate(productCode, value);
+    onChangeDiscountRate && onChangeDiscountRate(productCode, value ?? 0);
   };
 
   const handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -185,7 +183,9 @@ export default function ProductCard({
               <>
                 {convertNumberToKRW(
                   Math.round(
-                    factoryPrice * (1 - discountRate / 100) * (quantity ?? 1)
+                    factoryPrice *
+                      (1 - (discountRate ?? 0) / 100) *
+                      (quantity ?? 1)
                   )
                 )}
                 원
@@ -228,8 +228,9 @@ export default function ProductCard({
             <input
               type='number'
               className={`input input-xs input-bordered w-full mx-2 text-right`}
-              value={discountRate}
+              value={discountRate ?? ''}
               onChange={handleDiscountRateChange}
+              onFocus={handleFocus}
               disabled={!!specialDiscountRate}
               style={{
                 maxWidth: '5rem',
