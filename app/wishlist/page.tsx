@@ -1,7 +1,7 @@
 // app/wishlist/page.tsx
 'use client';
 
-import { IProduct, IWishListItem } from '@/src/types';
+import { IProduct, IWishListItem, UserType } from '@/src/types';
 import {
   JSONToBase64,
   base64ToJSON,
@@ -14,6 +14,7 @@ import ProductCard from 'components/product-card';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { getUserMy } from '../requests/user';
+import { toast } from 'react-toastify';
 
 /**
  * NOTE: 상품 지우기를 눌렀을 때, 해당 상품의 productCode를 저장합니다. Why?: Not for rendering
@@ -45,17 +46,26 @@ export default function WishListPage({}) {
   const [wishlist, setWishlist] = useState<WishListItemWithProduct[]>([]);
   const [openRemoveItemDialog, setOpenRemoveItemDialog] = useState(false);
   const [openRemoveAllDialog, setOpenRemoveAllDialog] = useState(false);
+  const [userData, setUserData] = useState<UserType | null>(null);
+  const [openPurchaseDialog, setOpenPurchaseDialog] = useState(false);
 
-  const { data: session, status } = useSession()
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchUserMy = async () => {
-      const userData = await getUserMy();
-      console.log('$$ userData', userData);
-    }
+      try {
+        const userData = await getUserMy();
+        setUserData(userData);
+      } catch (error) {
+        if (isAxiosError(error)) {
+          console.error('$$ error.response', error.response);
+          toast.error(error.response?.data.message);
+        }
+      }
+    };
 
     fetchUserMy();
-  }, [session])
+  }, [session]);
 
   useEffect(() => {
     const wishlistBase64 = localStorage.getItem('wishlist');
@@ -212,7 +222,12 @@ export default function WishListPage({}) {
             </span>
           </span>
         </div>
-        <button className='btn btn-md btn-neutral md:max-w-xs w-full'>
+        <button
+          className='btn btn-md btn-neutral md:max-w-xs w-full'
+          onClick={() => {
+            setOpenPurchaseDialog(true);
+          }}
+        >
           주문하기
         </button>
       </div>
@@ -243,7 +258,27 @@ export default function WishListPage({}) {
       >
         장바구니에 등록된 모든 상품을 비우시겠습니까?
       </ConfirmDialog>
-      
+      <ConfirmDialog
+        title='주문 확인'
+        onConfirm={() => {
+          setOpenPurchaseDialog(false);
+        }}
+        open={openPurchaseDialog}
+        onClose={() => {
+          setOpenPurchaseDialog(false);
+        }}
+      >
+        거래명세서를 받을 연락처와 배송지를 확인해주세요.
+        <br />
+        정보 변경이 필요한 경우 담당자에게 연락주시기 바랍니다.
+        <br />
+        <br />
+        <strong>{userData?.tel}</strong>
+        <br />
+        <strong>
+          {userData?.businessAddress?.address} {userData?.businessAddressDetail}
+        </strong>
+      </ConfirmDialog>
     </div>
   );
 }
