@@ -2,12 +2,18 @@
 'use client';
 
 import { IProduct, IWishListItem } from '@/src/types';
-import { JSONToBase64, base64ToJSON, roundUpToHundred } from '@/src/utils';
+import {
+  JSONToBase64,
+  base64ToJSON,
+  convertNumberToKRW,
+  roundUpToHundred,
+} from '@/src/utils';
 import axios, { isAxiosError } from 'axios';
 import ConfirmDialog from 'components/common/confirm-dialog';
 import ProductCard from 'components/product-card';
-import { set } from 'mongoose';
+import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
+import { getUserMy } from '../requests/user';
 
 /**
  * NOTE: 상품 지우기를 눌렀을 때, 해당 상품의 productCode를 저장합니다. Why?: Not for rendering
@@ -39,8 +45,30 @@ export default function WishListPage({}) {
   const [wishlist, setWishlist] = useState<WishListItemWithProduct[]>([]);
   const [openRemoveItemDialog, setOpenRemoveItemDialog] = useState(false);
   const [openRemoveAllDialog, setOpenRemoveAllDialog] = useState(false);
-  const [totalQuantity, setTotalQuantity] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0);
+
+  const { data: session, status } = useSession()
+
+  useEffect(() => {
+    // if (status === 'authenticated') {
+    //   console.log('$$ session', session);
+    // }
+
+    // if (status === 'loading') {
+    //   console.log('$$ loading');
+    // }
+
+    // if (status === 'unauthenticated') {
+    //   console.log('$$ unauthenticated');
+    // }
+    // // getUser
+
+    const fetchUserMy = async () => {
+      const userData = await getUserMy();
+      console.log('$$ userData', userData);
+    }
+
+    fetchUserMy();
+  }, [session])
 
   useEffect(() => {
     const wishlistBase64 = localStorage.getItem('wishlist');
@@ -176,19 +204,30 @@ export default function WishListPage({}) {
         })}
       </div>
       <div className='divider' />
-      <div>
-        <div>
-          <span>총 수량</span>
+      <div className='flex justify-between md:items-center flex-col md:flex-row'>
+        <div className='md:block flex justify-between'>
+          <span className='mr-4'>
+            <span className='text-md lg:text-lg text-neutral-400 font-semibold mr-2'>
+              총 수량
+            </span>
+            <span className='text-xl lg:text-3xl text-neutral-800 font-semibold'>
+              {wishlist.reduce((acc, cur) => {
+                return acc + cur.quantity;
+              }, 0)}
+            </span>
+          </span>
           <span>
-            {wishlist.reduce((acc, cur) => {
-              return acc + cur.quantity;
-            }, 0)}
+            <span className='text-md lg:text-lg text-neutral-400 font-semibold mr-2'>
+              예상 매입가
+            </span>
+            <span className='text-xl md:text-3xl text-neutral-800 font-semibold'>
+              {convertNumberToKRW(getTotalPrice())} 원
+            </span>
           </span>
         </div>
-        <div>
-          <span>예상 매입가</span>
-          <span>{getTotalPrice()}</span>
-        </div>
+        <button className='btn btn-md btn-neutral md:max-w-xs w-full'>
+          주문하기
+        </button>
       </div>
       <ConfirmDialog
         title='장바구니 상품 지우기'
@@ -217,6 +256,7 @@ export default function WishListPage({}) {
       >
         장바구니에 등록된 모든 상품을 비우시겠습니까?
       </ConfirmDialog>
+      
     </div>
   );
 }

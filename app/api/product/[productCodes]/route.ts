@@ -14,7 +14,6 @@ connectToDatabase();
 export async function GET(req: NextApiRequest, { params }) {
   const { productCodes: base64ProductCodes } = params;
   const productCodes = base64ToJSON(base64ProductCodes);
-  console.log(productCodes);
 
   try {
     const products = await getProductsByProductCodes(productCodes);

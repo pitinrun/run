@@ -8,18 +8,20 @@ export async function middleware(request: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
   if (!token) {
-    return NextResponse.redirect(new URL('/auth/sign-in', request.url));
-  }
-
-  if (request.nextUrl.pathname.startsWith('/auth/sign-in')) {
-    if (token) {
+    // NOTE: 토큰이 없으면 로그인 페이지로 이동
+    if (!request.nextUrl.pathname.startsWith('/auth/sign-in')) {
+      return NextResponse.redirect(new URL('/auth/sign-in', request.url));
+    }
+  } else {
+    // NOTE: 토큰이 있으면 로그인 페이지로 이동
+    if (request.nextUrl.pathname.startsWith('/auth/sign-in')) {
       return NextResponse.redirect(new URL('/', request.url));
     }
-  }
 
-  if (request.nextUrl.pathname.startsWith('/manage')) {
-    if (!token.role) {
-      return NextResponse.redirect(new URL('/403', request.url));
+    if (request.nextUrl.pathname.startsWith('/manage')) {
+      if (!token.role) {
+        return NextResponse.redirect(new URL('/403', request.url));
+      }
     }
   }
 
