@@ -1,7 +1,6 @@
 import { getProductsByProductCodes } from '@/src/services/product';
 import { base64ToJSON, connectToDatabase } from '@/src/utils';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 connectToDatabase();
 
@@ -11,7 +10,7 @@ connectToDatabase();
  * @param params productCodes (base64)
  * @returns
  */
-export async function GET(req: NextApiRequest, { params }) {
+export async function GET(req: NextRequest, { params }) {
   const { productCodes: base64ProductCodes } = params;
   const productCodes = base64ToJSON(base64ProductCodes);
 

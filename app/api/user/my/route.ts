@@ -1,17 +1,13 @@
 import { connectToDatabase } from '@/src/utils';
-import { NextApiRequest } from 'next';
-import { getServerSession } from 'next-auth';
-import { NextResponse } from 'next/server';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-import { User } from '@/src/models/user';
 import { getUser } from '@/src/services/user';
 
 connectToDatabase();
 
 // const data = await getServerSession(authOptions);
 
-export async function GET(req: NextApiRequest) {
+export async function GET(req: NextRequest) {
   // const productCodes = base64ToJSON(base64ProductCodes);
 
   try {
