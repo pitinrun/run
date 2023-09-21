@@ -59,7 +59,7 @@ export default function ProductCard({
   onPurchaseClick,
   onRemoveWishlistClick,
 }: ProductCardProps) {
-  const [quantity, setQuantity] = useState(defaultQuantity ?? 0);
+  const [quantity, setQuantity] = useState<number | null>(defaultQuantity ?? 0);
   const [discountRate, setDiscountRate] = useState(
     (specialDiscountRate ?? defaultDiscountRate ?? 0) * 100 || 0
   );
@@ -68,23 +68,20 @@ export default function ProductCard({
     onPurchaseClick &&
       onPurchaseClick({
         productCode,
-        quantity,
+        quantity: quantity ?? 0,
         discountRate,
       });
   };
 
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(event.target.value, 10);
-    // NOTE: value가 0이면, 1로 바꿔줍니다.
-    if (!value) {
-      setQuantity(1);
-      return;
+    let value: null | number = parseInt(event.target.value, 10);
+    // NOTE: NaN이거나 1보다 작으면, null로 설정합니다.
+    if (!value || value < 1) {
+      value = null;
     }
-    // NOTE: value가 1보다 작으면, 무시합니다.
-    if (value < 1) return;
 
     setQuantity(value);
-    onChangeQuantity && onChangeQuantity(productCode, value);
+    onChangeQuantity && onChangeQuantity(productCode, value ?? 1);
   };
 
   const handleDiscountRateChange = (
@@ -100,6 +97,10 @@ export default function ProductCard({
 
     setDiscountRate(value);
     onChangeDiscountRate && onChangeDiscountRate(productCode, value);
+  };
+
+  const handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    event.target.select();
   };
 
   return (
@@ -183,20 +184,25 @@ export default function ProductCard({
             {discountRate ? (
               <>
                 {convertNumberToKRW(
-                  Math.round(factoryPrice * (1 - discountRate / 100) * quantity)
+                  Math.round(
+                    factoryPrice * (1 - discountRate / 100) * (quantity ?? 1)
+                  )
                 )}
                 원
                 <del className='absolute right-[-1.5rem] sm:right-0 text-sm sm:text-base text-neutral-400 font-normal bottom-[1.5rem] sm:bottom-[2rem]'>
                   {
                     convertNumberToKRW(
-                      Math.round(factoryPrice * quantity)
+                      Math.round(factoryPrice * (quantity ?? 1))
                     ).split(' ')[0]
                   }
                   원
                 </del>
               </>
             ) : (
-              <>{convertNumberToKRW(Math.round(factoryPrice * quantity))}원</>
+              <>
+                {convertNumberToKRW(Math.round(factoryPrice * (quantity ?? 1)))}
+                원
+              </>
             )}
           </span>
         </div>
@@ -206,8 +212,9 @@ export default function ProductCard({
             <input
               type='number'
               className='input input-xs input-bordered w-full mx-2 text-right'
-              value={quantity}
+              value={quantity ?? ''}
               onChange={handleQuantityChange}
+              onFocus={handleFocus}
               style={{
                 maxWidth: '5rem',
               }}
