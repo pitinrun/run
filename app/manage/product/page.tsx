@@ -75,18 +75,6 @@ export default function ProductPage() {
     } catch (error) {
       isAxiosError(error) && console.error('!!ERROR: ', error.response?.data);
     }
-    // axios
-    //   .post(`/api/product/synchronize`)
-    //   .then(response => {
-    //     console.log(response);
-    //     setProducts(response.data.products);
-    //     setTotal(response.data.pagination.total);
-    //     setMaxPage(response.data.pagination.pages);
-    //     setSyncLoading(false);
-    //   })
-    //   .catch(error => {
-    //     console.error('There was an error fetching data', error);
-    //   });
   };
 
   return (
