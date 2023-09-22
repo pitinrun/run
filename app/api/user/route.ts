@@ -17,7 +17,7 @@ const generatePassword = (password: string) => {
 
 export async function GET() {
   try {
-    const users = await User.find();
+    const users = await User.find().lean();
     return NextResponse.json(users.reverse());
   } catch {
     return NextResponse.json('error', {

@@ -15,7 +15,7 @@ export default async function UserPage({
         businessName: {
           $regex: searchParams.businessName,
         },
-      });
+      }).lean();
     } else users = await User.find({});
 
     return users;

@@ -1,0 +1,52 @@
+import { FilterQuery } from 'mongoose';
+import { IOrderDocument, Order } from '../models/order';
+
+export const getOrders = (filter: FilterQuery<IOrderDocument>) => {
+  return Order.aggregate([
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'products.productCode',
+        foreignField: 'productCode',
+        as: 'productDetails',
+      },
+    },
+    {
+      $addFields: {
+        products: {
+          $map: {
+            input: '$products',
+            as: 'orderProduct',
+            in: {
+              $mergeObjects: [
+                '$$orderProduct',
+                {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: '$productDetails',
+                        as: 'productDetail',
+                        cond: {
+                          $eq: [
+                            '$$orderProduct.productCode',
+                            '$$productDetail.productCode',
+                          ],
+                        },
+                      },
+                    },
+                    0,
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        productDetails: 0,
+      },
+    },
+  ]);
+};

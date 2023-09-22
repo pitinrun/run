@@ -6,7 +6,7 @@ export const getProductsByProductCodes = async (productCodes: string[]) => {
     productCode: {
       $in: productCodes,
     },
-  });
+  }).lean();
 };
 
 export const dropAndBulkInsertProducts = async (products: IProduct[]) => {

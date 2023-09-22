@@ -63,7 +63,8 @@ export async function GET(req: Request) {
         _id: -1,
       })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
     // Fetch total product count with filter
     const total = await Product.countDocuments(filter);
