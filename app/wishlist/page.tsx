@@ -263,6 +263,8 @@ export default function WishListPage({}) {
         onConfirm={() => {
           setOpenPurchaseDialog(false);
         }}
+        confirmText='주문하기'
+        cancelText='취소'
         open={openPurchaseDialog}
         onClose={() => {
           setOpenPurchaseDialog(false);

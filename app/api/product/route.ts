@@ -45,6 +45,14 @@ export async function GET(req: Request) {
       filter.sizeSearchKeyword = sizeSearchKeyword;
     }
 
+    filter.storages = {
+      $elemMatch: {
+        stock: {
+          $gte: 1,
+        },
+      },
+    };
+
     // Pagination
     const skip = (Number(page) - 1) * Number(perPage);
     const limit = Number(perPage);
