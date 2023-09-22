@@ -9,6 +9,10 @@ const OrderSchema: Schema = new Schema(
       type: Number, // 1: 주문 확인중, 2: 배송 대기, 3: 배송중, 4: 배송완료
       required: true,
     },
+    userId: {
+      type: String,
+      required: true,
+    },
     products: {
       type: [
         {

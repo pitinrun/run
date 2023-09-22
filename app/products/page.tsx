@@ -152,7 +152,7 @@ export default function ProductPage() {
         >
           후륜타이어 사이즈
         </span>
-        검색
+        {' '}검색
       </h6>
       <ProductSearchBar
         className='my-2 ml-0 sm:flex-1'

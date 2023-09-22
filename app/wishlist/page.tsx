@@ -15,6 +15,8 @@ import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { getUserMy } from '../requests/user';
 import { toast } from 'react-toastify';
+import { createOrderRequest } from '../requests/order';
+import { useRouter } from 'next/navigation';
 
 /**
  * NOTE: 상품 지우기를 눌렀을 때, 해당 상품의 productCode를 저장합니다. Why?: Not for rendering
@@ -48,6 +50,8 @@ export default function WishListPage({}) {
   const [openRemoveAllDialog, setOpenRemoveAllDialog] = useState(false);
   const [userData, setUserData] = useState<UserType | null>(null);
   const [openPurchaseDialog, setOpenPurchaseDialog] = useState(false);
+
+  const router = useRouter();
 
   const { data: session } = useSession();
 
@@ -168,6 +172,33 @@ export default function WishListPage({}) {
     }, 0);
   };
 
+  const handleConfirmOrder = async () => {
+    try {
+      const response = await createOrderRequest({
+        products: wishlist.map(item => {
+          return {
+            productCode: item.productCode,
+            quantity: item.quantity,
+            discountRate: item.discountRate,
+          };
+        }),
+      });
+
+      if (response) {
+        toast.success('주문이 완료되었습니다.');
+        localStorage.removeItem('wishlist');
+        setWishlist([]);
+
+        router.push('/order');
+      }
+    } catch (error) {
+      if (isAxiosError(error)) {
+        console.error('!! ERROR:', error.response);
+        toast.error(error.response?.data.message);
+      }
+    }
+  };
+
   return (
     <div className='container'>
       <div className='flex justify-between items-center mb-4'>
@@ -222,8 +253,10 @@ export default function WishListPage({}) {
             </span>
           </span>
         </div>
+
         <button
-          className='btn btn-md btn-neutral md:max-w-xs w-full'
+          className={`btn btn-md btn-neutral md:max-w-xs w-full`}
+          disabled={wishlist.length === 0}
           onClick={() => {
             setOpenPurchaseDialog(true);
           }}
@@ -261,6 +294,7 @@ export default function WishListPage({}) {
       <ConfirmDialog
         title='주문 확인'
         onConfirm={() => {
+          handleConfirmOrder();
           setOpenPurchaseDialog(false);
         }}
         confirmText='주문하기'
