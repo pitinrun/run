@@ -138,13 +138,22 @@ export default function ProductPage() {
         setSelectedBrands={setSelectedBrands}
         className='mb-2 sm:my-2'
       />
-
       <ProductDashboard
         selectedBrands={selectedBrands}
         season={season as any as SeasonType}
         sizeSearchKeyword={sizeSearchKeyword}
       />
-
+      <div className='divider' />
+      <h6 className='text-3xl	font-bold text-center my-2'>
+        <span
+          style={{
+            color: 'var(--run-red-1)',
+          }}
+        >
+          후륜타이어 사이즈
+        </span>
+        검색
+      </h6>
       <ProductSearchBar
         className='my-2 ml-0 sm:flex-1'
         value={sizeSearchKeyword2}

@@ -28,7 +28,7 @@ export default function ProductSearchBar({
     >
       <input
         type='text'
-        placeholder='사이즈를 검색해 주세요. ex)234519'
+        placeholder='2454518'
         className='input-bordered flex-1'
         onKeyDown={handleKeyDown}
         value={inputValue}
