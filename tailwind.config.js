@@ -18,6 +18,12 @@ module.exports = {
     ],
   },
   theme: {
+    extend: {
+      colors: {
+        'run-red-1': '#ff1616',
+        'run-red-2': '#ff5151',
+      }
+    },
     container: {
       center: true,
       padding: {

@@ -5,7 +5,7 @@ import { IOrder } from '../types';
 export interface IOrderDocument extends Document, IOrder {}
 const OrderSchema: Schema = new Schema(
   {
-    state: {
+    status: {
       type: Number, // 1: 주문 확인중, 2: 배송 대기, 3: 배송중, 4: 배송완료
       required: true,
     },

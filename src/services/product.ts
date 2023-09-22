@@ -1,5 +1,8 @@
 import { Product } from '../models/product';
 import { IProduct } from '../types';
+import { connectToDatabase } from '../utils';
+
+connectToDatabase();
 
 export const getProductsByProductCodes = async (productCodes: string[]) => {
   return Product.find({

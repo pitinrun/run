@@ -1,8 +1,14 @@
 import { FilterQuery } from 'mongoose';
 import { IOrderDocument, Order } from '../models/order';
+import { connectToDatabase } from '../utils';
+
+connectToDatabase();
 
 export const getOrders = (filter: FilterQuery<IOrderDocument>) => {
   return Order.aggregate([
+    {
+      $match: filter,
+    },
     {
       $lookup: {
         from: 'products',

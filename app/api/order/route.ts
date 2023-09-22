@@ -14,7 +14,8 @@ export async function GET(req: NextRequest) {
 
     // 쿼리 파라미터에서 필요한 값을 추출합니다.
     const orderStatus = searchParams.get('orderStatus');
-    const month = searchParams.get('month');
+    const period = searchParams.get('period');
+
     const token = await getToken({
       req,
       secret: process.env.NEXTAUTH_SECRET,
@@ -35,12 +36,12 @@ export async function GET(req: NextRequest) {
 
     // 주문 상태 필터링을 위한 로직입니다.
     if (orderStatus) {
-      filter.state = Number(orderStatus);
+      filter.status = Number(orderStatus);
     }
 
     // 년도-월 필터링을 위한 로직입니다.
-    if (month) {
-      const [year, m] = month.split('-');
+    if (period) {
+      const [year, m] = period.split('-');
       const startDate = new Date(Number(year), Number(m) - 1, 1);
       const endDate = new Date(Number(year), Number(m), 0);
       filter.createdAt = {
