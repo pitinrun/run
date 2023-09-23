@@ -4,6 +4,10 @@ import { connectToDatabase } from '../utils';
 
 connectToDatabase();
 
+export const getOrderById = (id: string) => {
+  return Order.findById(id).lean();
+};
+
 export const getOrders = (filter: FilterQuery<IOrderDocument>) => {
   return Order.aggregate([
     {

@@ -1,7 +1,7 @@
 // app/manage/users/register/page.tsx
 'use client';
 
-import { createUserRequest } from '@/app/requests/user';
+import { createUserRequest } from 'requests/user';
 import { IUser } from '@/src/types';
 import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';

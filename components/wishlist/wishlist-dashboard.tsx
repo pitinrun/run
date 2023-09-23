@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import ProductCard from 'components/product-card';
 import ConfirmDialog from 'components/common/confirm-dialog';
 import { useState } from 'react';
-import { createOrderRequest } from '@/app/requests/order';
+import { createOrderRequest } from 'requests/order';
 
 let selectedProductCode: string | null = null;
 
@@ -62,7 +62,7 @@ export default function WishlistDashboard({
   };
 
   return (
-    <div className='container'>
+    <div>
       <div className='flex justify-between items-center mb-4'>
         <h2 className='text-lg sm:text-2xl font-bold'>장바구니</h2>
         <button

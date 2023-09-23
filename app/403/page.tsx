@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 const Forbidden403 = () => {
   return (
     <div className='h-screen w-full flex items-center justify-center bg-gray-100'>
@@ -7,7 +9,11 @@ const Forbidden403 = () => {
           You do not have permission to access this page.
         </p>
         <div className='flex justify-center'>
-          <button className='btn btn-primary btn-block'>Go to Homepage</button>
+          <Link href='/'>
+            <button className='btn btn-primary btn-block'>
+              Go to Homepage
+            </button>
+          </Link>
         </div>
       </div>
     </div>

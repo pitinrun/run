@@ -22,22 +22,6 @@ function Label({
   )
 }
 
-const Input = ({
-  placeholder,
-  name
-}: {
-  placeholder: string
-  name?: string
-}) => {
-  return (
-    <input
-      type='text'
-      placeholder={placeholder}
-      className='input input-bordered w-full max-w-lg'
-    />
-  )
-}
-
 export default function UserPage() {
   return (
     <div className='container'>

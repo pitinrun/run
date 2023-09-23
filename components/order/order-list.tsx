@@ -4,7 +4,7 @@ import {
   GetOrdersDataType,
   deleteOrderRequest,
   getOrdersRequest,
-} from '@/app/requests/order';
+} from 'requests/order';
 import { IOrder } from '@/src/types';
 import { convertNumberToKRW, getDiscountedPrice } from '@/src/utils';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/20/solid';
