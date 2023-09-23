@@ -1,6 +1,5 @@
 // app/wishlist/page.tsx
 'use client';
-
 import { IProduct, IWishListItem, UserType } from '@/src/types';
 import {
   JSONToBase64,
@@ -18,27 +17,28 @@ import { toast } from 'react-toastify';
 import { createOrderRequest } from '../requests/order';
 import { useRouter } from 'next/navigation';
 
-/**
- * NOTE: 상품 지우기를 눌렀을 때, 해당 상품의 productCode를 저장합니다. Why?: Not for rendering
- */
 let focusProductCode = '';
 
 type WishListItemWithProduct = IWishListItem & {
   product?: IProduct;
 };
-/**
- *
- * @param wishList injected
- * @param products inject items
- * @returns
- */
+
+const updateLocalStorageWishlist = (wishlist: WishListItemWithProduct[]) => {
+  localStorage.setItem('wishlist', JSONToBase64(wishlist));
+};
+
+const getLocalStorageWishlist = (): WishListItemWithProduct[] => {
+  const wishlistBase64 = localStorage.getItem('wishlist');
+  return wishlistBase64 ? base64ToJSON(wishlistBase64) : [];
+};
+
 const injectProduct = (
   wishList: WishListItemWithProduct[],
   products: IProduct[]
 ) => {
   wishList.forEach(item => {
     const product = products.find(
-      (product: IProduct) => product.productCode === item.productCode
+      product => product.productCode === item.productCode
     );
     item.product = product;
   });
@@ -52,7 +52,6 @@ export default function WishListPage({}) {
   const [openPurchaseDialog, setOpenPurchaseDialog] = useState(false);
 
   const router = useRouter();
-
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -62,7 +61,6 @@ export default function WishListPage({}) {
         setUserData(userData);
       } catch (error) {
         if (isAxiosError(error)) {
-          console.error('$$ error.response', error.response);
           toast.error(error.response?.data.message);
         }
       }
@@ -72,10 +70,7 @@ export default function WishListPage({}) {
   }, [session]);
 
   useEffect(() => {
-    const wishlistBase64 = localStorage.getItem('wishlist');
-    const localStorageWishlist = (
-      wishlistBase64 ? base64ToJSON(wishlistBase64) : []
-    ) as WishListItemWithProduct[];
+    const localStorageWishlist = getLocalStorageWishlist();
     const productCodes = localStorageWishlist.map(item => item.productCode);
     const encodedProductCodes = JSONToBase64(productCodes);
 
@@ -93,81 +88,58 @@ export default function WishListPage({}) {
     fetchWishlist();
   }, []);
 
-  const handleRemoveWishlistClick = (productCode: string) => {
-    const wishlistBase64 = localStorage.getItem('wishlist');
-    const localStorageWishlist = (
-      wishlistBase64 ? base64ToJSON(wishlistBase64) : []
-    ) as WishListItemWithProduct[];
-
-    // 새로운 배열을 생성
-    const newWishlist = localStorageWishlist.filter(
-      item => item.productCode !== productCode
+  const updateWishlistState = (newWishlist: WishListItemWithProduct[]) => {
+    updateLocalStorageWishlist(newWishlist);
+    injectProduct(
+      newWishlist,
+      wishlist.map(item => item.product!) as IProduct[]
     );
-
-    localStorage.setItem('wishlist', JSONToBase64(newWishlist));
-
-    const products = wishlist.map(item => item.product) as IProduct[]; // NOTE: product가 undefined일 수 있으므로, 타입 단언을 해줍니다.
-    injectProduct(localStorageWishlist, products);
-
-    // 새로운 배열로 상태를 업데이트
     setWishlist(newWishlist);
   };
 
-  const handleQuantityChange = (productCode: string, quantity: number) => {
-    const wishlistBase64 = localStorage.getItem('wishlist');
-    const localStorageWishlist = (
-      wishlistBase64 ? base64ToJSON(wishlistBase64) : []
-    ) as WishListItemWithProduct[];
-
+  const handleUpdateWishlistItem = (
+    updateFn: (item: WishListItemWithProduct) => void
+  ) => {
+    const localStorageWishlist = getLocalStorageWishlist();
     const newWishlist = localStorageWishlist.map(item => {
+      updateFn(item);
+      return item;
+    });
+    updateWishlistState(newWishlist);
+  };
+
+  const handleRemoveWishlistClick = (productCode: string) => {
+    const newWishlist = getLocalStorageWishlist().filter(
+      item => item.productCode !== productCode
+    );
+    updateWishlistState(newWishlist);
+  };
+
+  const handleQuantityChange = (productCode: string, quantity: number) => {
+    handleUpdateWishlistItem(item => {
       if (item.productCode === productCode) {
         item.quantity = quantity;
       }
-      return item;
     });
-
-    localStorage.setItem('wishlist', JSONToBase64(newWishlist));
-
-    const products = wishlist.map(item => item.product) as IProduct[]; // NOTE: product가 undefined일 수 있으므로, 타입 단언을 해줍니다.
-    injectProduct(localStorageWishlist, products);
-
-    // 새로운 배열로 상태를 업데이트
-    setWishlist(newWishlist);
   };
 
   const handleDiscountRateChange = (
     productCode: string,
     discountRate: number
   ) => {
-    const wishlistBase64 = localStorage.getItem('wishlist');
-    const localStorageWishlist = (
-      wishlistBase64 ? base64ToJSON(wishlistBase64) : []
-    ) as WishListItemWithProduct[];
-
-    const newWishlist = localStorageWishlist.map(item => {
+    handleUpdateWishlistItem(item => {
       if (item.productCode === productCode) {
         item.discountRate = discountRate / 100;
       }
-      return item;
     });
-
-    localStorage.setItem('wishlist', JSONToBase64(newWishlist));
-
-    const products = wishlist.map(item => item.product) as IProduct[]; // NOTE: product가 undefined일 수 있으므로, 타입 단언을 해줍니다.
-    injectProduct(localStorageWishlist, products);
-
-    // 새로운 배열로 상태를 업데이트
-    setWishlist(newWishlist);
   };
 
   const getTotalPrice = () => {
     return wishlist.reduce((acc, cur) => {
       if (!cur.product) return acc;
-
       const value = roundUpToHundred(
         cur.quantity * (cur.product?.factoryPrice * (1 - cur.discountRate))
       );
-
       return acc + value;
     }, 0);
   };
@@ -188,12 +160,10 @@ export default function WishListPage({}) {
         toast.success('주문이 완료되었습니다.');
         localStorage.removeItem('wishlist');
         setWishlist([]);
-
         router.push('/order');
       }
     } catch (error) {
       if (isAxiosError(error)) {
-        console.error('!! ERROR:', error.response);
         toast.error(error.response?.data.message);
       }
     }
