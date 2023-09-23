@@ -235,7 +235,7 @@ export default function WishListPage({}) {
       <div className='flex justify-between md:items-center flex-col md:flex-row'>
         <div className='md:block flex justify-between'>
           <span className='mr-4'>
-            <span className='text-md lg:text-lg text-neutral-400 font-semibold mr-2'>
+            <span className='text-base lg:text-lg text-neutral-400 font-semibold mr-2'>
               총 수량
             </span>
             <span className='text-xl lg:text-3xl text-neutral-800 font-semibold'>
@@ -245,7 +245,7 @@ export default function WishListPage({}) {
             </span>
           </span>
           <span>
-            <span className='text-md lg:text-lg text-neutral-400 font-semibold mr-2'>
+            <span className='text-base lg:text-lg text-neutral-400 font-semibold mr-2'>
               예상 매입가
             </span>
             <span className='text-xl md:text-3xl text-neutral-800 font-semibold'>

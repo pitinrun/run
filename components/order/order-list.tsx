@@ -43,20 +43,20 @@ function OrderCard({ createdAt, status, products }: GetOrdersDataType) {
 
   return (
     <div className='card w-full border border-solid border-neutral-200 my-4'>
-      <div className='card-header bg-gray-200 rounded-t-lg flex flex-row items-center justify-between px-8 py-4'>
-        <div className='flex items-center gap-4 rounded-t-lg'>
-          <h6 className='text-xl font-semibold'>
+      <div className='card-header bg-gray-200 rounded-t-lg flex flex-row items-center justify-between px-4 py-2 lg:px-8 lg:py-4'>
+        <div className='flex items-center gap-2 md:gap-4 rounded-t-lg'>
+          <h6 className='text-base md:text-lg lg:text-xl font-semibold'>
             {createdAt.toLocaleDateString('ko')}
           </h6>
-          <div className='badge badge-lg'>{statusMap[status]}</div>
+          <div className='badge badge-md md:badge-lg'>{statusMap[status]}</div>
         </div>
         {status === 1 && (
           <div>
-            <button className='btn btn-sm btn-outline mr-4'>
-              <TrashIcon className='w-5 h-5' />
+            <button className='btn btn-xs md:btn-sm btn-outline mr-2 md:mr-4'>
+              <TrashIcon className='w-4 h-4 md:w-5 md:h-5' />
             </button>
-            <button className='btn btn-sm btn-outline'>
-              <PencilSquareIcon className='w-5 h-5' />
+            <button className='btn btn-xs md:btn-sm btn-outline'>
+              <PencilSquareIcon className='w-4 h-4 md:w-5 md:h-5' />
             </button>
           </div>
         )}
@@ -65,18 +65,24 @@ function OrderCard({ createdAt, status, products }: GetOrdersDataType) {
         {products.map(product => {
           return (
             <div
-              className='px-8 py-3 flex flex-row justify-between border-b border-solid border-neutral-200'
+              className='px-4 py-2 lg:px-8 lg:py-3 flex flex-row justify-between border-b border-solid border-neutral-200'
               key={`${createdAt}-${product.productCode}`}
             >
-              <div className='sm:flex items-center text-neutral-400 font-semibold'>
-                <div className='mr-5 sm:text-xl font-semibold text-run-red-1'>
+              <div className='block md:flex items-center text-neutral-400 font-semibold'>
+                <div className='md:mr-5 text-sm md:text-lg lg:text-xl text-run-red-1'>
                   {product.patternKr}
                 </div>
-                <span className='mx-5'>{product.brand}</span>
-                <span className='mx-5'>{product.size}</span>
-                <span className='mx-5'>{product.marking}</span>
+                <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
+                  {product.brand}
+                </span>
+                <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
+                  {product.size}
+                </span>
+                <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
+                  {product.marking}
+                </span>
               </div>
-              <div className='flex items-center sm:text-xl font-semibold gap-10'>
+              <div className='flex items-center text-xs md:text-base lg:text-xl font-semibold gap-2 md:gap-10'>
                 <div>{product.quantity}개</div>
                 <div>{Math.round(product.discountRate * 100)}%</div>
                 <div>
@@ -94,16 +100,16 @@ function OrderCard({ createdAt, status, products }: GetOrdersDataType) {
           );
         })}
       </div>
-      <div className='card-body px-8 py-4'>
+      <div className='card-body px-4 py-2 lg:px-8 lg:py-4'>
         <div className='flex justify-end items-center'>
           <div>
             <span className='mr-8'>
-              <span className='mr-2 text-neutral-400'>총 수량</span>
-              <span className='font-semibold text-xl'>{40}</span>
+              <span className='mr-2 text-xs md:text-sm lg:text-base text-neutral-400'>총 수량</span>
+              <span className='font-semibold text-base md:text-lg lg:text-xl'>{40}</span>
             </span>
             <span>
-              <span className='mr-2 text-neutral-400'>매입가</span>
-              <span className='font-semibold text-xl'>{'15,000,000'}원</span>
+              <span className='mr-2 text-xs md:text-sm lg:text-base text-neutral-400'>매입가</span>
+              <span className='font-semibold text-base md:text-lg lg:text-xl'>{'15,000,000'}원</span>
             </span>
           </div>
         </div>
@@ -129,7 +135,6 @@ export default function OrderList({}) {
       if (filterPeriod) reqOrderParams['period'] = filterPeriod;
 
       const ordersData = await getOrdersRequest(reqOrderParams);
-      console.log(ordersData);
       setOrders(ordersData);
     };
 
@@ -142,7 +147,7 @@ export default function OrderList({}) {
         <div>
           <h6 className='mb-2'>주문 상태</h6>
           <select
-            className='select select-bordered w-full max-w-xs select-xs sm:select-md'
+            className='select select-bordered w-full max-w-xs select-xs md:select-md'
             style={{
               minWidth: '6rem',
             }}
@@ -163,7 +168,7 @@ export default function OrderList({}) {
           <div className='flex gap-2'>
             <input
               type='month'
-              className='input input-bordered w-full input-xs sm:input-md'
+              className='input input-bordered w-full input-xs md:input-md'
               onChange={e => {
                 setFilterPeriod(e.target.value);
               }}
@@ -173,12 +178,6 @@ export default function OrderList({}) {
         </div>
       </div>
       <div>
-        {/* <OrderCard /> */}
-        {/* <OrderCard 
-          createdAt={new Date()}
-          status={1}
-          products={[]}
-        /> */}
         {orders.map(order => (
           <OrderCard key={`order-${order.createdAt}`} {...order} />
         ))}

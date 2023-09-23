@@ -4,9 +4,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-* {
+/* * {
   font-family: 'Inter', sans-serif;
-}
+} */
 
 .table th:first-child {
   position: static;

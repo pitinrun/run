@@ -1,4 +1,7 @@
 import { User } from '../models/user';
+import { connectToDatabase } from '../utils';
+
+connectToDatabase();
 
 export const getUser = (userId: string) => {
   if (!userId) {
