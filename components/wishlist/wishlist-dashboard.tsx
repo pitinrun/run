@@ -16,6 +16,7 @@ type WishlistDashboardProps = {
   handleRemoveWishlistClick: (productCode: string) => void;
   handleQuantityChange: (productCode: string, quantity: number) => void;
   handleDiscountRateChange: (productCode: string, discountRate: number) => void;
+  onConfirmOrder: () => void;
   userData: UserType | null;
 };
 
@@ -24,6 +25,7 @@ export default function WishlistDashboard({
   handleRemoveWishlistClick,
   handleQuantityChange,
   handleDiscountRateChange,
+  onConfirmOrder,
   userData,
 }: WishlistDashboardProps) {
   const router = useRouter();
@@ -56,9 +58,12 @@ export default function WishlistDashboard({
       if (response) {
         toast.success('주문이 완료되었습니다.');
         handleRemoveWishlistClick('all');
+        onConfirmOrder && onConfirmOrder();
+
         router.push('/order');
       }
     } catch (error) {
+      console.error('!! ERROR', error);
       toast.error('주문 처리 중 오류가 발생했습니다.');
     }
   };
@@ -87,7 +92,6 @@ export default function WishlistDashboard({
               onRemoveWishlistClick={() => {
                 setOpenRemoveItemDialog(true);
                 selectedProductCode = wishlistItem.productCode;
-                // handleRemoveWishlistClick(wishlistItem.productCode);
               }}
               {...wishlistItem.product}
             />
@@ -117,7 +121,11 @@ export default function WishlistDashboard({
             </span>
           </span>
         </div>
-        <button className='btn btn-md btn-neutral md:max-w-xs w-full'>
+        <button
+          className='btn btn-md btn-neutral md:max-w-xs w-full'
+          onClick={() => setOpenPurchaseDialog(true)}
+          disabled={wishlist.length === 0}
+        >
           주문하기
         </button>
       </div>

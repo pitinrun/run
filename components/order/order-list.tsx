@@ -12,6 +12,7 @@ import { isAxiosError } from 'axios';
 import ConfirmDialog from 'components/common/confirm-dialog';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import Link from 'next/link';
 
 const ORDER_STATUSES = [
   {
@@ -45,6 +46,7 @@ function OrderCard({
   status,
   products,
   onClickRemove,
+  _id,
   onClickEdit,
 }: OrderCardProps) {
   const statusMap = {
@@ -73,9 +75,11 @@ function OrderCard({
                 onClick={onClickRemove}
               />
             </button>
-            <button className='btn btn-xs md:btn-sm btn-outline'>
-              <PencilSquareIcon className='w-4 h-4 md:w-5 md:h-5' />
-            </button>
+            <Link href={`/order/edit/${_id}`}>
+              <button className='btn btn-xs md:btn-sm btn-outline'>
+                <PencilSquareIcon className='w-4 h-4 md:w-5 md:h-5' />
+              </button>
+            </Link>
           </div>
         )}
       </div>

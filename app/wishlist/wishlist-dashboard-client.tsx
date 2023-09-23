@@ -5,15 +5,17 @@ import { useWishlist } from 'hooks/use-wishlist';
 
 export default function WishlistDashboardClient({
   userData,
+  localStorageKey = 'wishlist',
 }: {
   userData: UserType | null;
+  localStorageKey?: string;
 }) {
   const {
     wishlist,
     handleRemoveWishlistClick,
     handleQuantityChange,
     handleDiscountRateChange,
-  } = useWishlist('wishlist'); // 여기서 원하는 키를 전달하면 됩니다.
+  } = useWishlist(localStorageKey);
 
   return (
     <WishlistDashboard
