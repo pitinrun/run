@@ -1,4 +1,4 @@
-import { IOrder } from '@/src/types';
+import { IOrder, IProduct } from '@/src/types';
 import axios from 'axios';
 
 export const createOrderRequest = async ({
@@ -10,6 +10,13 @@ export const createOrderRequest = async ({
   return response.data;
 };
 
+export type GetOrdersDataType = Omit<IOrder, 'products' | 'userId'> & {
+  products: (IProduct & {
+    quantity: number;
+    discountRate: number;
+  })[];
+};
+
 export const getOrdersRequest = async ({
   orderStatus,
   period,
@@ -17,11 +24,16 @@ export const getOrdersRequest = async ({
   orderStatus?: string;
   period?: string;
 }) => {
-  const response = await axios.get('/api/order', {
+  const { data } = await axios.get<GetOrdersDataType[]>('/api/order', {
     params: {
       orderStatus,
       period,
     },
   });
-  return response.data;
+
+  data.forEach(order => {
+    order.createdAt = new Date(order.createdAt);
+  });
+
+  return data;
 };

@@ -57,9 +57,7 @@ export async function GET(req: NextRequest) {
     const orders = await getOrders(filter);
 
     // 응답 데이터를 반환합니다.
-    return NextResponse.json({
-      orders: orders,
-    });
+    return NextResponse.json(orders);
   } catch (error) {
     console.error('!! ERROR:', error);
     return NextResponse.json('error', {

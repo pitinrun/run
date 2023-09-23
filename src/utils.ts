@@ -34,13 +34,21 @@ export const getTotalStock = (storages: IProduct['storages']) =>
 
 export const roundUpToHundred = (num: number) => {
   return Math.ceil(num / 100) * 100;
-}
+};
 
 export const convertNumberToKRW = (price: number) => {
   // 10원 단위로 올림 처리
   price = roundUpToHundred(price);
 
   return `${price.toLocaleString()}`;
+};
+
+export const getDiscountedPrice = (
+  price: number,
+  discountRate: number,
+  quantity: number = 1
+) => {
+  return Math.round(price * (1 - discountRate)) * quantity;
 };
 
 export const convertNumberToPercent = (percent: number) => {

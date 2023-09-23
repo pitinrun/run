@@ -1,7 +1,8 @@
 'use client';
 
-import { getOrdersRequest } from '@/app/requests/order';
+import { GetOrdersDataType, getOrdersRequest } from '@/app/requests/order';
 import { IOrder, IProduct } from '@/src/types';
+import { convertNumberToKRW, getDiscountedPrice } from '@/src/utils';
 import {
   PencilIcon,
   PencilSquareIcon,
@@ -32,62 +33,66 @@ const ORDER_STATUSES = [
   },
 ];
 
-type OrderCardProps = Omit<IOrder, 'products'> & {
-  products: IProduct[];
-};
+function OrderCard({ createdAt, status, products }: GetOrdersDataType) {
+  const statusMap = {
+    1: '주문 확인중',
+    2: '배송 대기',
+    3: '배송중',
+    4: '배송완료',
+  };
 
-// type OrderCardProps = IOrder;
-
-function OrderCard({ createdAt, status, products }: OrderCardProps) {
   return (
-    <div className='card w-full border border-solid border-neutral-200'>
-      <div className='card-header bg-gray-200 flex flex-row items-center justify-between px-8 py-4'>
+    <div className='card w-full border border-solid border-neutral-200 my-4'>
+      <div className='card-header bg-gray-200 rounded-t-lg flex flex-row items-center justify-between px-8 py-4'>
         <div className='flex items-center gap-4 rounded-t-lg'>
-          <h6 className='text-xl font-semibold'>{'2023-07-09'}</h6>
-          <div className='badge badge-lg'>{'주문 확인중'}</div>
+          <h6 className='text-xl font-semibold'>
+            {createdAt.toLocaleDateString('ko')}
+          </h6>
+          <div className='badge badge-lg'>{statusMap[status]}</div>
         </div>
-        <div>
-          <button className='btn btn-sm btn-outline mr-4'>
-            <TrashIcon className='w-5 h-5' />
-          </button>
-          <button className='btn btn-sm btn-outline'>
-            <PencilSquareIcon className='w-5 h-5' />
-          </button>
-        </div>
+        {status === 1 && (
+          <div>
+            <button className='btn btn-sm btn-outline mr-4'>
+              <TrashIcon className='w-5 h-5' />
+            </button>
+            <button className='btn btn-sm btn-outline'>
+              <PencilSquareIcon className='w-5 h-5' />
+            </button>
+          </div>
+        )}
       </div>
       <div className='card-body p-0'>
-        <div className='px-8 py-3 flex flex-row justify-between border-b border-solid border-neutral-200'>
-          <div className='sm:flex items-center text-neutral-400 font-semibold'>
-            <div className='mr-5 sm:text-xl font-semibold text-run-red-1'>
-              {'프라이머시 투어 AS'}
+        {products.map(product => {
+          return (
+            <div
+              className='px-8 py-3 flex flex-row justify-between border-b border-solid border-neutral-200'
+              key={`${createdAt}-${product.productCode}`}
+            >
+              <div className='sm:flex items-center text-neutral-400 font-semibold'>
+                <div className='mr-5 sm:text-xl font-semibold text-run-red-1'>
+                  {product.patternKr}
+                </div>
+                <span className='mx-5'>{product.brand}</span>
+                <span className='mx-5'>{product.size}</span>
+                <span className='mx-5'>{product.marking}</span>
+              </div>
+              <div className='flex items-center sm:text-xl font-semibold gap-10'>
+                <div>{product.quantity}개</div>
+                <div>{Math.round(product.discountRate * 100)}%</div>
+                <div>
+                  {convertNumberToKRW(
+                    getDiscountedPrice(
+                      product.factoryPrice,
+                      product.discountRate,
+                      product.quantity
+                    )
+                  )}
+                  원
+                </div>
+              </div>
             </div>
-            <span className='mx-5'>{'미쉐린'}</span>
-            <span className='mx-5'>{'305/30ZR20'}</span>
-            <span className='mx-5'>{'GOE'}</span>
-          </div>
-          <div className='flex items-center sm:text-xl font-semibold gap-10'>
-            <div>{100}개</div>
-            <div>{20}%</div>
-            <div>{'1,000,000'}원</div>
-          </div>
-        </div>
-        {/* 하단은 지워도 됨 */}
-        <div className='px-8 py-3 flex flex-row justify-between border-b border-solid border-neutral-200'>
-          <div className='sm:flex items-center text-neutral-400 font-semibold'>
-            <div className='mr-5 sm:text-xl font-semibold text-run-red-1'>
-              {'프라이머시 투어 AS'}
-            </div>
-            <span className='mx-5'>{'미쉐린'}</span>
-            <span className='mx-5'>{'305/30ZR20'}</span>
-            <span className='mx-5'>{'GOE'}</span>
-          </div>
-          <div className='flex items-center sm:text-xl font-semibold gap-10'>
-            <div>{100}개</div>
-            <div>{20}%</div>
-            <div>{'1,000,000'}원</div>
-          </div>
-        </div>
-        {/* :END */}
+          );
+        })}
       </div>
       <div className='card-body px-8 py-4'>
         <div className='flex justify-end items-center'>
@@ -107,8 +112,8 @@ function OrderCard({ createdAt, status, products }: OrderCardProps) {
   );
 }
 
-export default function OrderList() {
-  const [orders, setOrders] = useState<IOrder[]>([]);
+export default function OrderList({}) {
+  const [orders, setOrders] = useState<GetOrdersDataType[]>([]);
   const [filterStatus, setFilterStatus] = useState<IOrder['status'] | null>(
     null
   );
@@ -124,8 +129,8 @@ export default function OrderList() {
       if (filterPeriod) reqOrderParams['period'] = filterPeriod;
 
       const ordersData = await getOrdersRequest(reqOrderParams);
-
-      console.log('$$ ordersData', ordersData);
+      console.log(ordersData);
+      setOrders(ordersData);
     };
 
     fetchOrders();
@@ -167,7 +172,17 @@ export default function OrderList() {
           </div>
         </div>
       </div>
-      <div>{/* <OrderCard /> */}</div>
+      <div>
+        {/* <OrderCard /> */}
+        {/* <OrderCard 
+          createdAt={new Date()}
+          status={1}
+          products={[]}
+        /> */}
+        {orders.map(order => (
+          <OrderCard key={`order-${order.createdAt}`} {...order} />
+        ))}
+      </div>
     </div>
   );
 }
