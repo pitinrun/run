@@ -51,6 +51,9 @@ export interface IWishListItem {
   discountRate: number;
 }
 
+/**
+ * @note 배송 대기(status: 1)는 deprecated 되었습니다.
+ */
 export interface IOrder {
   createdAt: Date;
   status: 1 | 2 | 3 | 4; // 1: 주문 확인중, 2: 배송 대기, 3: 배송중, 4: 배송완료

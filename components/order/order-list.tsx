@@ -1,14 +1,17 @@
 'use client';
 
-import { GetOrdersDataType, getOrdersRequest } from '@/app/requests/order';
-import { IOrder, IProduct } from '@/src/types';
-import { convertNumberToKRW, getDiscountedPrice } from '@/src/utils';
 import {
-  PencilIcon,
-  PencilSquareIcon,
-  TrashIcon,
-} from '@heroicons/react/20/solid';
+  GetOrdersDataType,
+  deleteOrderRequest,
+  getOrdersRequest,
+} from '@/app/requests/order';
+import { IOrder } from '@/src/types';
+import { convertNumberToKRW, getDiscountedPrice } from '@/src/utils';
+import { PencilSquareIcon, TrashIcon } from '@heroicons/react/20/solid';
+import { isAxiosError } from 'axios';
+import ConfirmDialog from 'components/common/confirm-dialog';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 const ORDER_STATUSES = [
   {
@@ -33,13 +36,25 @@ const ORDER_STATUSES = [
   },
 ];
 
-function OrderCard({ createdAt, status, products }: GetOrdersDataType) {
+type OrderCardProps = GetOrdersDataType & {
+  onClickRemove?: () => void;
+  onClickEdit?: () => void;
+};
+function OrderCard({
+  createdAt,
+  status,
+  products,
+  onClickRemove,
+  onClickEdit,
+}: OrderCardProps) {
   const statusMap = {
     1: '주문 확인중',
-    2: '배송 대기',
+    2: '배송 대기', // NOTE: deprecated
     3: '배송중',
     4: '배송완료',
   };
+
+  const isWaiting = status === 1;
 
   return (
     <div className='card w-full border border-solid border-neutral-200 my-4'>
@@ -53,7 +68,10 @@ function OrderCard({ createdAt, status, products }: GetOrdersDataType) {
         {status === 1 && (
           <div>
             <button className='btn btn-xs md:btn-sm btn-outline mr-2 md:mr-4'>
-              <TrashIcon className='w-4 h-4 md:w-5 md:h-5' />
+              <TrashIcon
+                className='w-4 h-4 md:w-5 md:h-5'
+                onClick={onClickRemove}
+              />
             </button>
             <button className='btn btn-xs md:btn-sm btn-outline'>
               <PencilSquareIcon className='w-4 h-4 md:w-5 md:h-5' />
@@ -65,36 +83,47 @@ function OrderCard({ createdAt, status, products }: GetOrdersDataType) {
         {products.map(product => {
           return (
             <div
-              className='px-4 py-2 lg:px-8 lg:py-3 flex flex-row justify-between border-b border-solid border-neutral-200'
+              className='px-4 py-2 lg:px-8 lg:py-3 md:flex flex-row justify-between border-b border-solid border-neutral-200'
               key={`${createdAt}-${product.productCode}`}
             >
               <div className='block md:flex items-center text-neutral-400 font-semibold'>
                 <div className='md:mr-5 text-sm md:text-lg lg:text-xl text-run-red-1'>
                   {product.patternKr}
                 </div>
-                <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
+                <span className='text-xs md:text-sm lg:text-base md:mx-2 md:mx-5'>
                   {product.brand}
                 </span>
                 <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
                   {product.size}
                 </span>
-                <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
-                  {product.marking}
-                </span>
+                {product.marking && (
+                  <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
+                    {product.marking}
+                  </span>
+                )}
+                {product.speedSymbolLoadIndex && (
+                  <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
+                    {product.speedSymbolLoadIndex}
+                  </span>
+                )}
               </div>
-              <div className='flex items-center text-xs md:text-base lg:text-xl font-semibold gap-2 md:gap-10'>
+              <div className='flex justify-end items-center text-xs md:text-base lg:text-xl font-semibold gap-2 md:gap-10'>
                 <div>{product.quantity}개</div>
-                <div>{Math.round(product.discountRate * 100)}%</div>
-                <div>
-                  {convertNumberToKRW(
-                    getDiscountedPrice(
-                      product.factoryPrice,
-                      product.discountRate,
-                      product.quantity
-                    )
-                  )}
-                  원
-                </div>
+                {!isWaiting && (
+                  <>
+                    <div>{Math.round(product.discountRate * 100)}%</div>
+                    <div>
+                      {convertNumberToKRW(
+                        getDiscountedPrice(
+                          product.factoryPrice,
+                          product.discountRate,
+                          product.quantity
+                        )
+                      )}
+                      원
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           );
@@ -103,20 +132,32 @@ function OrderCard({ createdAt, status, products }: GetOrdersDataType) {
       <div className='card-body px-4 py-2 lg:px-8 lg:py-4'>
         <div className='flex justify-end items-center'>
           <div>
-            <span className='mr-8'>
-              <span className='mr-2 text-xs md:text-sm lg:text-base text-neutral-400'>총 수량</span>
-              <span className='font-semibold text-base md:text-lg lg:text-xl'>{40}</span>
+            <span className={!isWaiting ? 'mr-8' : ''}>
+              <span className='mr-2 text-xs md:text-sm lg:text-base text-neutral-400'>
+                총 수량
+              </span>
+              <span className='font-semibold text-base md:text-lg lg:text-xl'>
+                {products.reduce((acc, cur) => acc + cur.quantity, 0)}개
+              </span>
             </span>
-            <span>
-              <span className='mr-2 text-xs md:text-sm lg:text-base text-neutral-400'>매입가</span>
-              <span className='font-semibold text-base md:text-lg lg:text-xl'>{'15,000,000'}원</span>
-            </span>
+            {!isWaiting && (
+              <span>
+                <span className='mr-2 text-xs md:text-sm lg:text-base text-neutral-400'>
+                  매입가
+                </span>
+                <span className='font-semibold text-base md:text-lg lg:text-xl'>
+                  {'15,000,000'}원
+                </span>
+              </span>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+let targetRemoveOrder: string | null = null;
 
 export default function OrderList({}) {
   const [orders, setOrders] = useState<GetOrdersDataType[]>([]);
@@ -126,20 +167,39 @@ export default function OrderList({}) {
   const [filterPeriod, setFilterPeriod] = useState(
     new Date().toISOString().slice(0, 7)
   );
+  const [openRemoveConfirm, setOpenRemoveConfirm] = useState(false);
+
+  const fetchOrders = async () => {
+    const reqOrderParams = {};
+    if (filterStatus !== null && filterStatus !== ORDER_STATUSES[0].value)
+      reqOrderParams['orderStatus'] = filterStatus;
+    if (filterPeriod) reqOrderParams['period'] = filterPeriod;
+
+    const ordersData = await getOrdersRequest(reqOrderParams);
+    setOrders(ordersData);
+  };
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      const reqOrderParams = {};
-      if (filterStatus !== null && filterStatus !== ORDER_STATUSES[0].value)
-        reqOrderParams['orderStatus'] = filterStatus;
-      if (filterPeriod) reqOrderParams['period'] = filterPeriod;
-
-      const ordersData = await getOrdersRequest(reqOrderParams);
-      setOrders(ordersData);
-    };
-
     fetchOrders();
   }, [filterStatus, filterPeriod]);
+
+  const handleConfirmRemoveOrder = async () => {
+    try {
+      if (!targetRemoveOrder) return;
+      await deleteOrderRequest(targetRemoveOrder);
+      await fetchOrders();
+    } catch (error) {
+      if (isAxiosError(error)) {
+        console.error('!!ERROR: ', error.response?.data);
+        toast.error(error.response?.data.message);
+      }
+    }
+  };
+
+  const handleRemoveOrder = (id: string) => {
+    targetRemoveOrder = id;
+    setOpenRemoveConfirm(true);
+  };
 
   return (
     <div>
@@ -179,9 +239,28 @@ export default function OrderList({}) {
       </div>
       <div>
         {orders.map(order => (
-          <OrderCard key={`order-${order.createdAt}`} {...order} />
+          <OrderCard
+            key={`order-${order.createdAt}`}
+            onClickRemove={() => {
+              handleRemoveOrder(order._id);
+            }}
+            {...order}
+          />
         ))}
       </div>
+      <ConfirmDialog
+        open={openRemoveConfirm}
+        title='주문 삭제'
+        onClose={() => {
+          setOpenRemoveConfirm(false);
+        }}
+        onConfirm={() => {
+          handleConfirmRemoveOrder();
+          setOpenRemoveConfirm(false);
+        }}
+      >
+        주문을 삭제하시겠습니까?
+      </ConfirmDialog>
     </div>
   );
 }

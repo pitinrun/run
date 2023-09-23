@@ -65,3 +65,61 @@ export async function GET(req: NextRequest) {
     });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+
+    // 쿼리 파라미터에서 필요한 값을 추출합니다.
+    const orderId = searchParams.get('orderId');
+
+    const token = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    if (!token || !token.sub) {
+      console.error('!!ERROR: Invalid or Do not have token');
+      return NextResponse.json(
+        { message: '!!ERROR: Do not have token' },
+        {
+          status: 401,
+        }
+      );
+    }
+
+    // 주어진 필터를 사용해 주문 정보를 가져옵니다.
+    const order = await Order.findById(orderId);
+
+    // 주문 정보가 없으면 404를 반환합니다.
+    if (!order) {
+      return NextResponse.json(
+        { message: '주문 정보를 찾을 수 없습니다.' },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    // 주문한 사용자의 ID와 주문 정보의 사용자 ID가 일치하지 않으면 403을 반환합니다.
+    if (token.sub !== order.userId) {
+      return NextResponse.json(
+        { message: '해당 주문 정보에 접근할 수 없습니다.' },
+        {
+          status: 403,
+        }
+      );
+    }
+
+    // 주문 정보를 삭제합니다.
+    await order.deleteOne();
+
+    // 응답 데이터를 반환합니다.
+    return NextResponse.json(order);
+  } catch (error) {
+    console.error('!! ERROR:', error);
+    return NextResponse.json('error', {
+      status: 500,
+    });
+  }
+}

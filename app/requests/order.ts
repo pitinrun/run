@@ -15,8 +15,8 @@ export type GetOrdersDataType = Omit<IOrder, 'products' | 'userId'> & {
     quantity: number;
     discountRate: number;
   })[];
+  _id: string;
 };
-
 export const getOrdersRequest = async ({
   orderStatus,
   period,
@@ -36,4 +36,13 @@ export const getOrdersRequest = async ({
   });
 
   return data;
+};
+
+export const deleteOrderRequest = async (orderId: string) => {
+  const response = await axios.delete('/api/order', {
+    params: {
+      orderId,
+    },
+  });
+  return response.data;
 };

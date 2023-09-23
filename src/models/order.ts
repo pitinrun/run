@@ -3,6 +3,9 @@ import mongoose, { Document, model, Model, Schema } from 'mongoose';
 import { IOrder } from '../types';
 
 export interface IOrderDocument extends Document, IOrder {}
+/**
+ * @note 배송 대기는 deprecated 되었습니다.
+ */
 const OrderSchema: Schema = new Schema(
   {
     status: {
