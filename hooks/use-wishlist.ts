@@ -1,3 +1,4 @@
+'use client';
 // hooks/use-wishlist.ts
 import { useState, useEffect } from 'react';
 import { IProduct, IWishListItem } from '@/src/types';

@@ -1,3 +1,5 @@
+'use client';
+
 import { IProduct, IWishListItem, UserType } from '@/src/types';
 import { convertNumberToKRW, roundUpToHundred } from '@/src/utils';
 import { useRouter } from 'next/navigation';
