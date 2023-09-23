@@ -1,23 +1,13 @@
 // app/wishlist/page.tsx
 'use client';
 import { IProduct, IWishListItem, UserType } from '@/src/types';
-import {
-  JSONToBase64,
-  base64ToJSON,
-  convertNumberToKRW,
-  roundUpToHundred,
-} from '@/src/utils';
+import { JSONToBase64, base64ToJSON } from '@/src/utils';
 import axios, { isAxiosError } from 'axios';
-import ConfirmDialog from 'components/common/confirm-dialog';
-import ProductCard from 'components/product-card';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { getUserMy } from '../requests/user';
 import { toast } from 'react-toastify';
-import { createOrderRequest } from '../requests/order';
-import { useRouter } from 'next/navigation';
-
-let focusProductCode = '';
+import WishlistDashboard from 'components/wishlist/wishlist-dashboard';
 
 type WishListItemWithProduct = IWishListItem & {
   product?: IProduct;
@@ -44,14 +34,10 @@ const injectProduct = (
   });
 };
 
-export default function WishListPage({}) {
+export default function WishListPage() {
   const [wishlist, setWishlist] = useState<WishListItemWithProduct[]>([]);
-  const [openRemoveItemDialog, setOpenRemoveItemDialog] = useState(false);
-  const [openRemoveAllDialog, setOpenRemoveAllDialog] = useState(false);
   const [userData, setUserData] = useState<UserType | null>(null);
-  const [openPurchaseDialog, setOpenPurchaseDialog] = useState(false);
 
-  const router = useRouter();
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -88,7 +74,16 @@ export default function WishListPage({}) {
     fetchWishlist();
   }, []);
 
-  const updateWishlistState = (newWishlist: WishListItemWithProduct[]) => {
+  const handleRemoveWishlistClick = (productCode: string) => {
+    if (productCode === 'all') {
+      localStorage.removeItem('wishlist');
+      setWishlist([]);
+      return;
+    }
+
+    const newWishlist = getLocalStorageWishlist().filter(
+      item => item.productCode !== productCode
+    );
     updateLocalStorageWishlist(newWishlist);
     injectProduct(
       newWishlist,
@@ -97,194 +92,48 @@ export default function WishListPage({}) {
     setWishlist(newWishlist);
   };
 
-  const handleUpdateWishlistItem = (
-    updateFn: (item: WishListItemWithProduct) => void
-  ) => {
+  const handleQuantityChange = (productCode: string, quantity: number) => {
     const localStorageWishlist = getLocalStorageWishlist();
     const newWishlist = localStorageWishlist.map(item => {
-      updateFn(item);
-      return item;
-    });
-    updateWishlistState(newWishlist);
-  };
-
-  const handleRemoveWishlistClick = (productCode: string) => {
-    const newWishlist = getLocalStorageWishlist().filter(
-      item => item.productCode !== productCode
-    );
-    updateWishlistState(newWishlist);
-  };
-
-  const handleQuantityChange = (productCode: string, quantity: number) => {
-    handleUpdateWishlistItem(item => {
       if (item.productCode === productCode) {
         item.quantity = quantity;
       }
+      return item;
     });
+    updateLocalStorageWishlist(newWishlist);
+    injectProduct(
+      newWishlist,
+      wishlist.map(item => item.product!) as IProduct[]
+    );
+    setWishlist(newWishlist);
   };
 
   const handleDiscountRateChange = (
     productCode: string,
     discountRate: number
   ) => {
-    handleUpdateWishlistItem(item => {
+    const localStorageWishlist = getLocalStorageWishlist();
+    const newWishlist = localStorageWishlist.map(item => {
       if (item.productCode === productCode) {
         item.discountRate = discountRate / 100;
       }
+      return item;
     });
-  };
-
-  const getTotalPrice = () => {
-    return wishlist.reduce((acc, cur) => {
-      if (!cur.product) return acc;
-      const value = roundUpToHundred(
-        cur.quantity * (cur.product?.factoryPrice * (1 - cur.discountRate))
-      );
-      return acc + value;
-    }, 0);
-  };
-
-  const handleConfirmOrder = async () => {
-    try {
-      const response = await createOrderRequest({
-        products: wishlist.map(item => {
-          return {
-            productCode: item.productCode,
-            quantity: item.quantity,
-            discountRate: item.discountRate,
-          };
-        }),
-      });
-
-      if (response) {
-        toast.success('주문이 완료되었습니다.');
-        localStorage.removeItem('wishlist');
-        setWishlist([]);
-        router.push('/order');
-      }
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(error.response?.data.message);
-      }
-    }
+    updateLocalStorageWishlist(newWishlist);
+    injectProduct(
+      newWishlist,
+      wishlist.map(item => item.product!) as IProduct[]
+    );
+    setWishlist(newWishlist);
   };
 
   return (
-    <div className='container'>
-      <div className='flex justify-between items-center mb-4'>
-        <h2 className='text-lg sm:text-2xl font-bold'>장바구니</h2>
-        <button
-          className='btn btn-sm sm:btn-md btn-outline-neutral'
-          onClick={() => {
-            setOpenRemoveAllDialog(true);
-          }}
-        >
-          장바구니 비우기
-        </button>
-      </div>
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
-        {wishlist.map(wishlistItem => {
-          if (!wishlistItem.product) return null;
-          return (
-            <ProductCard
-              key={wishlistItem.productCode}
-              defaultQuantity={wishlistItem.quantity}
-              defaultDiscountRate={wishlistItem.discountRate}
-              onChangeQuantity={handleQuantityChange}
-              onChangeDiscountRate={handleDiscountRateChange}
-              onRemoveWishlistClick={() => {
-                focusProductCode = wishlistItem.productCode;
-                setOpenRemoveItemDialog(true);
-              }}
-              {...wishlistItem.product}
-            />
-          );
-        })}
-      </div>
-      <div className='divider' />
-      <div className='flex justify-between md:items-center flex-col md:flex-row'>
-        <div className='md:block flex justify-between'>
-          <span className='mr-4'>
-            <span className='text-base lg:text-lg text-neutral-400 font-semibold mr-2'>
-              총 수량
-            </span>
-            <span className='text-xl lg:text-3xl text-neutral-800 font-semibold'>
-              {wishlist.reduce((acc, cur) => {
-                return acc + cur.quantity;
-              }, 0)}
-            </span>
-          </span>
-          <span>
-            <span className='text-base lg:text-lg text-neutral-400 font-semibold mr-2'>
-              예상 매입가
-            </span>
-            <span className='text-xl md:text-3xl text-neutral-800 font-semibold'>
-              {convertNumberToKRW(getTotalPrice())} 원
-            </span>
-          </span>
-        </div>
-
-        <button
-          className={`btn btn-md btn-neutral md:max-w-xs w-full`}
-          disabled={wishlist.length === 0}
-          onClick={() => {
-            setOpenPurchaseDialog(true);
-          }}
-        >
-          주문하기
-        </button>
-      </div>
-      <ConfirmDialog
-        title='장바구니 상품 지우기'
-        open={openRemoveItemDialog}
-        onClose={() => {
-          setOpenRemoveItemDialog(false);
-        }}
-        onConfirm={() => {
-          handleRemoveWishlistClick(focusProductCode);
-          setOpenRemoveItemDialog(false);
-        }}
-      >
-        장바구니에서 상품을 지우시겠습니까?
-      </ConfirmDialog>
-      <ConfirmDialog
-        title='장바구니 비우기'
-        onConfirm={() => {
-          localStorage.removeItem('wishlist');
-          setWishlist([]);
-          setOpenRemoveAllDialog(false);
-        }}
-        open={openRemoveAllDialog}
-        onClose={() => {
-          setOpenRemoveAllDialog(false);
-        }}
-      >
-        장바구니에 등록된 모든 상품을 비우시겠습니까?
-      </ConfirmDialog>
-      <ConfirmDialog
-        title='주문 확인'
-        onConfirm={() => {
-          handleConfirmOrder();
-          setOpenPurchaseDialog(false);
-        }}
-        confirmText='주문하기'
-        cancelText='취소'
-        open={openPurchaseDialog}
-        onClose={() => {
-          setOpenPurchaseDialog(false);
-        }}
-      >
-        거래명세서를 받을 연락처와 배송지를 확인해주세요.
-        <br />
-        정보 변경이 필요한 경우 담당자에게 연락주시기 바랍니다.
-        <br />
-        <br />
-        <strong>{userData?.tel}</strong>
-        <br />
-        <strong>
-          {userData?.businessAddress?.address} {userData?.businessAddressDetail}
-        </strong>
-      </ConfirmDialog>
-    </div>
+    <WishlistDashboard
+      wishlist={wishlist}
+      handleRemoveWishlistClick={handleRemoveWishlistClick}
+      handleQuantityChange={handleQuantityChange}
+      handleDiscountRateChange={handleDiscountRateChange}
+      userData={userData}
+    />
   );
 }
