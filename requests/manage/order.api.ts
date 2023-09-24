@@ -1,21 +1,22 @@
-import { IOrder, IProduct } from '@/src/types';
+import { IOrder, IProduct, UserType } from '@/src/types';
 import axios from 'axios';
 
-export type GetManageOrdersDataType = Omit<IOrder, 'products' | 'userId'> & {
+export type ResponseGetOrdersForManager = Omit<IOrder, 'products' | 'userId'> & {
   products: (IProduct & {
     quantity: number;
     discountRate: number;
   })[];
+  userData: UserType;
   _id: string;
 };
-export const getManageOrdersRequest = async ({
+export const getOrdersRequestForManager = async ({
   orderStatus,
   period,
 }: {
   orderStatus?: string;
   period?: string;
 }) => {
-  const { data } = await axios.get<GetManageOrdersDataType[]>('/api/manage/order', {
+  const { data } = await axios.get<ResponseGetOrdersForManager[]>('/api/manage/order', {
     params: {
       orderStatus,
       period,

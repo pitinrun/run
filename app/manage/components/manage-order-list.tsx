@@ -1,13 +1,16 @@
 'use client';
 
-import { GetOrdersDataType, deleteOrderRequest } from 'requests/order';
+import { deleteOrderRequest } from 'requests/order.api';
 import { IOrder } from '@/src/types';
 import { isAxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import ConfirmDialog from 'components/confirm-dialog';
 import ManageOrderCard from './manage-order-card';
-import { getManageOrdersRequest } from 'requests/manage/order';
+import {
+  ResponseGetOrdersForManager,
+  getOrdersRequestForManager,
+} from 'requests/manage/order.api';
 
 const ORDER_STATUSES = [
   {
@@ -18,10 +21,10 @@ const ORDER_STATUSES = [
     name: '주문 확인중',
     value: 1,
   },
-  {
-    name: '배송 대기',
-    value: 2,
-  },
+  // {
+  //   name: '배송 대기',
+  //   value: 2,
+  // },
   {
     name: '배송중',
     value: 3,
@@ -35,7 +38,7 @@ const ORDER_STATUSES = [
 let targetRemoveOrder: string | null = null;
 
 export default function ManageOrderList({}) {
-  const [orders, setOrders] = useState<GetOrdersDataType[]>([]);
+  const [orders, setOrders] = useState<ResponseGetOrdersForManager[]>([]);
   const [filterStatus, setFilterStatus] = useState<IOrder['status'] | null>(
     null
   );
@@ -50,7 +53,7 @@ export default function ManageOrderList({}) {
       reqOrderParams['orderStatus'] = filterStatus;
     if (filterPeriod) reqOrderParams['period'] = filterPeriod;
 
-    const ordersData = await getManageOrdersRequest(reqOrderParams);
+    const ordersData = await getOrdersRequestForManager(reqOrderParams);
     setOrders(ordersData);
   };
 

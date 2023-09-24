@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import ProductCard from 'components/product-card';
 import { useState } from 'react';
-import { createOrderRequest } from 'requests/order';
+import { createOrderRequest } from 'requests/order.api';
 import ConfirmDialog from 'components/confirm-dialog';
 
 let selectedProductCode: string | null = null;

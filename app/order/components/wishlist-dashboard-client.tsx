@@ -4,7 +4,7 @@ import { JSONToBase64 } from '@/src/utils';
 import WishlistDashboard from '@/app/wishlist/components/wishlist-dashboard';
 import { useWishlist } from 'hooks/use-wishlist';
 import { useEffect } from 'react';
-import { deleteOrderRequest } from 'requests/order';
+import { deleteOrderRequest } from 'requests/order.api';
 
 /**
  * @note 해달 컴포넌트는 Order Edit 전용으로 만들어졌습니다.

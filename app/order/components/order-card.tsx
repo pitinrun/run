@@ -1,122 +1,51 @@
 import { convertNumberToKRW, getDiscountedPrice } from '@/src/utils';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/20/solid';
-import dayjs from 'dayjs';
 import Link from 'next/link';
-import { ResponseGetOrdersForManager } from 'requests/manage/order.api';
+import { ResponseGetOrders } from 'requests/order.api';
 
-type ManageOrderCardProps = ResponseGetOrdersForManager & {
+type OrderCardProps = ResponseGetOrders & {
   onClickRemove?: () => void;
-  onClickEdit?: () => void;
 };
-export default function ManageOrderCard({
+export default function OrderCard({
   createdAt,
   status,
   products,
-  deliveredAt,
-  deliveryStartedAt,
-  deliveryInfo,
   onClickRemove,
   _id,
-  userData,
-  onClickEdit,
-}: ManageOrderCardProps) {
+}: OrderCardProps) {
   const statusMap = {
     1: '주문 확인중',
-    // 2: '배송 대기', // NOTE: deprecated
+    2: '배송 대기', // NOTE: deprecated
     3: '배송중',
     4: '배송완료',
   };
 
-  const statusButtonTextMap = {
-    1: '주문 접수',
-    3: '배송 완료',
-  };
-
   const isWaiting = status === 1;
-  const isDelivering = status === 3;
-  const isDelivered = status === 4;
-
-  const orderLabelClasses = 'text-xs md:text-sm text-neutral-400';
-  const orderValueClasses = 'text-xs md:text-base text-neutral-800';
 
   return (
     <div className='card w-full border border-solid border-neutral-200 my-4'>
       <div className='card-header bg-gray-200 rounded-t-lg flex flex-row items-center justify-between px-4 py-2 lg:px-8 lg:py-4'>
         <div className='flex items-center gap-2 md:gap-4 rounded-t-lg'>
           <h6 className='text-base md:text-lg lg:text-xl font-semibold'>
-            {userData.businessName}
+            {createdAt.toLocaleDateString('ko')}
           </h6>
           <div className='badge badge-md md:badge-lg'>{statusMap[status]}</div>
         </div>
-        <div className='flex items-center'>
-          <button className='btn btn-xs md:btn-sm btn-outline mr-2 md:mr-4'>
-            <TrashIcon
-              className='w-4 h-4 md:w-5 md:h-5'
-              onClick={onClickRemove}
-            />
-          </button>
-          <button className='btn btn-xs btn-neutral md:btn-sm'>
-            {statusButtonTextMap[status]}
-          </button>
-        </div>
-      </div>
-      <div className='card-body p-0'>
-        <div className='px-4 py-2 lg:px-8 lg:py-3 md:flex flex-row justify-between border-b border-solid border-neutral-200'>
-          <div className='grid gap-2 md:gap-4 grid-cols-12 font-semibold'>
-            <div className='col-span-12 md:col-span-4 text-sm md:font-medium text-neutral-800'>
-              <div>{userData.tel}</div>
-              <div>
-                {userData.businessAddress?.address}{' '}
-                {userData.businessAddressDetail}
-              </div>
-            </div>
-            <div className='col-span-3 md:col-span-2'>
-              <div className={orderLabelClasses}>주문 일자</div>
-              <div className={orderValueClasses}>
-                {dayjs(createdAt).format('YY-MM-DD hh:mm')}
-              </div>
-            </div>
-            <div className='col-span-3 md:col-span-2'>
-              <div className={orderLabelClasses}>배송 시작일</div>
-              <div className={orderValueClasses}>
-                {deliveryStartedAt
-                  ? dayjs(deliveryStartedAt).format('YY-MM-DD hh:mm')
-                  : '-'}
-              </div>
-            </div>
-            <div className='col-span-3 md:col-span-2'>
-              <div className={orderLabelClasses}>배송 완료일</div>
-              <div className={orderValueClasses}>
-                {deliveryStartedAt
-                  ? dayjs(deliveredAt).format('YY-MM-DD hh:mm')
-                  : '-'}
-              </div>
-            </div>
-            <div className='col-span-3 md:col-span-2'>
-              <div className={orderLabelClasses}>배송 정보</div>
-              <div className={orderValueClasses}>{deliveryInfo || '-'}</div>
-            </div>
-            {/* <div className={`md:mr-5 text-sm md:text-lg lg:text-xl`}>
-              {product.patternKr}
-            </div>
-            <span className='text-xs md:text-sm lg:text-base md:mx-2 md:mx-5'>
-              {product.brand}
-            </span>
-            <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
-              {product.size}
-            </span>
-            {product.marking && (
-              <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
-                {product.marking}
-              </span>
-            )}
-            {product.speedSymbolLoadIndex && (
-              <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
-                {product.speedSymbolLoadIndex}
-              </span>
-            )} */}
+        {status === 1 && (
+          <div>
+            <button className='btn btn-xs md:btn-sm btn-outline mr-2 md:mr-4'>
+              <TrashIcon
+                className='w-4 h-4 md:w-5 md:h-5'
+                onClick={onClickRemove}
+              />
+            </button>
+            <Link href={`/order/edit/${_id}`}>
+              <button className='btn btn-xs md:btn-sm btn-outline'>
+                <PencilSquareIcon className='w-4 h-4 md:w-5 md:h-5' />
+              </button>
+            </Link>
           </div>
-        </div>
+        )}
       </div>
       <div className='card-body p-0'>
         {products.map(product => {

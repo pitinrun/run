@@ -63,6 +63,9 @@ export interface IOrder {
     quantity: number;
     discountRate: number;
   }[];
+  deliveryStartedAt?: Date;
+  deliveredAt?: Date;
+  deliveryInfo?: string;
 }
 
 export interface IUser {

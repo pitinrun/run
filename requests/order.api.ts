@@ -10,7 +10,7 @@ export const createOrderRequest = async ({
   return response.data;
 };
 
-export type GetOrdersDataType = Omit<IOrder, 'products' | 'userId'> & {
+export type ResponseGetOrders = Omit<IOrder, 'products' | 'userId'> & {
   products: (IProduct & {
     quantity: number;
     discountRate: number;
@@ -24,7 +24,7 @@ export const getOrdersRequest = async ({
   orderStatus?: string;
   period?: string;
 }) => {
-  const { data } = await axios.get<GetOrdersDataType[]>('/api/order', {
+  const { data } = await axios.get<ResponseGetOrders[]>('/api/order', {
     params: {
       orderStatus,
       period,

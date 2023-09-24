@@ -26,6 +26,15 @@ const OrderSchema: Schema = new Schema(
       ],
       required: true,
     },
+    deliveryStartedAt: {
+      type: Date,
+    },
+    deliveredAt: {
+      type: Date,
+    },
+    deliveryInfo: {
+      type: String,
+    },
   },
   {
     timestamps: true,

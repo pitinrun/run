@@ -3,7 +3,7 @@ import { connectToDatabase } from 'src/utils';
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { FilterQuery } from 'mongoose';
-import { getOrders } from '@/src/services/order';
+import { getOrders, getOrdersForManager } from '@/src/services/order';
 
 // MongoDB에 연결합니다.
 connectToDatabase();
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
     }
 
     // 주어진 필터를 사용해 주문 정보를 가져옵니다.
-    const orders = await getOrders(filter);
+    const orders = await getOrdersForManager(filter);
 
     // 응답 데이터를 반환합니다.
     return NextResponse.json(orders);
