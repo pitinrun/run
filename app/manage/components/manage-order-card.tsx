@@ -1,7 +1,7 @@
-import { convertNumberToKRW, getDiscountedPrice } from "@/src/utils";
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
-import Link from "next/link";
-import { GetOrdersDataType } from "requests/order";
+import { convertNumberToKRW, getDiscountedPrice } from '@/src/utils';
+import { PencilSquareIcon, TrashIcon } from '@heroicons/react/20/solid';
+import Link from 'next/link';
+import { GetOrdersDataType } from 'requests/order';
 
 type ManageOrderCardProps = GetOrdersDataType & {
   onClickRemove?: () => void;
@@ -57,7 +57,13 @@ export default function ManageOrderCard({
               key={`${createdAt}-${product.productCode}`}
             >
               <div className='block md:flex items-center text-neutral-400 font-semibold'>
-                <div className='md:mr-5 text-sm md:text-lg lg:text-xl text-run-red-1'>
+                <div
+                  className={`md:mr-5 text-sm md:text-lg lg:text-xl ${
+                    product.specialDiscountRate
+                      ? 'text-run-red-1'
+                      : 'text-neutral-800'
+                  }`}
+                >
                   {product.patternKr}
                 </div>
                 <span className='text-xs md:text-sm lg:text-base md:mx-2 md:mx-5'>

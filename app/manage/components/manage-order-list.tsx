@@ -1,16 +1,13 @@
 'use client';
 
-import {
-  GetOrdersDataType,
-  deleteOrderRequest,
-  getOrdersRequest,
-} from 'requests/order';
+import { GetOrdersDataType, deleteOrderRequest } from 'requests/order';
 import { IOrder } from '@/src/types';
 import { isAxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import ConfirmDialog from 'components/confirm-dialog';
 import ManageOrderCard from './manage-order-card';
+import { getManageOrdersRequest } from 'requests/manage/order';
 
 const ORDER_STATUSES = [
   {
@@ -53,7 +50,7 @@ export default function ManageOrderList({}) {
       reqOrderParams['orderStatus'] = filterStatus;
     if (filterPeriod) reqOrderParams['period'] = filterPeriod;
 
-    const ordersData = await getOrdersRequest(reqOrderParams);
+    const ordersData = await getManageOrdersRequest(reqOrderParams);
     setOrders(ordersData);
   };
 

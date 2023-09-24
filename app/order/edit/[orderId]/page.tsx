@@ -21,11 +21,18 @@ export default async function OrderEditPage({
     const orderData = await getOrderById(orderId);
 
     if (!userData) {
-      throw new Error('사용자 정보를 불러올 수 없습니다.');
+      throw new Error('401');
     }
 
     if (!orderData) {
-      throw new Error('주문 정보를 불러올 수 없습니다.');
+      throw new Error('404');
+    }
+
+    const isAdmin = userData.role && userData.role >= 9;
+    const isOwner = userData.userId === orderData.userId;
+
+    if (!isOwner && !isAdmin) {
+      throw new Error('403');
     }
 
     return (
@@ -35,6 +42,6 @@ export default async function OrderEditPage({
     );
   } catch (error) {
     console.error('!! ERROR:', error);
-    return <ErrorAlert statusCode={500}>{error.message}</ErrorAlert>;
+    return <ErrorAlert statusCode={error.message ?? 500} />;
   }
 }
