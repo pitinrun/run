@@ -9,10 +9,10 @@ import { IOrder } from '@/src/types';
 import { convertNumberToKRW, getDiscountedPrice } from '@/src/utils';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/20/solid';
 import { isAxiosError } from 'axios';
-import ConfirmDialog from 'components/common/confirm-dialog';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
+import ConfirmDialog from 'components/confirm-dialog';
 
 const ORDER_STATUSES = [
   {

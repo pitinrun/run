@@ -1,13 +1,13 @@
 import { FetchConfig } from 'http-react';
 import './globals.css';
-import AuthSession from 'components/common/auth-session';
+import AuthSession from 'components/auth-session';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { LayoutProvider } from 'components/common/layout-provider';
 import { getServerSession } from 'next-auth';
 import { authOptions } from './api/auth/[...nextauth]/route';
 import { getUser } from '@/src/services/user';
 import { Noto_Sans_KR } from 'next/font/google';
+import { LayoutProvider } from 'components/layout-provider';
 
 const notoSansKr = Noto_Sans_KR({
   weight: ['100', '300', '400', '500', '700'],

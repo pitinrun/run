@@ -3,7 +3,7 @@
 import { BRANDS, BrandType, IProduct, SeasonType } from '@/src/types';
 import ProductCardDashboard__V2 from 'components/product-card-dashboard-v2';
 import ProductSearchBar from 'components/product-search-bar';
-import BrandFilter from 'components/products/brand-filter';
+import BrandFilter from '@/app/products/components/brand-filter';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 

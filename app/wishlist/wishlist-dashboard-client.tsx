@@ -1,7 +1,7 @@
 'use client';
 import { UserType } from '@/src/types';
-import WishlistDashboard from 'components/wishlist/wishlist-dashboard';
 import { useWishlist } from 'hooks/use-wishlist';
+import WishlistDashboard from './components/wishlist-dashboard';
 
 export default function WishlistDashboardClient({
   userData,

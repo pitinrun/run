@@ -1,10 +1,10 @@
 import { getOrderById } from '@/src/services/order';
-import WishlistDashboardClient from './wishlist-dashboard-client';
+import WishlistDashboardClient from '../../components/wishlist-dashboard-client';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { getUser } from '@/src/services/user';
-import ErrorAlert from 'components/common/error-alert';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import ErrorAlert from 'components/error-alert';
 
 export default async function OrderEditPage({
   params: { orderId },

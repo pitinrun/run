@@ -5,9 +5,9 @@ import { convertNumberToKRW, roundUpToHundred } from '@/src/utils';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import ProductCard from 'components/product-card';
-import ConfirmDialog from 'components/common/confirm-dialog';
 import { useState } from 'react';
 import { createOrderRequest } from 'requests/order';
+import ConfirmDialog from 'components/confirm-dialog';
 
 let selectedProductCode: string | null = null;
 
@@ -16,7 +16,7 @@ type WishlistDashboardProps = {
   handleRemoveWishlistClick: (productCode: string) => void;
   handleQuantityChange: (productCode: string, quantity: number) => void;
   handleDiscountRateChange: (productCode: string, discountRate: number) => void;
-  onConfirmOrder: () => void;
+  onConfirmOrder?: () => void;
   title?: string;
   clearButtonText?: string;
   confirmButtonText?: string;

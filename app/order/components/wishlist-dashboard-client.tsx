@@ -1,7 +1,7 @@
 'use client';
 import { IOrder, UserType } from '@/src/types';
 import { JSONToBase64 } from '@/src/utils';
-import WishlistDashboard from 'components/wishlist/wishlist-dashboard';
+import WishlistDashboard from '@/app/wishlist/components/wishlist-dashboard';
 import { useWishlist } from 'hooks/use-wishlist';
 import { useEffect } from 'react';
 import { deleteOrderRequest } from 'requests/order';

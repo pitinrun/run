@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react';
 import ProductCard from './product-card';
 import axios from 'axios';
 import { BrandType, IProduct, SeasonType } from '@/src/types';
-import OrderDialog from './products/order-dialog';
 import { JSONToBase64, base64ToJSON } from '@/src/utils';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
-import EmptyAlert from './common/empty-alert';
+import OrderDialog from './order-dialog';
+import EmptyAlert from './empty-alert';
 
 export default function ProductCardDashboard__V2({
   selectedBrands = null,

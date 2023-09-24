@@ -1,5 +1,5 @@
 import { IOrder } from '@/src/types';
-import OrderList from 'components/order/order-list';
+import OrderList from '@/app/order/components/order-list';
 import { useState } from 'react';
 
 export default function OrderPage() {
