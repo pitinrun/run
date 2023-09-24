@@ -17,6 +17,13 @@ type WishlistDashboardProps = {
   handleQuantityChange: (productCode: string, quantity: number) => void;
   handleDiscountRateChange: (productCode: string, discountRate: number) => void;
   onConfirmOrder: () => void;
+  title?: string;
+  clearButtonText?: string;
+  confirmButtonText?: string;
+  clearDialogText?: {
+    title: string;
+    content: string;
+  };
   userData: UserType | null;
 };
 
@@ -26,6 +33,13 @@ export default function WishlistDashboard({
   handleQuantityChange,
   handleDiscountRateChange,
   onConfirmOrder,
+  title = '장바구니',
+  clearButtonText = '장바구니 비우기',
+  confirmButtonText = '주문하기',
+  clearDialogText = {
+    title: '장바구니 비우기',
+    content: '장바구니를 비우시겠습니까?',
+  },
   userData,
 }: WishlistDashboardProps) {
   const router = useRouter();
@@ -71,12 +85,12 @@ export default function WishlistDashboard({
   return (
     <div>
       <div className='flex justify-between items-center mb-4'>
-        <h2 className='text-lg sm:text-2xl font-bold'>장바구니</h2>
+        <h2 className='text-lg sm:text-2xl font-bold'>{title}</h2>
         <button
           className='btn btn-sm sm:btn-md btn-outline-neutral'
           onClick={() => setOpenRemoveAllDialog(true)}
         >
-          장바구니 비우기
+          {clearButtonText}
         </button>
       </div>
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
@@ -126,12 +140,12 @@ export default function WishlistDashboard({
           onClick={() => setOpenPurchaseDialog(true)}
           disabled={wishlist.length === 0}
         >
-          주문하기
+          {confirmButtonText}
         </button>
       </div>
 
       <ConfirmDialog
-        title='장바구니 상품 지우기'
+        title='상품 지우기'
         open={openRemoveItemDialog}
         onClose={() => setOpenRemoveItemDialog(false)}
         onConfirm={() => {
@@ -139,11 +153,11 @@ export default function WishlistDashboard({
           setOpenRemoveItemDialog(false);
         }}
       >
-        장바구니에서 상품을 지우시겠습니까?
+        상품을 지우시겠습니까?
       </ConfirmDialog>
 
       <ConfirmDialog
-        title='장바구니 비우기'
+        title={clearDialogText.title}
         onConfirm={() => {
           handleRemoveWishlistClick('all');
           setOpenRemoveAllDialog(false);
@@ -151,7 +165,7 @@ export default function WishlistDashboard({
         open={openRemoveAllDialog}
         onClose={() => setOpenRemoveAllDialog(false)}
       >
-        장바구니에 등록된 모든 상품을 비우시겠습니까?
+        {clearDialogText.content}
       </ConfirmDialog>
 
       <ConfirmDialog

@@ -7,26 +7,18 @@ import OrderDialog from './products/order-dialog';
 import { JSONToBase64, base64ToJSON } from '@/src/utils';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
-
-const EmptyProducts = () => (
-  <div className='card border border-solid border-neutral-200'>
-    <div className='card-body'>
-      <div className='text-center text-neutral-600'>
-        <div className='text-base sm:text-lg'>검색된 제품이 없습니다.</div>
-        <div className='text-base sm:text-lg'>검색 조건을 확인해 주세요!</div>
-      </div>
-    </div>
-  </div>
-);
+import EmptyAlert from './common/empty-alert';
 
 export default function ProductCardDashboard__V2({
   selectedBrands = null,
+  title,
   season = '',
   onlySpecialDiscount = false,
   sizeSearchKeyword = '',
   perPage = 10,
 }: {
   selectedBrands?: BrandType[] | null;
+  title?: string;
   season?: SeasonType | '';
   onlySpecialDiscount?: boolean;
   sizeSearchKeyword?: string;
@@ -126,9 +118,18 @@ export default function ProductCardDashboard__V2({
     setOrderDialogOpen(true);
   }
 
+  if (!isLoading && products.length <= 0) {
+    return (
+      <EmptyAlert>
+        <div className='text-base sm:text-lg'>검색된 제품이 없습니다.</div>
+        <div className='text-base sm:text-lg'>검색 조건을 확인해 주세요!</div>
+      </EmptyAlert>
+    );
+  }
+
   return (
     <div>
-      {!isLoading && products.length <= 0 && <EmptyProducts />}
+      {title && <h2 className='text-lg sm:text-2xl font-bold mb-2'>{title}</h2>}
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
         {products.map((product, index) => (
           <ProductCard

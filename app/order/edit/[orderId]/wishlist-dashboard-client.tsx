@@ -46,6 +46,13 @@ export default function WishlistDashboardClient({
       handleQuantityChange={handleQuantityChange}
       handleDiscountRateChange={handleDiscountRateChange}
       onConfirmOrder={handleConfirmOrder}
+      title='주문 수정하기'
+      clearButtonText='주문 취소'
+      confirmButtonText='수정하기'
+      clearDialogText={{
+        title: '주문 취소',
+        content: '주문을 취소하시겠습니까?',
+      }}
       userData={userData}
     />
   );
