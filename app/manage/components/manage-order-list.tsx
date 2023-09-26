@@ -1,9 +1,10 @@
+// app/manage/components/manage-order-list.tsx
 'use client';
 
 import { deleteOrderRequest } from 'requests/order.api';
 import { IOrder } from '@/src/types';
 import { isAxiosError } from 'axios';
-import { useEffect, useState } from 'react';
+import { memo, useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import ConfirmDialog from 'components/confirm-dialog';
 import ManageOrderCard from './manage-order-card';
@@ -11,6 +12,10 @@ import {
   ResponseGetOrdersForManager,
   getOrdersRequestForManager,
 } from 'requests/manage/order.api';
+import ManageStockModal from './manage-stock-modal';
+import OrderModalProvider, {
+  OrderModalContext,
+} from '../contexts/order-modal.context';
 
 const ORDER_STATUSES = [
   {
@@ -37,7 +42,7 @@ const ORDER_STATUSES = [
 
 let targetRemoveOrder: string | null = null;
 
-export default function ManageOrderList({}) {
+function ManageOrderList({}) {
   const [orders, setOrders] = useState<ResponseGetOrdersForManager[]>([]);
   const [filterStatus, setFilterStatus] = useState<IOrder['status'] | null>(
     null
@@ -46,6 +51,16 @@ export default function ManageOrderList({}) {
     new Date().toISOString().slice(0, 7)
   );
   const [openRemoveConfirm, setOpenRemoveConfirm] = useState(false);
+  // const [orderModalOpen, setOrderModalOpen] = useState(false);
+  const {
+    products,
+    userData,
+    setProducts,
+    setUserData,
+    isVisible,
+    openModal,
+    closeModal,
+  } = useContext(OrderModalContext);
 
   const fetchOrders = async () => {
     const reqOrderParams = {};
@@ -139,6 +154,14 @@ export default function ManageOrderList({}) {
       >
         주문을 삭제하시겠습니까?
       </ConfirmDialog>
+      <ManageStockModal
+        open={isVisible}
+        onClose={() => {
+          closeModal();
+        }}
+      />
     </div>
   );
 }
+
+export default memo(ManageOrderList);

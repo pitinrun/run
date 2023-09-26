@@ -1,8 +1,13 @@
+// app/manage/components/manage-order-card.tsx
+'use client';
+
 import { convertNumberToKRW, getDiscountedPrice } from '@/src/utils';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/20/solid';
 import dayjs from 'dayjs';
-import Link from 'next/link';
 import { ResponseGetOrdersForManager } from 'requests/manage/order.api';
+import ManageStockModal from './manage-stock-modal';
+import { useContext, useEffect, useState } from 'react';
+import { OrderModalContext } from '../contexts/order-modal.context';
 
 type ManageOrderCardProps = ResponseGetOrdersForManager & {
   onClickRemove?: () => void;
@@ -20,6 +25,20 @@ export default function ManageOrderCard({
   userData,
   onClickEdit,
 }: ManageOrderCardProps) {
+  const {
+    // products,
+    // userData,
+    setProducts,
+    setUserData,
+    isVisible,
+    openModal,
+    // closeModal,
+  } = useContext(OrderModalContext);
+
+  useEffect(() => {
+    console.log('$$ manage-order-card', isVisible);
+  }, [isVisible])
+
   const statusMap = {
     1: '주문 확인중',
     // 2: '배송 대기', // NOTE: deprecated
@@ -55,7 +74,14 @@ export default function ManageOrderCard({
               onClick={onClickRemove}
             />
           </button>
-          <button className='btn btn-xs btn-neutral md:btn-sm'>
+          <button
+            className='btn btn-xs btn-neutral md:btn-sm'
+            onClick={() => {
+              setProducts(products);
+              setUserData(userData);
+              openModal();
+            }}
+          >
             {statusButtonTextMap[status]}
           </button>
         </div>
@@ -96,25 +122,6 @@ export default function ManageOrderCard({
               <div className={orderLabelClasses}>배송 정보</div>
               <div className={orderValueClasses}>{deliveryInfo || '-'}</div>
             </div>
-            {/* <div className={`md:mr-5 text-sm md:text-lg lg:text-xl`}>
-              {product.patternKr}
-            </div>
-            <span className='text-xs md:text-sm lg:text-base md:mx-2 md:mx-5'>
-              {product.brand}
-            </span>
-            <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
-              {product.size}
-            </span>
-            {product.marking && (
-              <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
-                {product.marking}
-              </span>
-            )}
-            {product.speedSymbolLoadIndex && (
-              <span className='text-xs md:text-sm lg:text-base mx-2 md:mx-5'>
-                {product.speedSymbolLoadIndex}
-              </span>
-            )} */}
           </div>
         </div>
       </div>
