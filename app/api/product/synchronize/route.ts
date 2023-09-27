@@ -114,7 +114,7 @@ const serializeSheetToObjectForProduct = (
         if (typeof row[map.rowNum - 1] !== 'undefined') {
           if (key === 'factoryPrice' && row[map.rowNum - 1]) {
             (product[key as keyof IProduct] as number) = parseInt(
-              row[map.rowNum - 1].replace('₩', '').replace(',', ''),
+              row[map.rowNum - 1].replace('₩', '').replaceAll(',', ''),
               10
             );
           } else if (key === 'specialDiscountRate' && row[map.rowNum - 1]) {
