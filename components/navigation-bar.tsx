@@ -22,12 +22,12 @@ type ContentItemType = {
 const userContents: ContentItemType[] = [
   {
     name: '장바구니',
-    href: '',
+    href: '/wishlist',
     icon: <ShoppingCartIcon className='w-6 h-6 mr-4' />,
   },
   {
     name: '주문내역',
-    href: '',
+    href: '/order',
     icon: <ListBulletIcon className='w-6 h-6 mr-4' />,
   },
 ];
@@ -35,7 +35,7 @@ const userContents: ContentItemType[] = [
 const managerContents: ContentItemType[] = [
   {
     name: '주문 관리',
-    href: '',
+    href: '/manage/order',
     icon: <ListBulletIcon className='w-6 h-6 mr-4' />,
   },
 ];
@@ -53,7 +53,7 @@ const masterContents: ContentItemType[] = [
   },
   {
     name: '주문 관리',
-    href: '',
+    href: '/manage/order',
     icon: <ListBulletIcon className='w-6 h-6 mr-4' />,
   },
   {

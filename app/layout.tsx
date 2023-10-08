@@ -45,7 +45,6 @@ async function MainLayout({ children }) {
               <LayoutProvider role={userData?.role}>
                 <ToastContainer />
                 {children}
-                <ToastContainer />
               </LayoutProvider>
             </AuthSession>
           </div>

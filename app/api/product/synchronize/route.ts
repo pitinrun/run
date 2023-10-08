@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from 'src/utils';
 import { google } from 'googleapis';
-// import { client_email, private_key } from '.meta/google-credentials.json';
 import { toColumnName } from './utils';
 import { dropAndBulkInsertProducts } from '@/src/services/product';
 import { updateStorageNames } from '@/src/services/metadata';

@@ -2,12 +2,9 @@
 import * as React from 'react';
 import { signIn } from 'next-auth/react';
 import { toast } from 'react-toastify';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function AuthSignInPage() {
-  const router = useRouter();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const target = e.target as typeof e.target & {
@@ -30,9 +27,7 @@ export default function AuthSignInPage() {
     if (response?.error) {
       toast.error(response.error);
     } else {
-      toast.success(`${userId}님 환영합니다!`);
-      // router.push(response?.url || '/');
-      // NOTE: Navigation role issue
+      toast.success(`로그인 인증에 성공하였습니다!`);
       window.location.href = response?.url || '/';
     }
   };
@@ -83,37 +78,5 @@ export default function AuthSignInPage() {
         </form>
       </div>
     </div>
-    // <div className='container mx-auto max-w-sm h-screen flex flex-col justify-center items-center'>
-    //   <div className='text-center mb-10'>
-    //     <h1 className='text-4xl font-bold'>아이홀덤</h1>
-    //   </div>
-    // </div>
   );
 }
-
-// export async function getServerSideProps(context: any) {
-//   const session = await getSession(context);
-
-//   // If the user is already logged in, redirect to root "/"
-//   if (session) {
-//     return {
-//       redirect: {
-//         destination: "/",
-//         permanent: false,
-//       },
-//     };
-//   }
-
-//   const { callbackUrl } = context.query;
-//   if (callbackUrl) {
-//     return {
-//       redirect: {
-//         destination: callbackUrl,
-//         permanent: false,
-//       },
-//     };
-//   }
-//   return {
-//     props: {},
-//   };
-// }
