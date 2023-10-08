@@ -35,9 +35,9 @@ export default function ManageOrderCard({
     // closeModal,
   } = useContext(OrderModalContext);
 
-  useEffect(() => {
-    console.log('$$ manage-order-card', isVisible);
-  }, [isVisible])
+  // useEffect(() => {
+  //   console.log('$$ manage-order-card', isVisible);
+  // }, [isVisible])
 
   const statusMap = {
     1: '주문 확인중',

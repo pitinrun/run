@@ -8,12 +8,13 @@ import { IProduct } from '@/src/types';
 
 connectToDatabase();
 
+const DEBUG_MODE = true;
+
 const credential = JSON.parse(
   Buffer.from(process.env.GOOGLE_CREDENTIALS ?? '', 'base64').toString()
 );
 
 const START_CELL = 'A6';
-
 const { SPREAD_SHEET_ID, SPREAD_SHEET_PRODUCT_NAME } = process.env;
 
 const SHEET_MATCH_MAP: { [K in keyof IProduct] } = {
@@ -83,7 +84,18 @@ const serializeSheetToObjectForProductMeta = (
 ) => {
   const storageNames = sheetData[0]
     .slice(SHEET_MATCH_MAP.storages.startRowNum - 1)
-    .filter(name => name);
+    .reduce((acc, name, index, arr) => {
+      if (index % 2 === 0) {
+        return [
+          ...acc,
+          {
+            name,
+            code: arr[index + 1],
+          },
+        ];
+      }
+      return acc;
+    }, []);
 
   return updateStorageNames(storageNames);
 };
@@ -140,10 +152,16 @@ const serializeSheetToObjectForProduct = (
           }
         }
       } else {
+        // NOTE: if key is storages
         const storageNames = sheetData[0].slice(map.startRowNum - 1);
         const storageRows = row.slice(map.startRowNum - 1);
+
         const storages: IProduct['storages'] = storageNames.reduce(
           (acc, name, index) => {
+            if (index % 2 === 1) {
+              // NOTE: 홀수 번째는 창고 코드
+              return acc;
+            }
             if (name) {
               return [
                 ...acc,
@@ -208,6 +226,13 @@ async function getSheetRange(
   const colCount = sheetInfo.properties.gridProperties.columnCount ?? 0;
 
   const endCell = toColumnName(colCount) + rowCount;
+
+  if (DEBUG_MODE && process.env.NODE_ENV === 'development') {
+    return {
+      startCell: START_CELL,
+      endCell: 'AO106',
+    };
+  }
 
   return {
     startCell: START_CELL,

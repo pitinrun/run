@@ -31,6 +31,7 @@ export const dropAndBulkInsertProducts = async (products: IProduct[]) => {
     // NOTE: Slice 1000 items and bulkWrite
     for (let i = 0; i < bulkOption.length; i += 500) {
       const result = await Product.bulkWrite(bulkOption.slice(i, i + 500));
+      // console.log('$$ result: ', result);
     }
   } catch (error) {
     console.error('!! ERROR: ', error.message);

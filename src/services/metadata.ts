@@ -1,9 +1,9 @@
-import { MetaData } from 'src/models/metadata';
+import { IMetaData, MetaData } from 'src/models/metadata';
 import { connectToDatabase } from '../utils';
 
 connectToDatabase();
 
-export const updateStorageNames = (storageNames: string[]) => {
+export const updateStorageNames = (storageNames: IMetaData['storageNames']) => {
   return MetaData.findOneAndUpdate(
     {},
     { storageNames },

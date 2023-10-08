@@ -1,7 +1,10 @@
 import mongoose, { Document, model, Model, Schema } from 'mongoose';
 
 export interface IMetaData {
-  storageNames: string[]; // NOTE: product에 속한 storages names example: 산동, 천안, 동남 ...
+  storageNames: {
+    name: string;
+    code: string;
+  }[]; // NOTE: product에 속한 storages names example: 산동, 천안, 동남 ...
 }
 
 export interface IMetaDataDocument extends Document, IMetaData {}
@@ -9,7 +12,7 @@ export interface IMetaDataDocument extends Document, IMetaData {}
 const MetaDataSchema: Schema = new Schema(
   {
     storageNames: {
-      type: Array,
+      type: Object,
     },
   },
   {
