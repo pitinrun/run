@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { OrderModalContext } from '../../contexts/order-modal.context';
 import {
   convertNumberToKRW,
+  convertNumberToPercent,
   getDiscountedPrice,
   roundUpToHundred,
 } from '@/src/utils';
@@ -38,17 +39,34 @@ export default function ManageStockModal({
   useEffect(() => {
     setOrderInfos(
       Object.fromEntries(
-        products?.map(product => [
-          product.productCode,
-          {
-            discountRate: 0,
-            totalQuantity: 0,
-            totalFactoryPrice: 0,
-            stocks: Object.fromEntries(
-              product.storages.map(storage => [storage.name, 0])
-            ),
-          },
-        ]) ?? []
+        products?.map(product => {
+          if (product.specialDiscountRate) {
+            return [
+              product.productCode,
+              {
+                discountRate: convertNumberToPercent(
+                  product.specialDiscountRate
+                ),
+                totalQuantity: 0,
+                totalFactoryPrice: 0,
+                stocks: Object.fromEntries(
+                  product.storages.map(storage => [storage.name, 0])
+                ),
+              },
+            ];
+          }
+          return [
+            product.productCode,
+            {
+              discountRate: 0,
+              totalQuantity: 0,
+              totalFactoryPrice: 0,
+              stocks: Object.fromEntries(
+                product.storages.map(storage => [storage.name, 0])
+              ),
+            },
+          ];
+        }) ?? []
       )
     );
   }, [products]);
@@ -135,7 +153,11 @@ export default function ManageStockModal({
             return (
               <div className='my-4 border-b py-4' key={product.productCode}>
                 <div className='flex gap-4 lg:gap-8 items-center font-semibold'>
-                  <h5 className='text-lg md:text-xl'>{product.patternKr}</h5>
+                  {product.specialDiscountRate ? (
+                    <h5 className='text-lg md:text-xl text-run-red-1'>{product.patternKr}</h5>
+                  ) : (
+                    <h5 className='text-lg md:text-xl'>{product.patternKr}</h5>
+                  )}
                   <span className='text-sm sm:text-md text-neutral-400'>
                     공장가: {convertNumberToKRW(product.factoryPrice)} 원
                   </span>
@@ -195,6 +217,7 @@ export default function ManageStockModal({
                     onChange={e =>
                       handleDiscountChange(product.productCode, e.target.value)
                     }
+                    disabled={!!product.specialDiscountRate}
                   />
                   {' %'}
                   <span className='text-neutral-500 ml-4 mr-2 font-semibold'>
