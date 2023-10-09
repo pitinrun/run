@@ -15,6 +15,7 @@ export async function GET(req: Request) {
     const pattern = searchParams.get('pattern');
     const season = searchParams.get('season');
     const sizeSearchKeyword = searchParams.get('sizeSearchKeyword');
+    const hasStock = searchParams.get('hasStock');
 
     // MongoDB filter object
     const filter: any = {};
@@ -45,13 +46,15 @@ export async function GET(req: Request) {
       filter.sizeSearchKeyword = sizeSearchKeyword;
     }
 
-    filter.storages = {
-      $elemMatch: {
-        stock: {
-          $gte: 1,
+    if (hasStock === 'true') {
+      filter.storages = {
+        $elemMatch: {
+          stock: {
+            $gte: 1,
+          },
         },
-      },
-    };
+      };
+    }
 
     // Pagination
     const skip = (Number(page) - 1) * Number(perPage);
