@@ -369,8 +369,10 @@ function getSheetColumnByStorageName(
  * @param shipmentEntries - 창고 이름과 출하할 수량이 있는 배열
  */
 export async function updateProductStock(
-  productCode: string,
-  shipmentEntries: [string, number][]
+  orderInfos: {
+    shipmentEntries: [string, number][];
+    productCode: string;
+  }[]
 ) {
   // 스프레드시트에서 데이터를 가져옴
   const { startCell, endCell } = await getSheetRange();
@@ -389,15 +391,64 @@ export async function updateProductStock(
     throw new Error('No spreadsheet ID found.');
   }
 
-  // 제품 코드에 해당하는 행을 찾음
-  const rowIndex = sheetData.findIndex(
-    row => row[SHEET_MATCH_MAP.productCode.rowNum - 1] === productCode
-  );
+  const requestParams: {
+    spreadsheetId: string;
+    range: string;
+    valueInputOption: string;
+    requestBody: {
+      values: string[][];
+    };
+  }[] = [];
 
-  // 제품 코드에 해당하는 행이 없다면 에러 발생
-  if (rowIndex === -1) {
-    throw new Error(`Product with code ${productCode} not found.`);
-  }
+  const storages = await getStorages();
+
+  // orderInfos.forEach(async ({ shipmentEntries, productCode }) => {
+  for (const orderInfo of orderInfos){
+    const { shipmentEntries, productCode } = orderInfo;
+    // 제품 코드에 해당하는 행을 찾음
+    const rowIndex = sheetData.findIndex(
+      row => row[SHEET_MATCH_MAP.productCode.rowNum - 1] === productCode
+    );
+
+    // 제품 코드에 해당하는 행이 없다면 에러 발생
+    if (rowIndex === -1) {
+      throw new Error(`Product with code ${productCode} not found.`);
+    }
+
+    // 각 출하 품목에 대한 처리
+    for (const [storageName, quantity] of shipmentEntries) {
+      const storageColumn = getSheetColumnByStorageName(storages, storageName);
+      const columnIndex = fromColumnName(storageColumn) - 1;
+
+      if (!storageColumn) {
+        throw new Error(`Storage ${storageName} not found.`);
+      }
+
+      const currentStock = parseInt(sheetData[rowIndex][columnIndex], 10) || 0;
+
+      // 출하 수량이 현재 재고보다 많다면 에러 발생
+      if (currentStock < quantity) {
+        throw new Error(
+          `Not enough stock in ${storageName}. Available: ${currentStock}, Requested: ${quantity}`
+        );
+      }
+
+      // 재고 업데이트
+      sheetData[rowIndex][columnIndex] = (currentStock - quantity).toString();
+
+      // NOTE: 스프레드시트에 변경 사항을 requestParams에 추가
+      // 이러한 이유는 병렬 전송 및 특정 상품 재고 부족 시 에러 처리를 위함
+      const updateRange = `${storageColumn}${rowIndex + START_ROW}`;
+      requestParams.push({
+        spreadsheetId: SPREAD_SHEET_ID,
+        range: `${SPREAD_SHEET_PRODUCT_NAME}!${updateRange}`,
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [[sheetData[rowIndex][columnIndex]]],
+        },
+      });
+    }
+  };
 
   const authorize = new google.auth.JWT(
     credential.client_email,
@@ -409,50 +460,6 @@ export async function updateProductStock(
     version: 'v4',
     auth: authorize,
   });
-
-  const requestParams: {
-    spreadsheetId: string;
-    range: string;
-    valueInputOption: string;
-    requestBody: {
-      values: string[][];
-    };
-  }[] = [];
-
-  const storages = await getStorages();
-  // 각 출하 품목에 대한 처리
-  for (const [storageName, quantity] of shipmentEntries) {
-    const storageColumn = getSheetColumnByStorageName(storages, storageName);
-    const columnIndex = fromColumnName(storageColumn) - 1;
-
-    if (!storageColumn) {
-      throw new Error(`Storage ${storageName} not found.`);
-    }
-
-    const currentStock = parseInt(sheetData[rowIndex][columnIndex], 10) || 0;
-
-    // 출하 수량이 현재 재고보다 많다면 에러 발생
-    if (currentStock < quantity) {
-      throw new Error(
-        `Not enough stock in ${storageName}. Available: ${currentStock}, Requested: ${quantity}`
-      );
-    }
-
-    // 재고 업데이트
-    sheetData[rowIndex][columnIndex] = (currentStock - quantity).toString();
-
-    // NOTE: 스프레드시트에 변경 사항을 requestParams에 추가
-    // 이러한 이유는 병렬 전송 및 특정 상품 재고 부족 시 에러 처리를 위함
-    const updateRange = `${storageColumn}${rowIndex + START_ROW}`;
-    requestParams.push({
-      spreadsheetId: SPREAD_SHEET_ID,
-      range: `${SPREAD_SHEET_PRODUCT_NAME}!${updateRange}`,
-      valueInputOption: 'RAW',
-      requestBody: {
-        values: [[sheetData[rowIndex][columnIndex]]],
-      },
-    });
-  }
 
   const requests = requestParams.map((requestParam, index) => {
     return googleSheet.spreadsheets.values.update(requestParam);

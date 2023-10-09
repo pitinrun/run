@@ -9,12 +9,14 @@ export async function PUT(req: NextRequest, { params }) {
       shipmentEntries: [string, number][];
     }[] = await req.json();
 
-    const promiseUpdatedProductStocks = data.map(
-      ({ productCode, shipmentEntries }) =>
-        updateProductStock(productCode, shipmentEntries)
-    );
+    await updateProductStock(data);
+    // const promiseUpdatedProductStocks = data.map(
+    //   ({ productCode, shipmentEntries }) =>{
 
-    const response = await Promise.all(promiseUpdatedProductStocks);
+    //   }
+    // );
+
+    // const response = await Promise.all(promiseUpdatedProductStocks);
 
     return NextResponse.json({
       message: 'success',
@@ -23,9 +25,14 @@ export async function PUT(req: NextRequest, { params }) {
   } catch (error) {
     if (error instanceof Error) {
       console.error('!! ERROR: ', error);
-      return NextResponse.json({
-        message: error.message,
-      });
+      return NextResponse.json(
+        {
+          message: error.message,
+        },
+        {
+          status: 500,
+        }
+      );
     }
 
     return NextResponse.json('Unknown error', {

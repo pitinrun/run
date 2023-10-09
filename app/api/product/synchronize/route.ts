@@ -46,6 +46,8 @@ export async function POST() {
       console.error('!! ERROR: ', error);
       return NextResponse.json({
         message: error.message,
+      }, {
+        status: 500,
       });
     }
 

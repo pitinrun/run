@@ -7,19 +7,7 @@ import {
   getDiscountedPrice,
   roundUpToHundred,
 } from '@/src/utils';
-
-type ProductDetailType = {
-  discountRate: number;
-  totalQuantity: number;
-  totalFactoryPrice: number;
-  stocks: {
-    [storageName: string]: number;
-  };
-};
-
-type ProductInfoType = {
-  [productCode: string]: ProductDetailType;
-};
+import { OrderInfoType, orderProduct } from './api';
 
 export default function ManageStockModal({
   open = false,
@@ -31,7 +19,7 @@ export default function ManageStockModal({
   const modalClass = open ? 'modal modal-open' : 'modal';
   const { userData, products } = useContext(OrderModalContext);
 
-  const [productInfos, setProductInfos] = useState<ProductInfoType>(
+  const [orderInfos, setOrderInfos] = useState<OrderInfoType>(
     Object.fromEntries(
       products?.map(product => [
         product.productCode,
@@ -48,7 +36,7 @@ export default function ManageStockModal({
   );
 
   useEffect(() => {
-    setProductInfos(
+    setOrderInfos(
       Object.fromEntries(
         products?.map(product => [
           product.productCode,
@@ -70,7 +58,7 @@ export default function ManageStockModal({
     storageName: string,
     value: number
   ) => {
-    setProductInfos(prev => {
+    setOrderInfos(prev => {
       const prevProductInfo = prev[productCode];
       const updatedStocks = {
         ...prevProductInfo.stocks,
@@ -101,7 +89,7 @@ export default function ManageStockModal({
 
   const handleDiscountChange = (productCode: string, value: string) => {
     const discount = parseFloat(value);
-    setProductInfos(prev => {
+    setOrderInfos(prev => {
       const prevProductInfo = prev[productCode];
       return {
         ...prev,
@@ -113,16 +101,18 @@ export default function ManageStockModal({
     });
   };
 
-  const handleClickOrder = () => {};
+  const handleClickOrder = () => {
+    orderProduct(orderInfos);
+  };
 
   const calculateTotalPrice = (productCode: string) => {
-    const productInfo = productInfos[productCode];
+    const productInfo = orderInfos[productCode];
     const { totalFactoryPrice } = productInfo;
 
     return convertNumberToKRW(
       getDiscountedPrice(
         totalFactoryPrice,
-        productInfos[productCode].discountRate / 100
+        orderInfos[productCode].discountRate / 100
       )
     );
   };
@@ -137,8 +127,8 @@ export default function ManageStockModal({
         </h4>
         <div className='overflow-scroll'>
           {products?.map(product => {
-            const productStockAndDiscount = productInfos[product.productCode];
-            const productInfo = productInfos[product.productCode];
+            const productStockAndDiscount = orderInfos[product.productCode];
+            const productInfo = orderInfos[product.productCode];
             if (!productInfo) return null;
             const totalQuantity = productInfo.totalQuantity;
 
@@ -234,7 +224,7 @@ export default function ManageStockModal({
           <button className='btn flex-1' onClick={onClose}>
             닫기
           </button>
-          <button className='btn flex-1 btn-primary' onClick={() => {}}>
+          <button className='btn flex-1 btn-primary' onClick={handleClickOrder}>
             접수
           </button>
           {/* </form> */}

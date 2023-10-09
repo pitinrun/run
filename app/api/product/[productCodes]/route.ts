@@ -22,7 +22,9 @@ export async function GET(req: NextRequest, { params }) {
     });
   } catch (error) {
     console.error('!! ERROR:', error);
-    return NextResponse.json('error', {
+    return NextResponse.json({
+      message: error.message,
+    }, {
       status: 500,
     });
   }
