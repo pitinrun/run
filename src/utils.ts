@@ -48,7 +48,7 @@ export const getDiscountedPrice = (
   discountRate: number,
   quantity: number = 1
 ) => {
-  return Math.round(price * (1 - discountRate)) * quantity;
+  return price * (1 - discountRate) * quantity;
 };
 
 export const convertNumberToPercent = (percent: number) => {

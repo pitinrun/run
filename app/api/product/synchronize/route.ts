@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { connectToDatabase } from 'src/utils';
 import { dropAndBulkInsertProducts } from '@/src/services/product';
 import {

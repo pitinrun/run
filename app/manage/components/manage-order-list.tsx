@@ -13,9 +13,7 @@ import {
   getOrdersRequestForManager,
 } from 'requests/manage/order.api';
 import ManageStockModal from './manage-stock-modal';
-import OrderModalProvider, {
-  OrderModalContext,
-} from '../contexts/order-modal.context';
+import { OrderModalContext } from '../contexts/order-modal.context';
 
 const ORDER_STATUSES = [
   {

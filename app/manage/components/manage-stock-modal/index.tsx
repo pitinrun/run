@@ -1,88 +1,61 @@
 // app/manage/components/manage-stock-modal.tsx
+'use client';
 import { useContext, useEffect, useState } from 'react';
-import { OrderModalContext } from '../contexts/order-modal.context';
+import { OrderModalContext } from '../../contexts/order-modal.context';
 import {
   convertNumberToKRW,
   getDiscountedPrice,
   roundUpToHundred,
 } from '@/src/utils';
 
-type ProductStockAndDiscountType = {
-  [productCode: string]: {
-    discountRate: number;
-    stocks: {
-      [storageName: string]: number;
-    };
+type ProductDetailType = {
+  discountRate: number;
+  totalQuantity: number;
+  totalFactoryPrice: number;
+  stocks: {
+    [storageName: string]: number;
   };
 };
 
-type ProductTotalInfoType = {
-  [productCode: string]: {
-    totalQuantity: number;
-    totalFactoryPrice: number;
-  };
+type ProductInfoType = {
+  [productCode: string]: ProductDetailType;
 };
 
 export default function ManageStockModal({
   open = false,
-  onConfirm = () => {},
   onClose = () => {},
 }: {
   open?: boolean;
-  onConfirm?: () => void;
   onClose?: () => void;
 }) {
   const modalClass = open ? 'modal modal-open' : 'modal';
-
   const { userData, products } = useContext(OrderModalContext);
-  /**
-   * @example {
-   *  'P0001': {
-   *   totalPrice: 10000,
-   *   totalQuantity: 10,
-   *   discountRate: 0.1,
-   *   },
-   *  'P0002': {
-   *   totalPrice: 20000,
-   *   totalQuantity: 20,
-   *   discountRate: 0.2,
-   *   },
-   * }
-   */
-  const [productTotalInfos, setProductTotalInfos] =
-    useState<ProductTotalInfoType>(
-      Object.fromEntries(
-        products?.map(product => [
-          product.productCode,
-          {
-            totalQuantity: 0,
-            totalFactoryPrice: 0,
-          },
-        ]) ?? []
-      )
-    );
-  const [productStockAndDiscounts, setProductStockAndDiscounts] =
-    useState<ProductStockAndDiscountType>(
-      Object.fromEntries(
-        products?.map(product => [
-          product.productCode,
-          {
-            discountRate: 0,
-            stocks: Object.fromEntries(
-              product.storages.map(storage => [storage.name, 0])
-            ),
-          },
-        ]) ?? []
-      )
-    );
+
+  const [productInfos, setProductInfos] = useState<ProductInfoType>(
+    Object.fromEntries(
+      products?.map(product => [
+        product.productCode,
+        {
+          discountRate: 0,
+          totalQuantity: 0,
+          totalFactoryPrice: 0,
+          stocks: Object.fromEntries(
+            product.storages.map(storage => [storage.name, 0])
+          ),
+        },
+      ]) ?? []
+    )
+  );
 
   useEffect(() => {
-    setProductStockAndDiscounts(
+    setProductInfos(
       Object.fromEntries(
         products?.map(product => [
           product.productCode,
           {
             discountRate: 0,
+            totalQuantity: 0,
+            totalFactoryPrice: 0,
             stocks: Object.fromEntries(
               product.storages.map(storage => [storage.name, 0])
             ),
@@ -92,45 +65,35 @@ export default function ManageStockModal({
     );
   }, [products]);
 
-  useEffect(() => {
-    setProductTotalInfos(prev => {
-      const newProductTotalInfos = { ...prev };
-      Object.entries(productStockAndDiscounts).forEach(
-        ([productCode, productInfo]) => {
-          const totalQuantity = Object.values(productInfo.stocks).reduce(
-            (acc, cur) => acc + cur,
-            0
-          );
-          const totalFactoryPrice =
-            products?.find(product => product.productCode === productCode)
-              ?.factoryPrice! * totalQuantity;
-          newProductTotalInfos[productCode] = {
-            totalQuantity,
-            totalFactoryPrice,
-          };
-        }
-      );
-      return newProductTotalInfos;
-    });
-  }, [productStockAndDiscounts]);
-
   const handleStockQuantityInputChange = (
     productCode: string,
     storageName: string,
     value: number
   ) => {
-    setProductStockAndDiscounts(prev => {
+    setProductInfos(prev => {
       const prevProductInfo = prev[productCode];
-      // Update the quantity for the specific storage
       const updatedStocks = {
         ...prevProductInfo.stocks,
         [storageName]: value,
       };
+      const totalQuantity = Object.values(updatedStocks).reduce(
+        (acc, cur) => acc + cur,
+        0
+      );
+
+      const totalFactoryPrice =
+        roundUpToHundred(
+          products?.find(product => product.productCode === productCode)
+            ?.factoryPrice!
+        ) * totalQuantity;
+
       return {
         ...prev,
         [productCode]: {
           ...prevProductInfo,
           stocks: updatedStocks,
+          totalQuantity,
+          totalFactoryPrice,
         },
       };
     });
@@ -138,7 +101,7 @@ export default function ManageStockModal({
 
   const handleDiscountChange = (productCode: string, value: string) => {
     const discount = parseFloat(value);
-    setProductStockAndDiscounts(prev => {
+    setProductInfos(prev => {
       const prevProductInfo = prev[productCode];
       return {
         ...prev,
@@ -150,16 +113,16 @@ export default function ManageStockModal({
     });
   };
 
+  const handleClickOrder = () => {};
+
   const calculateTotalPrice = (productCode: string) => {
-    const productInfo = productTotalInfos[productCode];
-    const totalQuantity = productInfo.totalQuantity;
+    const productInfo = productInfos[productCode];
+    const { totalFactoryPrice } = productInfo;
 
     return convertNumberToKRW(
       getDiscountedPrice(
-        totalQuantity *
-          products?.find(product => product.productCode === productCode)
-            ?.factoryPrice!,
-        productStockAndDiscounts[productCode].discountRate / 100
+        totalFactoryPrice,
+        productInfos[productCode].discountRate / 100
       )
     );
   };
@@ -174,9 +137,8 @@ export default function ManageStockModal({
         </h4>
         <div className='overflow-scroll'>
           {products?.map(product => {
-            const productStockAndDiscount =
-              productStockAndDiscounts[product.productCode];
-            const productInfo = productTotalInfos[product.productCode];
+            const productStockAndDiscount = productInfos[product.productCode];
+            const productInfo = productInfos[product.productCode];
             if (!productInfo) return null;
             const totalQuantity = productInfo.totalQuantity;
 
@@ -272,7 +234,7 @@ export default function ManageStockModal({
           <button className='btn flex-1' onClick={onClose}>
             닫기
           </button>
-          <button className='btn flex-1 btn-primary' onClick={onConfirm}>
+          <button className='btn flex-1 btn-primary' onClick={() => {}}>
             접수
           </button>
           {/* </form> */}

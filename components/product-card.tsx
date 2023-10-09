@@ -3,7 +3,9 @@ import { IProduct } from '@/src/types';
 import {
   convertNumberToKRW,
   convertNumberToPercent,
+  getDiscountedPrice,
   getTotalStock,
+  roundUpToHundred,
 } from '@/src/utils';
 import { useEffect, useState } from 'react';
 
@@ -86,11 +88,6 @@ export default function ProductCard({
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     let value: null | number = parseInt(event.target.value, 10);
-    // if (!value) {
-    //   setDiscountRate(0);
-    //   return;
-    // }
-    // NOTE: value가 0보다 작거나 100보다 크면, 무시합니다.
     if (value < 0 || value > 100 || !value) value = null;
 
     setDiscountRate(value);
@@ -182,17 +179,19 @@ export default function ProductCard({
             {discountRate ? (
               <>
                 {convertNumberToKRW(
-                  Math.round(
-                    factoryPrice *
-                      (1 - (discountRate ?? 0) / 100) *
-                      (quantity ?? 1)
+                  getDiscountedPrice(
+                    roundUpToHundred(factoryPrice),
+                    discountRate / 100,
+                    quantity ?? 1
                   )
                 )}
                 원
                 <del className='absolute right-[-1.5rem] sm:right-0 text-sm sm:text-base text-neutral-400 font-normal bottom-[1.5rem] sm:bottom-[2rem]'>
                   {
                     convertNumberToKRW(
-                      Math.round(factoryPrice * (quantity ?? 1))
+                      Math.round(
+                        roundUpToHundred(factoryPrice) * (quantity ?? 1)
+                      )
                     ).split(' ')[0]
                   }
                   원
@@ -200,7 +199,9 @@ export default function ProductCard({
               </>
             ) : (
               <>
-                {convertNumberToKRW(Math.round(factoryPrice * (quantity ?? 1)))}
+                {convertNumberToKRW(
+                  Math.round(roundUpToHundred(factoryPrice) * (quantity ?? 1))
+                )}
                 원
               </>
             )}

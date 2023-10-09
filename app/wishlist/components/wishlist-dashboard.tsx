@@ -1,7 +1,11 @@
 'use client';
 
 import { IProduct, IWishListItem, UserType } from '@/src/types';
-import { convertNumberToKRW, roundUpToHundred } from '@/src/utils';
+import {
+  convertNumberToKRW,
+  getDiscountedPrice,
+  roundUpToHundred,
+} from '@/src/utils';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import ProductCard from 'components/product-card';
@@ -50,8 +54,10 @@ export default function WishlistDashboard({
   const getTotalPrice = () => {
     return wishlist.reduce((acc, cur) => {
       if (!cur.product) return acc;
-      const value = roundUpToHundred(
-        cur.quantity * (cur.product?.factoryPrice * (1 - cur.discountRate))
+      const value = getDiscountedPrice(
+        roundUpToHundred(cur.product?.factoryPrice),
+        cur.discountRate,
+        cur.quantity
       );
       return acc + value;
     }, 0);
