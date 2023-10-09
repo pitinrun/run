@@ -7,6 +7,7 @@ import {
   MagnifyingGlassIcon,
 } from '@heroicons/react/24/solid';
 import ProductTable from 'components/product-table';
+import { toast } from 'react-toastify';
 
 const BRANDS = [
   '',
@@ -71,9 +72,14 @@ export default function ProductPage() {
         setMaxPage(responseGetProducts.data.pagination.pages);
         setPage(1);
         setSyncLoading(false);
+        toast.success('스프레드시트 데이터 연동에 성공했습니다.');
       }
     } catch (error) {
+      setSyncLoading(false);
       isAxiosError(error) && console.error('!!ERROR: ', error.response?.data);
+      toast.error(
+        '스프레드시트 데이터 연동에 실패했습니다. 개발자 모드 콘솔 화면과 Network 탭을 개발자분께 전달해주세요.'
+      );
     }
   };
 

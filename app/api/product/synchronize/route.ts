@@ -8,7 +8,7 @@ import { IProduct } from '@/src/types';
 
 connectToDatabase();
 
-const DEBUG_MODE = true;
+const DEBUG_MODE = false;
 
 const credential = JSON.parse(
   Buffer.from(process.env.GOOGLE_CREDENTIALS ?? '', 'base64').toString()
@@ -17,6 +17,9 @@ const credential = JSON.parse(
 const START_CELL = 'A6';
 const { SPREAD_SHEET_ID, SPREAD_SHEET_PRODUCT_NAME } = process.env;
 
+/**
+ * 시트와 상품 객체의 매핑 정보를 정의합니다.
+ */
 const SHEET_MATCH_MAP: { [K in keyof IProduct] } = {
   brand: {
     row: 'A',
@@ -79,6 +82,12 @@ const SHEET_MATCH_MAP: { [K in keyof IProduct] } = {
   },
 };
 
+/**
+ * 시트 데이터를 메타데이터 객체로 직렬화합니다.
+ * 
+ * @param {Array<Array<string>>} sheetData - 시트 데이터
+ * @returns 메타데이터의 배열
+ */
 const serializeSheetToObjectForProductMeta = (
   sheetData: Array<Array<string>>
 ) => {
@@ -100,6 +109,12 @@ const serializeSheetToObjectForProductMeta = (
   return updateStorageNames(storageNames);
 };
 
+/**
+ * 시트 데이터를 상품 객체로 직렬화합니다.
+ * 
+ * @param {Array<Array<string>>} sheetData - 시트 데이터
+ * @returns 상품 객체의 배열
+ */
 const serializeSheetToObjectForProduct = (
   sheetData: Array<Array<string>>
 ): IProduct[] => {
@@ -188,6 +203,13 @@ const serializeSheetToObjectForProduct = (
   return results;
 };
 
+/**
+ * 주어진 스프레드시트의 범위를 가져옵니다.
+ * 
+ * @param {string} spreadsheetId - 스프레드시트의 ID
+ * @param {string} sheetName - 시트의 이름
+ * @returns 시작 셀과 끝 셀의 정보를 포함한 객체
+ */
 async function getSheetRange(
   spreadsheetId: string = SPREAD_SHEET_ID ?? '',
   sheetName: string = SPREAD_SHEET_PRODUCT_NAME ?? ''
@@ -240,6 +262,15 @@ async function getSheetRange(
   };
 }
 
+/**
+ * 주어진 스프레드시트에서 데이터를 가져옵니다.
+ * 
+ * @param {string} spreadsheetId - 스프레드시트의 ID
+ * @param {string} sheetName - 시트의 이름
+ * @param {string} startCell - 시작 셀
+ * @param {string} endCell - 끝 셀
+ * @returns 시트의 데이터 배열
+ */
 async function getSpreadSheetData(
   spreadsheetId = SPREAD_SHEET_ID ?? '',
   sheetName = SPREAD_SHEET_PRODUCT_NAME ?? '',
@@ -265,6 +296,11 @@ async function getSpreadSheetData(
   return context.data.values;
 }
 
+/**
+ * 주어진 스프레드시트의 데이터를 사용하여 상품 데이터를 업데이트합니다.
+ * 
+ * @returns 응답 객체
+ */
 export async function POST() {
   try {
     const sheetRange = await getSheetRange();
