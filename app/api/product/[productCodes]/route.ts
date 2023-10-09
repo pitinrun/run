@@ -9,6 +9,7 @@ connectToDatabase();
  * @param req
  * @param params productCodes (base64)
  * @returns
+ * @todo productCodes는 body로 받아야 함
  */
 export async function GET(req: NextRequest, { params }) {
   const { productCodes: base64ProductCodes } = params;

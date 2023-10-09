@@ -1,7 +1,9 @@
+// src/services/spreadsheet/index.ts
 import { google } from 'googleapis';
-import { updateStorageNames } from '@/src/services/metadata';
+import { getStorages, updateStorageNames } from '@/src/services/metadata';
 import { IProduct } from '@/src/types';
-import { toColumnName } from './utils';
+import { fromColumnName, toColumnName } from './utils';
+import { IMetaData } from '@/src/models/metadata';
 
 const DEBUG_MODE = false;
 
@@ -9,7 +11,8 @@ const credential = JSON.parse(
   Buffer.from(process.env.GOOGLE_CREDENTIALS ?? '', 'base64').toString()
 );
 
-const START_CELL = 'A6';
+const START_ROW = 6;
+const START_CELL = `A${START_ROW}`;
 const { SPREAD_SHEET_ID, SPREAD_SHEET_PRODUCT_NAME } = process.env;
 
 /**
@@ -292,4 +295,175 @@ export async function getSpreadSheetData(
   });
 
   return context.data.values;
+}
+
+type RowDataResult = {
+  rowIndex: number;
+  rowData: string[];
+};
+
+/**
+ * 주어진 제품코드에 해당하는 행 데이터를 반환합니다.
+ *
+ * @param {string} productCode - 검색할 제품코드
+ * @returns rowIndex와 rowData를 포함한 객체
+ */
+export async function getRowDataByProductCode(
+  productCode: string
+): Promise<RowDataResult> {
+  // 기본 범위 설정으로 전체 데이터를 가져옵니다.
+  const range = await getSheetRange();
+  const sheetData = await getSpreadSheetData(
+    undefined,
+    undefined,
+    range.startCell,
+    range.endCell
+  );
+
+  if (!sheetData) {
+    throw new Error('No sheet data found.');
+  }
+
+  // 제품코드 컬럼 위치를 찾습니다.
+  const productCodeColIndex = SHEET_MATCH_MAP.productCode.rowNum - 1;
+
+  // 해당 제품코드의 행을 찾습니다.
+  for (let i = 0; i < sheetData.length; i++) {
+    const row = sheetData[i];
+    if (row[productCodeColIndex] === productCode) {
+      return {
+        rowIndex: i,
+        rowData: row,
+      };
+    }
+  }
+
+  // 제품코드에 해당하는 행이 없을 경우 오류를 발생시킵니다.
+  throw new Error(`Product code ${productCode} not found.`);
+}
+
+/**
+ * 주어진 제품코드에 해당하는 행의 재고를 반환합니다.
+ *
+ * @param storages
+ * @param storageName
+ * @returns
+ */
+function getSheetColumnByStorageName(
+  storages: IMetaData['storages'],
+  storageName: string
+) {
+  const storage = storages.find(storage => storage.name === storageName);
+
+  if (!storage) {
+    throw new Error(`Storage ${storageName} not found.`);
+  }
+
+  return storage.sheetColumn;
+}
+
+/**
+ * 스프레드시트에서 제품의 재고를 출하합니다.
+ *
+ * @param productCode - 제품 코드
+ * @param shipments - 창고 이름과 출하할 수량이 있는 배열
+ */
+export async function updateProductStock(
+  productCode: string,
+  shipments: [string, number][]
+) {
+  // 스프레드시트에서 데이터를 가져옴
+  const { startCell, endCell } = await getSheetRange();
+  const sheetData = await getSpreadSheetData(
+    undefined,
+    undefined,
+    startCell,
+    endCell
+  );
+
+  if (!sheetData) {
+    throw new Error('No sheet data found.');
+  }
+
+  if (!SPREAD_SHEET_ID) {
+    throw new Error('No spreadsheet ID found.');
+  }
+
+  // 제품 코드에 해당하는 행을 찾음
+  const rowIndex = sheetData.findIndex(
+    row => row[SHEET_MATCH_MAP.productCode.rowNum - 1] === productCode
+  );
+
+  // 제품 코드에 해당하는 행이 없다면 에러 발생
+  if (rowIndex === -1) {
+    throw new Error(`Product with code ${productCode} not found.`);
+  }
+
+  const authorize = new google.auth.JWT(
+    credential.client_email,
+    undefined,
+    credential.private_key,
+    ['https://www.googleapis.com/auth/spreadsheets']
+  );
+  const googleSheet = google.sheets({
+    version: 'v4',
+    auth: authorize,
+  });
+
+  const requestParams: {
+    spreadsheetId: string;
+    range: string;
+    valueInputOption: string;
+    requestBody: {
+      values: string[][];
+    };
+  }[] = [];
+
+  // 각 출하 품목에 대한 처리
+  for (const [storageName, quantity] of shipments) {
+    const storages = await getStorages();
+    const storageColumn = getSheetColumnByStorageName(storages, storageName);
+    const columnIndex = fromColumnName(storageColumn) - 1;
+
+    if (!storageColumn) {
+      throw new Error(`Storage ${storageName} not found.`);
+    }
+
+    const currentStock = parseInt(sheetData[rowIndex][columnIndex], 10) || 0;
+
+    // 출하 수량이 현재 재고보다 많다면 에러 발생
+    if (currentStock < quantity) {
+      throw new Error(
+        `Not enough stock in ${storageName}. Available: ${currentStock}, Requested: ${quantity}`
+      );
+    }
+
+    // 재고 업데이트
+    sheetData[rowIndex][columnIndex] = (currentStock - quantity).toString();
+
+    // NOTE: 스프레드시트에 변경 사항을 requestParams에 추가
+    // 이러한 이유는 병렬 전송 및 특정 상품 재고 부족 시 에러 처리를 위함
+    const updateRange = `${storageColumn}${rowIndex + START_ROW}`;
+    requestParams.push({
+      spreadsheetId: SPREAD_SHEET_ID,
+      range: `${SPREAD_SHEET_PRODUCT_NAME}!${updateRange}`,
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [[sheetData[rowIndex][columnIndex]]],
+      },
+    });
+  }
+
+  const requests = requestParams.map((requestParam, index) => {
+    return googleSheet.spreadsheets.values.update(requestParam);
+  });
+  const responses = await Promise.all(requests);
+
+  responses.forEach(response => {
+    if (response.status !== 200) {
+      throw new Error(`Error updating stock DATA: ${response.data}.`);
+    }
+  });
+
+  return true;
 }

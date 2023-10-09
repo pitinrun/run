@@ -1,7 +1,7 @@
 import mongoose, { Document, model, Model, Schema } from 'mongoose';
 
 export interface IMetaData {
-  storageNames: {
+  storages: {
     name: string;
     code: string;
     sheetColumn: string;
@@ -12,7 +12,7 @@ export interface IMetaDataDocument extends Document, IMetaData {}
 
 const MetaDataSchema: Schema = new Schema(
   {
-    storageNames: {
+    storages: {
       type: Object,
     },
   },

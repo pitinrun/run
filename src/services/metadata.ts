@@ -3,20 +3,20 @@ import { connectToDatabase } from '../utils';
 
 connectToDatabase();
 
-export const updateStorageNames = (storageNames: IMetaData['storageNames']) => {
+export const updateStorageNames = (storages: IMetaData['storages']) => {
   return MetaData.findOneAndUpdate(
     {},
-    { storageNames },
+    { storages },
     { upsert: true, new: true }
   );
 };
 
-export const getStorageNames = async () => {
+export const getStorages = async () => {
   const metaData = await MetaData.findOne({});
 
   if (!metaData) {
     return [];
   }
 
-  return metaData.storageNames;
+  return metaData.storages;
 };

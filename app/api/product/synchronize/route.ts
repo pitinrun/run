@@ -6,6 +6,7 @@ import {
   getSpreadSheetData,
   serializeSheetToObjectForProduct,
   serializeSheetToObjectForProductMeta,
+  updateProductStock,
 } from '@/src/services/spreadsheet';
 
 connectToDatabase();
