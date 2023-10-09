@@ -3,15 +3,22 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function PUT(req: NextRequest, { params }) {
   try {
-    const { productCode } = params;
-    const { shipments } = await req.json();
+    // const { productCode } = params;
+    const data: {
+      productCode: string;
+      shipmentEntries: [string, number][];
+    }[] = await req.json();
 
-    // console.log('$$ shipments', shipments);
-    // console.log('$$ productCode', productCode);
-    updateProductStock(productCode, shipments);
+    const promiseUpdatedProductStocks = data.map(
+      ({ productCode, shipmentEntries }) =>
+        updateProductStock(productCode, shipmentEntries)
+    );
+
+    const response = await Promise.all(promiseUpdatedProductStocks);
+
     return NextResponse.json({
       message: 'success',
-      status: 201,
+      status: 200,
     });
   } catch (error) {
     if (error instanceof Error) {
@@ -21,7 +28,7 @@ export async function PUT(req: NextRequest, { params }) {
       });
     }
 
-    return NextResponse.json('unknown error', {
+    return NextResponse.json('Unknown error', {
       status: 500,
     });
   }

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from 'src/utils';
 import { dropAndBulkInsertProducts } from '@/src/services/product';
 import {
@@ -6,7 +6,6 @@ import {
   getSpreadSheetData,
   serializeSheetToObjectForProduct,
   serializeSheetToObjectForProductMeta,
-  updateProductStock,
 } from '@/src/services/spreadsheet';
 
 connectToDatabase();

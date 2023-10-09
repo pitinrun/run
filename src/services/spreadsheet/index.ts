@@ -366,11 +366,11 @@ function getSheetColumnByStorageName(
  * 스프레드시트에서 제품의 재고를 출하합니다.
  *
  * @param productCode - 제품 코드
- * @param shipments - 창고 이름과 출하할 수량이 있는 배열
+ * @param shipmentEntries - 창고 이름과 출하할 수량이 있는 배열
  */
 export async function updateProductStock(
   productCode: string,
-  shipments: [string, number][]
+  shipmentEntries: [string, number][]
 ) {
   // 스프레드시트에서 데이터를 가져옴
   const { startCell, endCell } = await getSheetRange();
@@ -419,9 +419,9 @@ export async function updateProductStock(
     };
   }[] = [];
 
+  const storages = await getStorages();
   // 각 출하 품목에 대한 처리
-  for (const [storageName, quantity] of shipments) {
-    const storages = await getStorages();
+  for (const [storageName, quantity] of shipmentEntries) {
     const storageColumn = getSheetColumnByStorageName(storages, storageName);
     const columnIndex = fromColumnName(storageColumn) - 1;
 
