@@ -4,6 +4,7 @@ export interface IMetaData {
   storageNames: {
     name: string;
     code: string;
+    sheetColumn: string;
   }[]; // NOTE: product에 속한 storages names example: 산동, 천안, 동남 ...
 }
 

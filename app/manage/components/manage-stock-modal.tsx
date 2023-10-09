@@ -126,26 +126,11 @@ export default function ManageStockModal({
         ...prevProductInfo.stocks,
         [storageName]: value,
       };
-      // // Update the total price for the specific product
-      // const updatedTotalPrice =
-      //   products?.find(product => product.productCode === productCode)
-      //     ?.factoryPrice! * updatedQuantity;
-      // console.log('$$ ', {
-      //   ...prev,
-      //   [productCode]: {
-      //     ...prevProductInfo,
-      //     totalQuantity: updatedQuantity,
-      //     stocks: updatedStocks,
-      //     totalOriginPrice: updatedTotalPrice,
-      //   },
-      // });
       return {
         ...prev,
         [productCode]: {
           ...prevProductInfo,
-          // totalQuantity: updatedQuantity,
           stocks: updatedStocks,
-          // totalOriginPrice: updatedTotalPrice,
         },
       };
     });

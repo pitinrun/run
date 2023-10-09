@@ -1,7 +1,4 @@
-import { NextResponse } from 'next/server';
-import { connectToDatabase } from 'src/utils';
 import { google } from 'googleapis';
-import { dropAndBulkInsertProducts } from '@/src/services/product';
 import { updateStorageNames } from '@/src/services/metadata';
 import { IProduct } from '@/src/types';
 import { toColumnName } from './utils';
@@ -82,7 +79,7 @@ const SHEET_MATCH_MAP: { [K in keyof IProduct] } = {
 
 /**
  * 시트 데이터를 메타데이터 객체로 직렬화합니다.
- *
+ * 창고 이름과 코드를 매핑합니다.
  * @param {Array<Array<string>>} sheetData - 시트 데이터
  * @returns 메타데이터의 배열
  */
@@ -98,6 +95,9 @@ export const serializeSheetToObjectForProductMeta = (
           {
             name,
             code: arr[index + 1],
+            sheetColumn: toColumnName(
+              SHEET_MATCH_MAP.storages.startRowNum + index
+            ),
           },
         ];
       }
