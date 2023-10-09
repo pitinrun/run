@@ -7,6 +7,22 @@ import {
   roundUpToHundred,
 } from '@/src/utils';
 
+type ProductStockAndDiscountType = {
+  [productCode: string]: {
+    discountRate: number;
+    stocks: {
+      [storageName: string]: number;
+    };
+  };
+};
+
+type ProductTotalInfoType = {
+  [productCode: string]: {
+    totalQuantity: number;
+    totalFactoryPrice: number;
+  };
+};
+
 export default function ManageStockModal({
   open = false,
   onConfirm = () => {},
@@ -19,78 +35,149 @@ export default function ManageStockModal({
   const modalClass = open ? 'modal modal-open' : 'modal';
 
   const { userData, products } = useContext(OrderModalContext);
-  const [enteredQuantities, setEnteredQuantities] = useState({});
-  const [productQuantities, setProductQuantities] = useState({});
-  const [productPrices, setProductPrices] = useState({});
-  const [productDiscountRates, setProductDiscountRates] = useState({});
+  /**
+   * @example {
+   *  'P0001': {
+   *   totalPrice: 10000,
+   *   totalQuantity: 10,
+   *   discountRate: 0.1,
+   *   },
+   *  'P0002': {
+   *   totalPrice: 20000,
+   *   totalQuantity: 20,
+   *   discountRate: 0.2,
+   *   },
+   * }
+   */
+  const [productTotalInfos, setProductTotalInfos] =
+    useState<ProductTotalInfoType>(
+      Object.fromEntries(
+        products?.map(product => [
+          product.productCode,
+          {
+            totalQuantity: 0,
+            totalFactoryPrice: 0,
+          },
+        ]) ?? []
+      )
+    );
+  const [productStockAndDiscounts, setProductStockAndDiscounts] =
+    useState<ProductStockAndDiscountType>(
+      Object.fromEntries(
+        products?.map(product => [
+          product.productCode,
+          {
+            discountRate: 0,
+            stocks: Object.fromEntries(
+              product.storages.map(storage => [storage.name, 0])
+            ),
+          },
+        ]) ?? []
+      )
+    );
 
-  const handleInputChange = (key, value) => {
-    setEnteredQuantities(prev => {
-      const newQuantities = { ...prev, [key]: value };
-      // 상품 코드 추출
-      const productCode = key.split('-')[0];
-      // 해당 상품에 대한 수량 합계 및 금액 계산
-      if (!products) return;
+  useEffect(() => {
+    setProductStockAndDiscounts(
+      Object.fromEntries(
+        products?.map(product => [
+          product.productCode,
+          {
+            discountRate: 0,
+            stocks: Object.fromEntries(
+              product.storages.map(storage => [storage.name, 0])
+            ),
+          },
+        ]) ?? []
+      )
+    );
+  }, [products]);
 
-      const product = products.find(p => p.productCode === productCode);
-      const totalForProduct = Object.entries(newQuantities).reduce(
-        (sum, [k, v]) => {
-          if (k.startsWith(productCode)) sum += Number(v);
-          return sum;
-        },
-        0
+  useEffect(() => {
+    setProductTotalInfos(prev => {
+      const newProductTotalInfos = { ...prev };
+      Object.entries(productStockAndDiscounts).forEach(
+        ([productCode, productInfo]) => {
+          const totalQuantity = Object.values(productInfo.stocks).reduce(
+            (acc, cur) => acc + cur,
+            0
+          );
+          const totalFactoryPrice =
+            products?.find(product => product.productCode === productCode)
+              ?.factoryPrice! * totalQuantity;
+          newProductTotalInfos[productCode] = {
+            totalQuantity,
+            totalFactoryPrice,
+          };
+        }
       );
-      const priceForProduct =
-        totalForProduct *
-        (product?.factoryPrice || 0) *
-        (1 - (product?.discountRate || 0));
+      return newProductTotalInfos;
+    });
+  }, [productStockAndDiscounts]);
 
-      // productQuantities 및 productPrices 업데이트
-      setProductQuantities(prev => ({
+  const handleStockQuantityInputChange = (
+    productCode: string,
+    storageName: string,
+    value: number
+  ) => {
+    setProductStockAndDiscounts(prev => {
+      const prevProductInfo = prev[productCode];
+      // Update the quantity for the specific storage
+      const updatedStocks = {
+        ...prevProductInfo.stocks,
+        [storageName]: value,
+      };
+      // // Update the total price for the specific product
+      // const updatedTotalPrice =
+      //   products?.find(product => product.productCode === productCode)
+      //     ?.factoryPrice! * updatedQuantity;
+      // console.log('$$ ', {
+      //   ...prev,
+      //   [productCode]: {
+      //     ...prevProductInfo,
+      //     totalQuantity: updatedQuantity,
+      //     stocks: updatedStocks,
+      //     totalOriginPrice: updatedTotalPrice,
+      //   },
+      // });
+      return {
         ...prev,
-        [productCode]: totalForProduct,
-      }));
-      setProductPrices(prev => ({
-        ...prev,
-        [productCode]: priceForProduct,
-      }));
-      return newQuantities;
+        [productCode]: {
+          ...prevProductInfo,
+          // totalQuantity: updatedQuantity,
+          stocks: updatedStocks,
+          // totalOriginPrice: updatedTotalPrice,
+        },
+      };
     });
   };
 
-  const handleDiscountChange = (productCode, discountRate) => {
-    setProductDiscountRates(prev => ({
-      ...prev,
-      [productCode]: discountRate,
-    }));
+  const handleDiscountChange = (productCode: string, value: string) => {
+    const discount = parseFloat(value);
+    setProductStockAndDiscounts(prev => {
+      const prevProductInfo = prev[productCode];
+      return {
+        ...prev,
+        [productCode]: {
+          ...prevProductInfo,
+          discountRate: discount || 0,
+        },
+      };
+    });
   };
 
-  useEffect(() => {
-    if (!products) return;
-    const initialQuantities = products.reduce((acc, product) => {
-      acc[product.productCode] = 0;
-      return acc;
-    }, {});
-    setEnteredQuantities(initialQuantities);
-  }, [products]);
+  const calculateTotalPrice = (productCode: string) => {
+    const productInfo = productTotalInfos[productCode];
+    const totalQuantity = productInfo.totalQuantity;
 
-  // const totalQuantity = Object.values(enteredQuantities).reduce<number>(
-  //   (sum, value) => sum + Number(value),
-  //   0
-  // );
-
-  // const totalPrice =
-  //   products &&
-  //   products.reduce((sum, product) => {
-  //     return (
-  //       sum +
-  //       product.storages.reduce((subSum, storage) => {
-  //         const key = `${product.productCode}-${storage.name}`;
-  //         const quantity = enteredQuantities[key] || 0;
-  //         return subSum + quantity * product.factoryPrice;
-  //       }, 0)
-  //     );
-  //   }, 0);
+    return convertNumberToKRW(
+      getDiscountedPrice(
+        totalQuantity *
+          products?.find(product => product.productCode === productCode)
+            ?.factoryPrice!,
+        productStockAndDiscounts[productCode].discountRate / 100
+      )
+    );
+  };
 
   return (
     <dialog className={modalClass}>
@@ -102,20 +189,11 @@ export default function ManageStockModal({
         </h4>
         <div className='overflow-scroll'>
           {products?.map(product => {
-            const discountRate =
-              productDiscountRates[product.productCode] ||
-              // product.discountRate ||
-              0;
-
-            const quantity = productQuantities[product.productCode] || 0;
-
-            const totalPrice = roundUpToHundred(
-              getDiscountedPrice(
-                product.factoryPrice,
-                discountRate / 100,
-                quantity
-              )
-            );
+            const productStockAndDiscount =
+              productStockAndDiscounts[product.productCode];
+            const productInfo = productTotalInfos[product.productCode];
+            if (!productInfo) return null;
+            const totalQuantity = productInfo.totalQuantity;
 
             return (
               <div className='my-4 border-b py-4' key={product.productCode}>
@@ -139,7 +217,6 @@ export default function ManageStockModal({
                 </div>
                 <div className='flex gap-2 items-center font-semibold'>
                   {product.storages.map(storage => {
-                    const key = `${product.productCode}-${storage.name}`;
                     return (
                       <div key={`${product.productCode}-${storage.name}`}>
                         <div>
@@ -156,7 +233,11 @@ export default function ManageStockModal({
                             type='number'
                             className='input input-bordered w-[6rem]'
                             onChange={e =>
-                              handleInputChange(key, e.target.value)
+                              handleStockQuantityInputChange(
+                                product.productCode,
+                                storage.name,
+                                Number(e.target.value)
+                              )
                             }
                           />
                         </div>
@@ -169,7 +250,11 @@ export default function ManageStockModal({
                   <input
                     type='number'
                     className='input input-bordered w-[6rem]'
-                    value={discountRate <= 0 ? '' : discountRate}
+                    value={
+                      productStockAndDiscount.discountRate <= 0
+                        ? ''
+                        : productStockAndDiscount.discountRate
+                    }
                     onChange={e =>
                       handleDiscountChange(product.productCode, e.target.value)
                     }
@@ -179,7 +264,7 @@ export default function ManageStockModal({
                     수량
                   </span>
                   <span className='text-neutral-700 ml-4 mr-2 text-run-red-1 sm:text-xl font-semibold'>
-                    {quantity}
+                    {totalQuantity}
                   </span>
                   <span>{'/'}</span>
                   <span className='text-neutral-700 ml-4 mr-2 text-neutral-900 sm:text-xl font-semibold'>
@@ -189,7 +274,7 @@ export default function ManageStockModal({
                     금액
                   </span>
                   <span className='text-neutral-700 ml-4 mr-2 text-neutral-900 sm:text-xl font-semibold'>
-                    {convertNumberToKRW(totalPrice)} 원
+                    {calculateTotalPrice(product.productCode)} 원
                   </span>
                 </div>
               </div>
