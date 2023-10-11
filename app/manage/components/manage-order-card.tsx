@@ -1,7 +1,11 @@
 // app/manage/components/manage-order-card.tsx
 'use client';
 
-import { convertNumberToKRW, getDiscountedPrice } from '@/src/utils';
+import {
+  convertNumberToKRW,
+  getDiscountedPrice,
+  roundUpToHundred,
+} from '@/src/utils';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/20/solid';
 import dayjs from 'dayjs';
 import { ResponseGetOrdersForManager } from 'requests/manage/order.api';
@@ -25,19 +29,8 @@ export default function ManageOrderCard({
   userData,
   onClickEdit,
 }: ManageOrderCardProps) {
-  const {
-    // products,
-    // userData,
-    setProducts,
-    setUserData,
-    isVisible,
-    openModal,
-    // closeModal,
-  } = useContext(OrderModalContext);
-
-  // useEffect(() => {
-  //   console.log('$$ manage-order-card', isVisible);
-  // }, [isVisible])
+  const { setProducts, setUserData, setOrderId, openModal } =
+    useContext(OrderModalContext);
 
   const statusMap = {
     1: '주문 확인중',
@@ -57,10 +50,17 @@ export default function ManageOrderCard({
 
   const orderLabelClasses = 'text-xs md:text-sm text-neutral-400';
   const orderValueClasses = 'text-xs md:text-base text-neutral-800';
+  const orderBgColorMap = {
+    1: 'bg-slate-100',
+    3: 'bg-slate-300',
+    4: 'bg-neutral-400',
+  };
 
   return (
     <div className='card w-full border border-solid border-neutral-200 my-4'>
-      <div className='card-header bg-gray-200 rounded-t-lg flex flex-row items-center justify-between px-4 py-2 lg:px-8 lg:py-4'>
+      <div
+        className={`card-header rounded-t-lg flex flex-row items-center justify-between px-4 py-2 lg:px-8 lg:py-4 ${orderBgColorMap[status]}`}
+      >
         <div className='flex items-center gap-2 md:gap-4 rounded-t-lg'>
           <h6 className='text-base md:text-lg lg:text-xl font-semibold'>
             {userData.businessName}
@@ -79,6 +79,7 @@ export default function ManageOrderCard({
             onClick={() => {
               setProducts(products);
               setUserData(userData);
+              setOrderId(_id);
               openModal();
             }}
           >
@@ -198,7 +199,20 @@ export default function ManageOrderCard({
                   매입가
                 </span>
                 <span className='font-semibold text-base md:text-lg lg:text-xl'>
-                  {'15,000,000'}원
+                  {convertNumberToKRW(
+                    products.reduce((acc, cur) => {
+                      return (
+                        acc +
+                        roundUpToHundred(
+                          getDiscountedPrice(
+                            cur.factoryPrice,
+                            cur.discountRate,
+                            cur.quantity
+                          )
+                        )
+                      );
+                    }, 0)
+                  )}
                 </span>
               </span>
             )}

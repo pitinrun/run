@@ -84,5 +84,7 @@ export type UserType = Omit<IUser, 'password'>;
 
 export type ProductShipmentEntry = {
   productCode: string;
+  discountRate: number;
+  quantity: number;
   shipmentEntries: [string, number][];
 };

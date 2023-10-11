@@ -1,10 +1,12 @@
-'use client'
+'use client';
 // app/manage/components/manage-order-context.tsx
 import React, { createContext, useState, useContext } from 'react';
 import { ResponseGetOrdersForManager } from 'requests/manage/order.api';
 
 export const OrderModalContext = createContext<{
   isVisible: boolean;
+  orderId: string | null;
+  setOrderId: React.Dispatch<React.SetStateAction<string | null>>;
   openModal: () => void;
   closeModal: () => void;
   products: ResponseGetOrdersForManager['products'] | null;
@@ -17,6 +19,8 @@ export const OrderModalContext = createContext<{
   >;
 }>({
   isVisible: false,
+  orderId: null,
+  setOrderId: () => {},
   openModal: () => {},
   closeModal: () => {},
   products: [],
@@ -33,6 +37,7 @@ export default function OrderModalProvider({ children }) {
   const [userData, setUserData] = useState<
     ResponseGetOrdersForManager['userData'] | null
   >(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
 
   const openModal = () => setIsVisible(true);
   const closeModal = () => setIsVisible(false);
@@ -41,6 +46,8 @@ export default function OrderModalProvider({ children }) {
     <OrderModalContext.Provider
       value={{
         isVisible,
+        orderId,
+        setOrderId,
         openModal,
         closeModal,
         products,

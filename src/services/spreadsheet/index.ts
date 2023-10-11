@@ -458,16 +458,24 @@ export async function updateSheetStock(
     auth: authorize,
   });
 
-  const requests = requestParams.map((requestParam, index) => {
-    return googleSheet.spreadsheets.values.update(requestParam);
+  const batchUpdateRequestBody = {
+    data: requestParams.map(param => ({
+      range: param.range,
+      values: param.requestBody.values
+    })),
+    valueInputOption: 'RAW'
+  };
+  
+  // spreadsheets.values.batchUpdate를 사용하여 여러 작업을 한 번의 요청으로 수행
+  const response = await googleSheet.spreadsheets.values.batchUpdate({
+    spreadsheetId: SPREAD_SHEET_ID,
+    requestBody: batchUpdateRequestBody
   });
-  const responses = await Promise.all(requests);
-
-  responses.forEach(response => {
-    if (response.status !== 200) {
-      throw new Error(`Error updating stock DATA: ${response.data}.`);
-    }
-  });
+  
+  // 응답 처리
+  if (response.status !== 200) {
+    throw new Error(`Error updating stock DATA: ${response.data}.`);
+  }
 
   return true;
 }

@@ -20,7 +20,7 @@ export default function ManageStockModal({
   onClose?: () => void;
 }) {
   const modalClass = open ? 'modal modal-open' : 'modal';
-  const { userData, products } = useContext(OrderModalContext);
+  const { userData, products, orderId } = useContext(OrderModalContext);
 
   const [orderInfos, setOrderInfos] = useState<OrderInfoType>(
     Object.fromEntries(
@@ -123,7 +123,11 @@ export default function ManageStockModal({
 
   const handleClickOrder = async () => {
     try {
-      const response = await orderProduct(orderInfos);
+      if (!orderId) {
+        toast.error('주문 번호가 없습니다.' + ' ' + orderId);
+        return;
+      }
+      const response = await orderProduct(orderId, orderInfos);
       toast.success('정상적으로 처리 되었습니다.');
     } catch (error) {
       if (isAxiosError(error)) {
@@ -194,7 +198,11 @@ export default function ManageStockModal({
                             {storage.name}
                           </span>
                           <span className='font-semibold text-xs sm:text-sm text-run-red-1'>
-                            {storage.stock}개
+                            {storage.stock -
+                              orderInfos[product.productCode].stocks[
+                                storage.name
+                              ]}
+                            개
                           </span>
                         </div>
                         <div>
@@ -202,13 +210,20 @@ export default function ManageStockModal({
                             min={0}
                             type='number'
                             className='input input-bordered w-[6rem]'
-                            onChange={e =>
+                            value={
+                              productStockAndDiscount.stocks[storage.name] <= 0
+                                ? ''
+                                : productStockAndDiscount.stocks[storage.name]
+                            }
+                            onChange={e => {
+                              if (e.target.value === '-') return;
+                              if (Number(e.target.value) < 0) return;
                               handleStockQuantityInputChange(
                                 product.productCode,
                                 storage.name,
                                 Number(e.target.value)
-                              )
-                            }
+                              );
+                            }}
                           />
                         </div>
                       </div>

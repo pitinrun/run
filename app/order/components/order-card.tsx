@@ -1,4 +1,9 @@
-import { convertNumberToKRW, getDiscountedPrice } from '@/src/utils';
+import {
+  convertNumberToKRW,
+  getDiscountedPrice,
+  getTotalStock,
+  roundUpToHundred,
+} from '@/src/utils';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/20/solid';
 import Link from 'next/link';
 import { ResponseGetOrders } from 'requests/order.api';
@@ -21,6 +26,8 @@ export default function OrderCard({
   };
 
   const isWaiting = status === 1;
+
+  const totalQuantity = products.reduce((acc, cur) => acc + cur.quantity, 0);
 
   return (
     <div className='card w-full border border-solid border-neutral-200 my-4'>
@@ -111,7 +118,7 @@ export default function OrderCard({
                 총 수량
               </span>
               <span className='font-semibold text-base md:text-lg lg:text-xl'>
-                {products.reduce((acc, cur) => acc + cur.quantity, 0)}개
+                {totalQuantity}개
               </span>
             </span>
             {!isWaiting && (
@@ -120,7 +127,21 @@ export default function OrderCard({
                   매입가
                 </span>
                 <span className='font-semibold text-base md:text-lg lg:text-xl'>
-                  {'15,000,000'}원
+                  {/* {'15,000,000'}원 */}
+                  {convertNumberToKRW(
+                    products.reduce((acc, cur) => {
+                      return (
+                        acc +
+                        roundUpToHundred(
+                          getDiscountedPrice(
+                            cur.factoryPrice,
+                            cur.discountRate,
+                            cur.quantity
+                          )
+                        )
+                      );
+                    }, 0)
+                  ) + '원'}
                 </span>
               </span>
             )}

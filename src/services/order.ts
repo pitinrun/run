@@ -1,6 +1,7 @@
 import { FilterQuery } from 'mongoose';
 import { IOrderDocument, Order } from '../models/order';
 import { connectToDatabase } from '../utils';
+import { ProductShipmentEntry } from '../types';
 
 connectToDatabase();
 
@@ -126,4 +127,34 @@ export const getOrders = (filter: FilterQuery<IOrderDocument>) => {
       },
     },
   ]);
+};
+
+export const updateOrder = async (
+  orderId: string,
+  productShipmentEntries: ProductShipmentEntry[]
+) => {
+  const order = await Order.findById(orderId);
+
+  if (!order) {
+    throw new Error('주문을 찾을 수 없습니다.');
+  }
+
+  order.status = 3;
+
+  for (const productEntry of productShipmentEntries) {
+    const product = order.products.find(
+      product => product.productCode === productEntry.productCode
+    );
+
+    if (!product) {
+      throw new Error('ORDER: 해당하는 상품을 찾을 수 없습니다.');
+    }
+
+    product.discountRate = productEntry.discountRate / 100;
+    product.quantity = productEntry.quantity;
+  }
+
+  await order.save();
+
+  return order;
 };

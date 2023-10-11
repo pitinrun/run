@@ -27,10 +27,15 @@ export type OrderInfoType = {
 ]
  * @param param0 
  */
-export const orderProduct = async (orderInfos: OrderInfoType) => {
+export const orderProduct = async (
+  orderId: string,
+  orderInfos: OrderInfoType
+) => {
   const body = Object.entries(orderInfos).map(([productCode, orderDetail]) => {
     return {
       productCode,
+      discountRate: orderDetail.discountRate,
+      quantity: orderDetail.totalQuantity,
       shipmentEntries: Object.entries(orderDetail.stocks)
         .filter(orderInfo => {
           return orderInfo[1] > 0;
@@ -41,6 +46,6 @@ export const orderProduct = async (orderInfos: OrderInfoType) => {
     };
   });
 
-  const response = await axios.put('/api/product/shipments', body);
+  const response = await axios.put(`/api/product/shipments/${orderId}`, body);
   return response.data;
 };
