@@ -29,23 +29,29 @@ export type OrderInfoType = {
  */
 export const orderProduct = async (
   orderId: string,
-  orderInfos: OrderInfoType
+  orderInfos: OrderInfoType,
+  deliveryInfo: string
 ) => {
-  const body = Object.entries(orderInfos).map(([productCode, orderDetail]) => {
-    return {
-      productCode,
-      discountRate: orderDetail.discountRate,
-      quantity: orderDetail.totalQuantity,
-      shipmentEntries: Object.entries(orderDetail.stocks)
-        .filter(orderInfo => {
-          return orderInfo[1] > 0;
-        })
-        .map(([storageName, quantity]) => {
-          return [storageName, quantity];
-        }),
-    };
-  });
+  const entries = Object.entries(orderInfos).map(
+    ([productCode, orderDetail]) => {
+      return {
+        productCode,
+        discountRate: orderDetail.discountRate,
+        quantity: orderDetail.totalQuantity,
+        shipmentEntries: Object.entries(orderDetail.stocks)
+          .filter(orderInfo => {
+            return orderInfo[1] > 0;
+          })
+          .map(([storageName, quantity]) => {
+            return [storageName, quantity];
+          }),
+      };
+    }
+  );
 
-  const response = await axios.put(`/api/product/shipments/${orderId}`, body);
+  const response = await axios.put(`/api/product/shipments/${orderId}`, {
+    deliveryInfo,
+    entries,
+  });
   return response.data;
 };

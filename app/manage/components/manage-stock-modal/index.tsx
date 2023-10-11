@@ -37,6 +37,7 @@ export default function ManageStockModal({
       ]) ?? []
     )
   );
+  const [deliveryInfo, setDeliveryInfo] = useState<string>('');
 
   useEffect(() => {
     setOrderInfos(
@@ -127,7 +128,7 @@ export default function ManageStockModal({
         toast.error('주문 번호가 없습니다.' + ' ' + orderId);
         return;
       }
-      const response = await orderProduct(orderId, orderInfos);
+      const response = await orderProduct(orderId, orderInfos, deliveryInfo);
       toast.success('정상적으로 처리 되었습니다.');
     } catch (error) {
       if (isAxiosError(error)) {
@@ -146,6 +147,10 @@ export default function ManageStockModal({
         orderInfos[productCode].discountRate / 100
       )
     );
+  };
+
+  const handleChangeDeliveryInfo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDeliveryInfo(e.target.value);
   };
 
   return (
@@ -267,15 +272,29 @@ export default function ManageStockModal({
             );
           })}
         </div>
-        <div className='modal-action w-full'>
+        <div className='modal-action w-full flex flex-col'>
           {/* <form method='dialog flex w-full'> */}
           {/* if there is a button in form, it will close the modal */}
-          <button className='btn flex-1' onClick={onClose}>
-            닫기
-          </button>
-          <button className='btn flex-1 btn-primary' onClick={handleClickOrder}>
-            접수
-          </button>
+          <div className='mb-4'>
+            <span>배송 정보: </span>
+            <input
+              type='text'
+              className='input input-bordered w-56'
+              value={deliveryInfo}
+              onChange={handleChangeDeliveryInfo}
+            />
+          </div>
+          <div className='flex gap-4'>
+            <button className='btn flex-1' onClick={onClose}>
+              닫기
+            </button>
+            <button
+              className='btn flex-1 btn-primary'
+              onClick={handleClickOrder}
+            >
+              접수
+            </button>
+          </div>
           {/* </form> */}
         </div>
       </div>

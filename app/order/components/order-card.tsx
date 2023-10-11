@@ -1,7 +1,6 @@
 import {
   convertNumberToKRW,
   getDiscountedPrice,
-  getTotalStock,
   roundUpToHundred,
 } from '@/src/utils';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/20/solid';
@@ -100,7 +99,7 @@ export default function OrderCard({
                           product.discountRate,
                           product.quantity
                         )
-                      )}
+                      )}{' '}
                       원
                     </div>
                   </>
@@ -127,7 +126,6 @@ export default function OrderCard({
                   매입가
                 </span>
                 <span className='font-semibold text-base md:text-lg lg:text-xl'>
-                  {/* {'15,000,000'}원 */}
                   {convertNumberToKRW(
                     products.reduce((acc, cur) => {
                       return (

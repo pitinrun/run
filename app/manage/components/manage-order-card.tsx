@@ -77,10 +77,12 @@ export default function ManageOrderCard({
           <button
             className='btn btn-xs btn-neutral md:btn-sm'
             onClick={() => {
-              setProducts(products);
-              setUserData(userData);
-              setOrderId(_id);
-              openModal();
+              if (isWaiting) {
+                setProducts(products);
+                setUserData(userData);
+                setOrderId(_id);
+                openModal();
+              }
             }}
           >
             {statusButtonTextMap[status]}
@@ -114,7 +116,7 @@ export default function ManageOrderCard({
             <div className='col-span-3 md:col-span-2'>
               <div className={orderLabelClasses}>배송 완료일</div>
               <div className={orderValueClasses}>
-                {deliveryStartedAt
+                {deliveredAt
                   ? dayjs(deliveredAt).format('YY-MM-DD hh:mm')
                   : '-'}
               </div>
@@ -212,7 +214,8 @@ export default function ManageOrderCard({
                         )
                       );
                     }, 0)
-                  )}
+                  )}{' '}
+                  원
                 </span>
               </span>
             )}
