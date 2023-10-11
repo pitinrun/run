@@ -1,25 +1,17 @@
-import { updateProductStock } from '@/src/services/spreadsheet';
+import { updateProductStorage } from '@/src/services/product';
+import { updateSheetStock } from '@/src/services/spreadsheet';
+import { ProductShipmentEntry } from '@/src/types';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function PUT(req: NextRequest, { params }) {
   try {
-    // const { productCode } = params;
-    const data: {
-      productCode: string;
-      shipmentEntries: [string, number][];
-    }[] = await req.json();
+    const productShipmentEntry: ProductShipmentEntry[] = await req.json();
 
-    await updateProductStock(data);
-    // const promiseUpdatedProductStocks = data.map(
-    //   ({ productCode, shipmentEntries }) =>{
-
-    //   }
-    // );
-
-    // const response = await Promise.all(promiseUpdatedProductStocks);
+    await updateSheetStock(productShipmentEntry);
+    await updateProductStorage(productShipmentEntry);
 
     return NextResponse.json({
-      message: 'success',
+      message: '정상적으로 접수되었습니다.',
       status: 200,
     });
   } catch (error) {

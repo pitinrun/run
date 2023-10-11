@@ -1,7 +1,7 @@
 // src/services/spreadsheet/index.ts
 import { google } from 'googleapis';
 import { getStorages, updateStorageNames } from '@/src/services/metadata';
-import { IProduct } from '@/src/types';
+import { IProduct, ProductShipmentEntry } from '@/src/types';
 import { fromColumnName, toColumnName } from './utils';
 import { IMetaData } from '@/src/models/metadata';
 
@@ -368,11 +368,8 @@ function getSheetColumnByStorageName(
  * @param productCode - 제품 코드
  * @param shipmentEntries - 창고 이름과 출하할 수량이 있는 배열
  */
-export async function updateProductStock(
-  orderInfos: {
-    shipmentEntries: [string, number][];
-    productCode: string;
-  }[]
+export async function updateSheetStock(
+  productShipmentEntry: ProductShipmentEntry[]
 ) {
   // 스프레드시트에서 데이터를 가져옴
   const { startCell, endCell } = await getSheetRange();
@@ -403,7 +400,7 @@ export async function updateProductStock(
   const storages = await getStorages();
 
   // orderInfos.forEach(async ({ shipmentEntries, productCode }) => {
-  for (const orderInfo of orderInfos){
+  for (const orderInfo of productShipmentEntry){
     const { shipmentEntries, productCode } = orderInfo;
     // 제품 코드에 해당하는 행을 찾음
     const rowIndex = sheetData.findIndex(
@@ -429,7 +426,7 @@ export async function updateProductStock(
       // 출하 수량이 현재 재고보다 많다면 에러 발생
       if (currentStock < quantity) {
         throw new Error(
-          `Not enough stock in ${storageName}. Available: ${currentStock}, Requested: ${quantity}`
+          `enough stock in ${storageName}. Available: ${currentStock}, Requested: ${quantity}`
         );
       }
 

@@ -29,7 +29,6 @@ export type OrderInfoType = {
  */
 export const orderProduct = async (orderInfos: OrderInfoType) => {
   const body = Object.entries(orderInfos).map(([productCode, orderDetail]) => {
-
     return {
       productCode,
       shipmentEntries: Object.entries(orderDetail.stocks)

@@ -81,3 +81,8 @@ export interface IUser {
 }
 
 export type UserType = Omit<IUser, 'password'>;
+
+export type ProductShipmentEntry = {
+  productCode: string;
+  shipmentEntries: [string, number][];
+};

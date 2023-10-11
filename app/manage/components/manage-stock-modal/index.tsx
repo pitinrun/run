@@ -9,6 +9,8 @@ import {
   roundUpToHundred,
 } from '@/src/utils';
 import { OrderInfoType, orderProduct } from './api';
+import { isAxiosError } from 'axios';
+import { toast } from 'react-toastify';
 
 export default function ManageStockModal({
   open = false,
@@ -119,8 +121,15 @@ export default function ManageStockModal({
     });
   };
 
-  const handleClickOrder = () => {
-    orderProduct(orderInfos);
+  const handleClickOrder = async () => {
+    try {
+      const response = await orderProduct(orderInfos);
+      toast.success('정상적으로 처리 되었습니다.');
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.error(error.response?.data?.message);
+      }
+    }
   };
 
   const calculateTotalPrice = (productCode: string) => {
@@ -154,7 +163,9 @@ export default function ManageStockModal({
               <div className='my-4 border-b py-4' key={product.productCode}>
                 <div className='flex gap-4 lg:gap-8 items-center font-semibold'>
                   {product.specialDiscountRate ? (
-                    <h5 className='text-lg md:text-xl text-run-red-1'>{product.patternKr}</h5>
+                    <h5 className='text-lg md:text-xl text-run-red-1'>
+                      {product.patternKr}
+                    </h5>
                   ) : (
                     <h5 className='text-lg md:text-xl'>{product.patternKr}</h5>
                   )}
