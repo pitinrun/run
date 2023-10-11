@@ -14,6 +14,7 @@ import {
 } from 'requests/manage/order.api';
 import ManageStockModal from './manage-stock-modal';
 import { OrderModalContext } from '../contexts/order-modal.context';
+import { deliveryCompleteOrder } from '../api';
 
 const ORDER_STATUSES = [
   {
@@ -50,15 +51,7 @@ function ManageOrderList({}) {
   );
   const [openRemoveConfirm, setOpenRemoveConfirm] = useState(false);
   // const [orderModalOpen, setOrderModalOpen] = useState(false);
-  const {
-    products,
-    userData,
-    setProducts,
-    setUserData,
-    isVisible,
-    openModal,
-    closeModal,
-  } = useContext(OrderModalContext);
+  const { modalType, orderId, closeModal } = useContext(OrderModalContext);
 
   const fetchOrders = async () => {
     const reqOrderParams = {};
@@ -90,6 +83,24 @@ function ManageOrderList({}) {
   const handleRemoveOrder = (id: string) => {
     targetRemoveOrder = id;
     setOpenRemoveConfirm(true);
+  };
+
+  const handleConfirmCompleteDelivery = async () => {
+    if (!orderId) {
+      toast.error('주문 정보가 없습니다.');
+      return;
+    }
+
+    try {
+      await deliveryCompleteOrder(orderId);
+      toast.success('배송 완료 처리되었습니다. 새로고침을 해주세요.');
+      closeModal();
+    } catch (error) {
+      if (isAxiosError(error)) {
+        console.error('!!ERROR: ', error.response?.data);
+        toast.error(error.response?.data.message);
+      }
+    }
   };
 
   return (
@@ -153,11 +164,21 @@ function ManageOrderList({}) {
         주문을 삭제하시겠습니까?
       </ConfirmDialog>
       <ManageStockModal
-        open={isVisible}
+        open={modalType === 'stock'}
         onClose={() => {
           closeModal();
         }}
       />
+      <ConfirmDialog
+        title='배송 완료'
+        open={modalType === 'delivered'}
+        onClose={() => {
+          closeModal();
+        }}
+        onConfirm={handleConfirmCompleteDelivery}
+      >
+        해당 주문을 배송완료 처리하시겠습니까?
+      </ConfirmDialog>
     </div>
   );
 }

@@ -3,11 +3,13 @@
 import React, { createContext, useState, useContext } from 'react';
 import { ResponseGetOrdersForManager } from 'requests/manage/order.api';
 
+type ModalType = 'stock' | 'delivered';
+
 export const OrderModalContext = createContext<{
-  isVisible: boolean;
+  modalType: ModalType | null;
   orderId: string | null;
   setOrderId: React.Dispatch<React.SetStateAction<string | null>>;
-  openModal: () => void;
+  openModal: (modalType: ModalType) => void;
   closeModal: () => void;
   products: ResponseGetOrdersForManager['products'] | null;
   setProducts: React.Dispatch<
@@ -18,10 +20,10 @@ export const OrderModalContext = createContext<{
     React.SetStateAction<ResponseGetOrdersForManager['userData']>
   >;
 }>({
-  isVisible: false,
+  modalType: null,
   orderId: null,
   setOrderId: () => {},
-  openModal: () => {},
+  openModal: (modalType: string) => {},
   closeModal: () => {},
   products: [],
   setProducts: () => {},
@@ -30,7 +32,7 @@ export const OrderModalContext = createContext<{
 });
 
 export default function OrderModalProvider({ children }) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [modalType, setModalType] = useState<ModalType | null>(null);
   const [products, setProducts] = useState<
     ResponseGetOrdersForManager['products'] | null
   >(null);
@@ -39,13 +41,13 @@ export default function OrderModalProvider({ children }) {
   >(null);
   const [orderId, setOrderId] = useState<string | null>(null);
 
-  const openModal = () => setIsVisible(true);
-  const closeModal = () => setIsVisible(false);
+  const openModal = (modalType: ModalType) => setModalType(modalType);
+  const closeModal = () => setModalType(null);
 
   return (
     <OrderModalContext.Provider
       value={{
-        isVisible,
+        modalType,
         orderId,
         setOrderId,
         openModal,

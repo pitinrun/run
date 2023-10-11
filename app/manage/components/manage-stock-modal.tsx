@@ -1,14 +1,14 @@
 // app/manage/components/manage-stock-modal.tsx
 'use client';
 import { useContext, useEffect, useState } from 'react';
-import { OrderModalContext } from '../../contexts/order-modal.context';
+import { OrderModalContext } from '../contexts/order-modal.context';
 import {
   convertNumberToKRW,
   convertNumberToPercent,
   getDiscountedPrice,
   roundUpToHundred,
 } from '@/src/utils';
-import { OrderInfoType, orderProduct } from './api';
+import { OrderInfoType, orderProduct } from '../api';
 import { isAxiosError } from 'axios';
 import { toast } from 'react-toastify';
 
@@ -21,6 +21,7 @@ export default function ManageStockModal({
 }) {
   const modalClass = open ? 'modal modal-open' : 'modal';
   const { userData, products, orderId } = useContext(OrderModalContext);
+  const [buttonLoading, setButtonLoading] = useState(false);
 
   const [orderInfos, setOrderInfos] = useState<OrderInfoType>(
     Object.fromEntries(
@@ -123,18 +124,21 @@ export default function ManageStockModal({
   };
 
   const handleClickOrder = async () => {
+    setButtonLoading(true);
     try {
       if (!orderId) {
         toast.error('주문 번호가 없습니다.' + ' ' + orderId);
         return;
       }
       const response = await orderProduct(orderId, orderInfos, deliveryInfo);
-      toast.success('정상적으로 처리 되었습니다.');
+      toast.success('정상적으로 처리 되었습니다. 새로고침을 해주세요.');
+      onClose();
     } catch (error) {
       if (isAxiosError(error)) {
         toast.error(error.response?.data?.message);
       }
     }
+    setButtonLoading(false);
   };
 
   const calculateTotalPrice = (productCode: string) => {
@@ -280,6 +284,7 @@ export default function ManageStockModal({
             <input
               type='text'
               className='input input-bordered w-56'
+              placeholder='배송 정보 입력'
               value={deliveryInfo}
               onChange={handleChangeDeliveryInfo}
             />
@@ -288,14 +293,19 @@ export default function ManageStockModal({
             <button className='btn flex-1' onClick={onClose}>
               닫기
             </button>
-            <button
-              className='btn flex-1 btn-primary'
-              onClick={handleClickOrder}
-            >
-              접수
-            </button>
+            {buttonLoading ? (
+              <button className='btn flex-1 btn-primary' disabled>
+                접수 중
+              </button>
+            ) : (
+              <button
+                className='btn flex-1 btn-primary'
+                onClick={handleClickOrder}
+              >
+                접수
+              </button>
+            )}
           </div>
-          {/* </form> */}
         </div>
       </div>
     </dialog>

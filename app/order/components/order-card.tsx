@@ -27,10 +27,16 @@ export default function OrderCard({
   const isWaiting = status === 1;
 
   const totalQuantity = products.reduce((acc, cur) => acc + cur.quantity, 0);
-
+  const orderBgColorMap = {
+    1: 'bg-slate-100',
+    3: 'bg-slate-300',
+    4: 'bg-neutral-400',
+  };
   return (
     <div className='card w-full border border-solid border-neutral-200 my-4'>
-      <div className='card-header bg-gray-200 rounded-t-lg flex flex-row items-center justify-between px-4 py-2 lg:px-8 lg:py-4'>
+      <div
+        className={`card-header rounded-t-lg flex flex-row items-center justify-between px-4 py-2 lg:px-8 lg:py-4 ${orderBgColorMap[status]}`}
+      >
         <div className='flex items-center gap-2 md:gap-4 rounded-t-lg'>
           <h6 className='text-base md:text-lg lg:text-xl font-semibold'>
             {createdAt.toLocaleDateString('ko')}

@@ -1,13 +1,11 @@
-import { updateStatusDeliveryStart } from '@/src/services/order';
-import { updateProductStorage } from '@/src/services/product';
-import { updateSheetStock } from '@/src/services/spreadsheet';
-import { ProductShipmentEntry } from '@/src/types';
+import { updateStatusDeliveryCompleted } from '@/src/services/order';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function PUT(req: NextRequest, { params }) {
   try {
     const { orderId } = params;
 
+    updateStatusDeliveryCompleted(orderId);
     return NextResponse.json({
       message: '배송이 완료되었습니다.',
       status: 200,

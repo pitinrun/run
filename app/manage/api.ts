@@ -55,3 +55,10 @@ export const orderProduct = async (
   });
   return response.data;
 };
+
+export const deliveryCompleteOrder = async (orderId: string) => {
+  const response = await axios.put(
+    `/api/product/shipments/${orderId}/complete`
+  );
+  return response.data;
+};

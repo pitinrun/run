@@ -12,6 +12,8 @@ import { ResponseGetOrdersForManager } from 'requests/manage/order.api';
 import ManageStockModal from './manage-stock-modal';
 import { useContext, useEffect, useState } from 'react';
 import { OrderModalContext } from '../contexts/order-modal.context';
+import { deliveryCompleteOrder } from '../api';
+import { toast } from 'react-toastify';
 
 type ManageOrderCardProps = ResponseGetOrdersForManager & {
   onClickRemove?: () => void;
@@ -56,6 +58,17 @@ export default function ManageOrderCard({
     4: 'bg-neutral-400',
   };
 
+  const handleClickButton = async () => {
+    setOrderId(_id);
+    if (isWaiting) {
+      setProducts(products);
+      setUserData(userData);
+      openModal('stock');
+    } else if (isDelivering) {
+      openModal('delivered');
+    }
+  };
+
   return (
     <div className='card w-full border border-solid border-neutral-200 my-4'>
       <div
@@ -68,25 +81,20 @@ export default function ManageOrderCard({
           <div className='badge badge-md md:badge-lg'>{statusMap[status]}</div>
         </div>
         <div className='flex items-center'>
-          <button className='btn btn-xs md:btn-sm btn-outline mr-2 md:mr-4'>
+          {/* <button className='btn btn-xs md:btn-sm btn-outline mr-2 md:mr-4'>
             <TrashIcon
               className='w-4 h-4 md:w-5 md:h-5'
               onClick={onClickRemove}
             />
-          </button>
-          <button
-            className='btn btn-xs btn-neutral md:btn-sm'
-            onClick={() => {
-              if (isWaiting) {
-                setProducts(products);
-                setUserData(userData);
-                setOrderId(_id);
-                openModal();
-              }
-            }}
-          >
-            {statusButtonTextMap[status]}
-          </button>
+          </button> */}
+          {!isDelivered && (
+            <button
+              className='btn btn-xs btn-neutral md:btn-sm'
+              onClick={handleClickButton}
+            >
+              {statusButtonTextMap[status]}
+            </button>
+          )}
         </div>
       </div>
       <div className='card-body p-0'>
