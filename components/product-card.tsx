@@ -7,6 +7,7 @@ import {
   getTotalStock,
   roundUpToHundred,
 } from '@/src/utils';
+import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
 function DividerHorizon() {
@@ -37,6 +38,7 @@ type ProductCardProps = {
     quantity: number;
     discountRate: number;
   }) => void;
+  onStockClick?: (productCode: string) => void;
 } & IProduct;
 
 export default function ProductCard({
@@ -60,11 +62,14 @@ export default function ProductCard({
   onChangeQuantity,
   onPurchaseClick,
   onRemoveWishlistClick,
+  onStockClick,
 }: ProductCardProps) {
   const [quantity, setQuantity] = useState<number | null>(defaultQuantity ?? 0);
   const [discountRate, setDiscountRate] = useState<number | null>(
     Math.round((specialDiscountRate ?? defaultDiscountRate ?? 0) * 100) || 0
   );
+  const { data: session, status } = useSession();
+  const { role, id } = session?.user ?? {};
 
   const handlePurchaseClick = () => {
     onPurchaseClick &&
@@ -73,6 +78,12 @@ export default function ProductCard({
         quantity: quantity ?? 0,
         discountRate: discountRate ?? 0,
       });
+  };
+
+  const handleStockClick = () => {
+    if (role && role >= 9) {
+      onStockClick && onStockClick(productCode);
+    }
   };
 
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,6 +142,7 @@ export default function ProductCard({
           style={{
             backgroundColor: 'rgba(255, 255, 255, 0.1)',
           }}
+          onClick={handleStockClick}
         >
           총 재고 {getTotalStock(storages)}
         </button>

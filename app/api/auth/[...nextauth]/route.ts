@@ -91,6 +91,7 @@ export const authOptions: AuthOptions = {
       if (session.user && token.sub) {
         // Add property to session
         session.user.id = token.sub;
+        session.user.role = token.role ?? 0;
       }
 
       return session;

@@ -12,6 +12,12 @@ export const getProductsByProductCodes = async (productCodes: string[]) => {
   }).lean();
 };
 
+export const getProductByProductCode = async (productCode: string) => {
+  return Product.findOne({
+    productCode,
+  }).lean();
+}
+
 export const dropAndBulkInsertProducts = async (products: IProduct[]) => {
   try {
     await Product.deleteMany({});

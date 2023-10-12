@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import OrderDialog from './order-dialog';
 import EmptyAlert from './empty-alert';
+import StockDialog from './stock-dialog';
 
 export default function ProductCardDashboard__V2({
   selectedBrands = null,
@@ -31,6 +32,7 @@ export default function ProductCardDashboard__V2({
   const [maxPage, setMaxPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
+  const [stockDialogCode, setStockDialogCode] = useState<string | null>(null);
 
   useEffect(() => {
     setProducts([]);
@@ -119,6 +121,11 @@ export default function ProductCardDashboard__V2({
     setOrderDialogOpen(true);
   }
 
+  function handleStockClick(productCode: string) {
+    // console.log('$$ productCode', productCode);
+    setStockDialogCode(productCode);
+  }
+
   if (!isLoading && products.length <= 0) {
     return (
       <EmptyAlert>
@@ -136,6 +143,7 @@ export default function ProductCardDashboard__V2({
           <ProductCard
             key={`product-card-${index}-${product.pattern}`}
             onPurchaseClick={onPurchaseClick}
+            onStockClick={handleStockClick}
             defaultQuantity={1}
             {...product}
           />
@@ -157,6 +165,13 @@ export default function ProductCardDashboard__V2({
         }}
         onClose={() => {
           setOrderDialogOpen(false);
+        }}
+      />
+      <StockDialog
+        open={!!stockDialogCode}
+        productCode={stockDialogCode}
+        onClose={() => {
+          setStockDialogCode(null);
         }}
       />
     </div>

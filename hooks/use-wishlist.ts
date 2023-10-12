@@ -40,7 +40,7 @@ export const useWishlist = (key: string) => {
 
     async function fetchWishlist() {
       try {
-        const { data } = await axios.get(`/api/product/${encodedProductCodes}`);
+        const { data } = await axios.get(`/api/product/wishlist/${encodedProductCodes}`);
         injectProduct(localStorageWishlist, data);
         setWishlist(localStorageWishlist);
       } catch (error) {
