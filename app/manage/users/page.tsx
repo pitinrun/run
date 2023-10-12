@@ -1,5 +1,6 @@
 import { User } from '@/src/models/user';
 import { IUser } from '@/src/types';
+import Link from 'next/link';
 
 export default async function UserPage({
   params,
@@ -9,7 +10,9 @@ export default async function UserPage({
   searchParams: { businessName: string };
 }) {
   const getUser = async () => {
-    let users = [] as IUser[];
+    let users = [] as (IUser & {
+      _id: string;
+    })[];
     if (searchParams.businessName) {
       users = await User.find({
         businessName: {
@@ -40,7 +43,7 @@ export default async function UserPage({
         </form>
       </div>
       <div className='overflow-x-auto'>
-        <table className='table w-full'>
+        <table className='table w-full min-w-[800px]'>
           {/* head */}
           <thead>
             <tr>
@@ -48,18 +51,26 @@ export default async function UserPage({
               <th>담당자 휴대폰 번호</th>
               <th>이메일</th>
               <th>사업장 주소</th>
+              <th>More</th>
             </tr>
           </thead>
           <tbody>
             {users.map(user => {
               return (
-                <tr key={`user-${user}`}>
+                <tr className='' key={`user-${user}`}>
                   <td>{user.businessName}</td>
                   <td>{user.tel}</td>
                   <td>{user.email}</td>
                   <td>
                     {user.businessAddress?.address +
                       (user.businessAddressDetail ?? '')}
+                  </td>
+                  <td>
+                    <Link href={`/manage/users/${user._id}`}>
+                      <button className='btn btn-sm'>
+                        상세보기
+                      </button>
+                    </Link>
                   </td>
                 </tr>
               );

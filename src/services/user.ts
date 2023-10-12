@@ -17,3 +17,10 @@ export const getUser = (userId: string) => {
     }
   );
 };
+
+export const getUserById = (id: string) => {
+  if (!id) {
+    return null;
+  }
+  return User.findById(id);
+};
