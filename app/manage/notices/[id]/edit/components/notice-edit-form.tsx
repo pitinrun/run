@@ -26,6 +26,7 @@ export default function NoticeEditForm({
     defaultValues: {
       title: initNoticeData.title,
       content: initNoticeData.content,
+      isImportant: initNoticeData.isImportant,
     },
   });
 
@@ -49,6 +50,19 @@ export default function NoticeEditForm({
       </header>
 
       <form onSubmit={handleSubmit(onSubmit)}>
+        <div className='form-control items-end'>
+          <label className='label cursor-pointer w-36'>
+            <span className='label-text'>상단 고정</span>
+            <input
+              {...register('isImportant')}
+              type='checkbox'
+              onChange={e => {
+                setValue('isImportant', e.target.checked);
+              }}
+              className='checkbox'
+            />
+          </label>
+        </div>
         <div className='mb-4'>
           <label
             className='block text-gray-700 text-sm font-bold mb-2'

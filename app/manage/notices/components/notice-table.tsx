@@ -23,6 +23,7 @@ export default function NoticeTable({
         <thead>
           <tr>
             <th>게시일</th>
+            <th>상단 여부</th>
             <th>제목</th>
             <th>내용</th>
             <th>수정</th>
@@ -40,6 +41,7 @@ export default function NoticeTable({
                 }}
               >
                 <td>{dayjs(notice.createdAt).format('YYYY-MM-DD')}</td>
+                <td>{notice.isImportant ? '상단' : '일반'}</td>
                 <td className='w-32'>{notice.title}</td>
                 <td>{notice.content}</td>
                 <td>

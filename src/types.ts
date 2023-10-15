@@ -92,6 +92,7 @@ export type ProductShipmentEntry = {
 export type INotice = {
   title: string;
   content: string;
+  isImportant: boolean;
   createdAt: Date;
   updatedAt: Date;
 };

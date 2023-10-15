@@ -40,7 +40,7 @@ export default function NoticeList({
     <div>
       <Header>공지</Header>
       {notices.map((notice, index) => {
-        if (!onMore && index === MAXIMUM) return;
+        if (!onMore && index >= MAXIMUM) return;
         return (
           <NoticeItem
             title={notice.title}
