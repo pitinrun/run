@@ -1,6 +1,5 @@
 'use client';
 import { NoticeModalContext } from 'contexts/notice-modal.context';
-import dayjs from 'dayjs';
 import { useContext } from 'react';
 import './style.css';
 import { useSession } from 'next-auth/react';
@@ -30,7 +29,7 @@ export function NoticeDetailModal() {
           </div>
         )}
         <div
-          className='text-base mb-4 break-keep overflow-y-auto max-h-96'
+          className='text-base mb-4 break-keep overflow-y-auto max-h-96 quill'
           dangerouslySetInnerHTML={{ __html: content ?? '' }}
         />
         <div className='modal-action w-full'>
