@@ -1,4 +1,5 @@
 import { getUser, getUserById } from '@/src/services/user';
+import Link from 'next/link';
 
 function Label({
   children,
@@ -53,12 +54,15 @@ export default async function UserPage({ params }: { params: { id: string } }) {
         </div>
       </div>
       <div className='flex md:justify-end gap-4'>
-        <button className='btn btn-primary flex-1 md:w-full md:max-w-xs'>
+        {/* <button className='btn btn-primary flex-1 md:w-full md:max-w-xs'>
           비밀번호 재설정
-        </button>
-        <button className='btn btn-secondary flex-1 md:w-full md:max-w-xs'>
-          수정하기
-        </button>
+        </button> */}
+        <Link
+          className='flex-1 md:w-full md:max-w-xs'
+          href={`/manage/users/${user._id}/edit`}
+        >
+          <button className='btn btn-primary w-full'>수정하기</button>
+        </Link>
       </div>
     </div>
   );

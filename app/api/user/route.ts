@@ -1,13 +1,13 @@
 // app/api/users/route.ts
 import Validate from 'next-api-validation';
 import { NextResponse } from 'next/server';
-import bcrypt from 'bcrypt';
 import { User, IUserDocument } from '@/src/models/user'; // 경로는 실제 파일 위치에 따라 변경해 주세요.
 import { connectToDatabase } from 'src/utils';
+import bcrypt from 'bcrypt';
 
 connectToDatabase();
 
-const generatePassword = (password: string) => {
+export const generatePassword = (password: string) => {
   const SALT_ROUNDS = 10;
 
   const salt = bcrypt.genSaltSync(SALT_ROUNDS);
