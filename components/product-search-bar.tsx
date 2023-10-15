@@ -1,25 +1,39 @@
+'use client';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function ProductSearchBar({
   className = '',
-  value = '',
-  setValue,
 }: {
   className?: string;
-  value?: string;
-  setValue?: (value: string) => void;
 }) {
-  const [inputValue, setInputValue] = useState(value || '');
+  const [inputValue, setInputValue] = useState('');
+  const [sizeSearchKeyword, setSizeSearchKeyword] = useState('');
+  const router = useRouter();
+
+  const handle = () => {
+    router.push(
+      `/products?${new URLSearchParams({
+        sizeSearchKeyword,
+      }).toString()}`
+    );
+  };
+
+  useEffect(() => {
+    if (sizeSearchKeyword) {
+      handle();
+    }
+  }, [sizeSearchKeyword]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      setValue && setValue(inputValue);
+      setSizeSearchKeyword(inputValue);
     }
   };
 
   const handleClick = () => {
-    setValue && setValue(inputValue);
+    setSizeSearchKeyword(inputValue);
   };
 
   return (

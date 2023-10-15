@@ -7,9 +7,15 @@ const NoticeSchema: Schema = new Schema(
   {
     title: {
       type: String,
+      required: true,
     },
     content: {
       type: String,
+      require: true,
+    },
+    isImportant: {
+      type: Boolean,
+      default: false,
     },
   },
   {

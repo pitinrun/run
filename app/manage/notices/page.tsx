@@ -22,18 +22,18 @@ export default async function NoticesPage() {
   });
 
   return (
-    <div className='container'>
-      <div className='overflow-x-auto'>
-        <Header>공지사항</Header>
-        <div className='text-right'>
-          <Link href='/manage/notices/create'>
-            <button className='btn'>공지사항 작성</button>
-          </Link>
-        </div>
-        <NoticeModalProvider>
+    <NoticeModalProvider>
+      <div className='container'>
+        <div className='overflow-x-auto'>
+          <Header>공지사항</Header>
+          <div className='text-right'>
+            <Link href='/manage/notices/create'>
+              <button className='btn'>공지사항 작성</button>
+            </Link>
+          </div>
           <NoticeTable notices={notices as (INotice & { _id: string })[]} />
-        </NoticeModalProvider>
+        </div>
       </div>
-    </div>
+    </NoticeModalProvider>
   );
 }
