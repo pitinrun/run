@@ -4,11 +4,13 @@ import Header from 'components/Header';
 import dayjs from 'dayjs';
 import jsdom from 'jsdom';
 import Link from 'next/link';
+import NoticeTableBody from './components/notice-table-body';
+import { INotice } from '@/src/types';
 
 export default async function NoticesPage() {
-  const notices = await getNoticeList();
+  const noticesOrigin = await getNoticeList();
 
-  const noticesForDom = notices.map(notice => {
+  const notices = noticesOrigin.map(notice => {
     return {
       ...notice,
       content: new jsdom.JSDOM(
@@ -35,24 +37,7 @@ export default async function NoticesPage() {
               <th>수정</th>
             </tr>
           </thead>
-          <tbody>
-            {noticesForDom.map(notice => {
-              return (
-                <tr>
-                  <td>{dayjs(notice.createdAt).format('YYYY-MM-DD')}</td>
-                  <td className='w-32'>{notice.title}</td>
-                  <td>{notice.content}</td>
-                  <td>
-                    <Link href={`/manage/notices/${notice._id}/edit`}>
-                      <button className='btn btn-sm'>
-                        <PencilSquareIcon className='w-4 h-4 md:w-5 md:h-5' />
-                      </button>
-                    </Link>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
+          <NoticeTableBody notices={notices as (INotice & { _id: string })[]} />
         </table>
       </div>
     </div>

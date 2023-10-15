@@ -12,7 +12,9 @@ import { INotice } from '@/src/types';
 export default function NoticeEditForm({
   initNoticeData,
 }: {
-  initNoticeData: INotice;
+  initNoticeData: INotice & {
+    _id: string;
+  };
 }) {
   const ReactQuill = useMemo(
     () => dynamic(() => import('react-quill'), { ssr: false }),
