@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt';
 
 connectToDatabase();
 
-export const generatePassword = (password: string) => {
+const generatePassword = (password: string) => {
   const SALT_ROUNDS = 10;
 
   const salt = bcrypt.genSaltSync(SALT_ROUNDS);

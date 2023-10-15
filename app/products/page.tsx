@@ -2,12 +2,54 @@
 
 import { BRANDS, BrandType, IProduct, SeasonType } from '@/src/types';
 import ProductCardDashboard__V2 from 'components/product-card-dashboard-v2';
-import ProductSearchBar from 'components/product-search-bar';
 import BrandFilter from '@/app/products/components/brand-filter';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 
 const PER_PAGE = 10;
+
+function SizeSearchBar({
+  className = '',
+  value = '',
+  setValue,
+}: {
+  className?: string;
+  value?: string;
+  setValue?: (value: string) => void;
+}) {
+  const [inputValue, setInputValue] = useState(value || '');
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      setValue && setValue(inputValue);
+    }
+  };
+
+  const handleClick = () => {
+    setValue && setValue(inputValue);
+  };
+
+  return (
+    <div
+      className={`max-w-3xl w-full flex border border-solid border-current rounded-lg py-2 px-4 ${className}`}
+    >
+      <input
+        type='text'
+        placeholder='2454518'
+        className='input-bordered flex-1'
+        onKeyDown={handleKeyDown}
+        value={inputValue}
+        onChange={e => {
+          setInputValue(e.target.value);
+        }}
+      />
+      <button className='btn-ghost' onClick={handleClick}>
+        <MagnifyingGlassIcon className='w-8 h-8' />
+      </button>
+    </div>
+  );
+}
 
 const SeasonFilter = ({
   season: selectedSeason,
@@ -121,7 +163,7 @@ export default function ProductPage() {
   return (
     <div className='container'>
       <div className='sm:flex sm:gap-4'>
-        <ProductSearchBar
+        <SizeSearchBar
           className='mb-4 sm:mb-0 ml-0 sm:flex-1'
           value={sizeSearchKeyword}
           setValue={setSizeSearchKeyword}
@@ -151,10 +193,10 @@ export default function ProductPage() {
           }}
         >
           후륜타이어 사이즈
-        </span>
-        {' '}검색
+        </span>{' '}
+        검색
       </h6>
-      <ProductSearchBar
+      <SizeSearchBar
         className='my-2 ml-0 sm:flex-1'
         value={sizeSearchKeyword2}
         setValue={setSizeSearchKeyword2}
