@@ -88,3 +88,8 @@ export type ProductShipmentEntry = {
   quantity: number;
   shipmentEntries: [string, number][];
 };
+
+export type INotice = {
+  title: string;
+  content: string;
+};
