@@ -63,7 +63,7 @@ const masterContents: ContentItemType[] = [
   },
   {
     name: '공지 관리',
-    href: '',
+    href: '/manage/notices',
     icon: <SpeakerWaveIcon className='w-6 h-6 mr-4' />,
   },
 ];
