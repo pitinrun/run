@@ -1,0 +1,17 @@
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+}

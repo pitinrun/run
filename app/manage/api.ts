@@ -62,3 +62,8 @@ export const deliveryCompleteOrder = async (orderId: string) => {
   );
   return response.data;
 };
+
+export const getNoticeById = async (id: string) => {
+  const response = await axios.get(`/api/notices/${id}`);
+  return response.data;
+}

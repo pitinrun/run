@@ -4,8 +4,9 @@ import Header from 'components/Header';
 import dayjs from 'dayjs';
 import jsdom from 'jsdom';
 import Link from 'next/link';
-import NoticeTableBody from './components/notice-table-body';
+import NoticeTable from './components/notice-table';
 import { INotice } from '@/src/types';
+import NoticeModalProvider from 'contexts/notice-modal.context';
 
 export default async function NoticesPage() {
   const noticesOrigin = await getNoticeList();
@@ -13,6 +14,7 @@ export default async function NoticesPage() {
   const notices = noticesOrigin.map(notice => {
     return {
       ...notice,
+      _id: notice._id.toString(),
       content: new jsdom.JSDOM(
         notice.content
       ).window.document.body.textContent?.slice(0, 50),
@@ -28,17 +30,9 @@ export default async function NoticesPage() {
             <button className='btn'>공지사항 작성</button>
           </Link>
         </div>
-        <table className='table'>
-          <thead>
-            <tr>
-              <th>게시일</th>
-              <th>제목</th>
-              <th>내용</th>
-              <th>수정</th>
-            </tr>
-          </thead>
-          <NoticeTableBody notices={notices as (INotice & { _id: string })[]} />
-        </table>
+        <NoticeModalProvider>
+          <NoticeTable notices={notices as (INotice & { _id: string })[]} />
+        </NoticeModalProvider>
       </div>
     </div>
   );

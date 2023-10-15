@@ -32,3 +32,47 @@ export async function PUT(req: NextRequest, { params }) {
     });
   }
 }
+
+export async function DELETE(req: NextRequest, { params }) {
+  try {
+    const { id } = params;
+    const deletedNotice = await Notice.findByIdAndDelete(id);
+
+    if (!deletedNotice) {
+      return NextResponse.json(
+        { message: '공지사항을 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(deletedNotice);
+  } catch (error) {
+    console.error('!! ERROR', error);
+
+    return NextResponse.json('error', {
+      status: 500,
+    });
+  }
+}
+
+export async function GET(req: NextRequest, { params }) {
+  try {
+    const { id } = params;
+    const notice = await Notice.findById(id);
+
+    if (!notice) {
+      return NextResponse.json(
+        { message: '공지사항을 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(notice);
+  } catch (error) {
+    console.error('!! ERROR', error);
+
+    return NextResponse.json('error', {
+      status: 500,
+    });
+  }
+}

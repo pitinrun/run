@@ -13,13 +13,17 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/auth/sign-in', request.url));
     }
   } else {
+    if (token.role === null || token.role === undefined) {
+      return NextResponse.redirect(new URL('/403', request.url));
+    }
     // NOTE: 토큰이 있으면 로그인 페이지로 이동
     if (request.nextUrl.pathname.startsWith('/auth/sign-in')) {
       return NextResponse.redirect(new URL('/', request.url));
     }
 
     if (request.nextUrl.pathname.startsWith('/manage')) {
-      if (!token.role) {
+      if (token.role < 9) {
+        console.log('$$ redirect');
         return NextResponse.redirect(new URL('/403', request.url));
       }
     }
