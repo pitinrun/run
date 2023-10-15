@@ -7,8 +7,13 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
+import { INotice } from '@/src/types';
 
-export default function NoticeCreateForm() {
+export default function NoticeEditForm({
+  initNoticeData,
+}: {
+  initNoticeData: INotice;
+}) {
   const ReactQuill = useMemo(
     () => dynamic(() => import('react-quill'), { ssr: false }),
     []
@@ -17,20 +22,18 @@ export default function NoticeCreateForm() {
   const router = useRouter();
   const { register, handleSubmit, setValue, watch } = useForm({
     defaultValues: {
-      title: '',
-      // eventDate: '',
-      content: '',
-      link: '',
+      title: initNoticeData.title,
+      content: initNoticeData.content,
     },
   });
 
   const onSubmit = async data => {
     try {
-      await axios.post('/api/notices', data);
-      toast.success('공지사항이 생성되었습니다.');
+      await axios.put(`/api/notices/${initNoticeData._id}`, data);
+      toast.success('공지사항이 수정되었습니다.');
       router.push('/manage/notices');
     } catch (error) {
-      toast.error('공지사항 생성 도중 에러가 발생하였습니다. ' + error.message);
+      toast.error('공지사항 수정 도중 에러가 발생하였습니다. ' + error.message);
       console.error(error);
     }
   };
@@ -40,7 +43,7 @@ export default function NoticeCreateForm() {
   return (
     <div className='container mx-auto p-4'>
       <header>
-        <h1 className='text-2xl font-bold my-4'>공지 생성</h1>
+        <h1 className='text-2xl font-bold my-4'>공지 수정</h1>
       </header>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -79,7 +82,7 @@ export default function NoticeCreateForm() {
         </div>
 
         <button className='btn' type='submit'>
-          공지 생성
+          공지 수정
         </button>
       </form>
     </div>

@@ -1,7 +1,9 @@
 import { getNoticeList } from '@/src/services/notice';
-import { PencilIcon, PencilSquareIcon } from '@heroicons/react/20/solid';
+import { PencilSquareIcon } from '@heroicons/react/20/solid';
+import Header from 'components/Header';
 import dayjs from 'dayjs';
 import jsdom from 'jsdom';
+import Link from 'next/link';
 
 export default async function NoticesPage() {
   const notices = await getNoticeList();
@@ -18,6 +20,12 @@ export default async function NoticesPage() {
   return (
     <div className='container'>
       <div className='overflow-x-auto'>
+        <Header>공지사항</Header>
+        <div className='text-right'>
+          <Link href='/manage/notices/create'>
+            <button className='btn'>공지사항 작성</button>
+          </Link>
+        </div>
         <table className='table'>
           <thead>
             <tr>
@@ -27,20 +35,24 @@ export default async function NoticesPage() {
               <th>수정</th>
             </tr>
           </thead>
-          {noticesForDom.map(notice => {
-            return (
-              <tr>
-                <td>{dayjs(notice.createdAt).format('YYYY-MM-DD')}</td>
-                <td className='w-32'>{notice.title}</td>
-                <td>{notice.content}</td>
-                <td>
-                  <button className='btn btn-sm'>
-                    <PencilSquareIcon className='w-4 h-4 md:w-5 md:h-5' />
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
+          <tbody>
+            {noticesForDom.map(notice => {
+              return (
+                <tr>
+                  <td>{dayjs(notice.createdAt).format('YYYY-MM-DD')}</td>
+                  <td className='w-32'>{notice.title}</td>
+                  <td>{notice.content}</td>
+                  <td>
+                    <Link href={`/manage/notices/${notice._id}/edit`}>
+                      <button className='btn btn-sm'>
+                        <PencilSquareIcon className='w-4 h-4 md:w-5 md:h-5' />
+                      </button>
+                    </Link>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
         </table>
       </div>
     </div>

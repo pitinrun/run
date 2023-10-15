@@ -94,4 +94,5 @@ export type INotice = {
   content: string;
   createdAt: Date;
   updatedAt: Date;
+  _id: string;
 };
