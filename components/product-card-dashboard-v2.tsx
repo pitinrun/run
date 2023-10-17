@@ -55,7 +55,7 @@ export default function ProductCardDashboard__V2({
             season,
             onlySpecialDiscount: onlySpecialDiscount.toString(),
             sizeSearchKeyword,
-            hasStock: 'true',
+            hasStock: 'false',
           }).toString()}`
         );
 

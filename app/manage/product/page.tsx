@@ -8,25 +8,7 @@ import {
 } from '@heroicons/react/24/solid';
 import ProductTable from 'components/product-table';
 import { toast } from 'react-toastify';
-
-const BRANDS = [
-  '',
-  '금호',
-  '한국',
-  '넥센',
-  '미쉐린',
-  '콘티넨탈',
-  '피렐리',
-  '던롭',
-  '브릿지스톤',
-  '굿이어',
-  '요코하마',
-  '패더럴',
-  '사일룬',
-  '트라이앵글',
-  'BFG',
-  '라우펜',
-];
+import { BRANDS } from '@/src/types';
 
 export default function ProductPage() {
   const [products, setProducts] = useState([]);

@@ -17,6 +17,7 @@ export const BRANDS = [
   '트라이앵글',
   'BFG',
   '라우펜',
+  '브레데스타인',
 ] as const;
 export type BrandType = (typeof BRANDS)[number];
 
