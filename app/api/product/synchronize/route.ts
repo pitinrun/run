@@ -10,6 +10,11 @@ import {
 
 connectToDatabase();
 
+/**
+ * @for Vercel
+ */
+export const maxDuration = 60 * 3; // 3 minutes
+
 const { SPREAD_SHEET_ID, SPREAD_SHEET_PRODUCT_NAME } = process.env;
 /**
  * 주어진 스프레드시트의 데이터를 사용하여 상품 데이터를 업데이트합니다.
@@ -44,11 +49,14 @@ export async function POST() {
   } catch (error) {
     if (error instanceof Error) {
       console.error('!! ERROR: ', error);
-      return NextResponse.json({
-        message: error.message,
-      }, {
-        status: 500,
-      });
+      return NextResponse.json(
+        {
+          message: error.message,
+        },
+        {
+          status: 500,
+        }
+      );
     }
 
     return NextResponse.json('unknown error', {
