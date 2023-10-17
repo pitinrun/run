@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/product/synchronize/route.ts": {
+    "app/api/product/synchronize/route.ts": {
       "maxDuration": 180
     }
   }
