@@ -151,16 +151,16 @@ export default function ProductCard({
           </div>
           <div className=''>
             {special && (
-              <span className='badge badge-sm sm:badge-md badge-primary mr-1'>
+              <span className='badge badge-sm sm:badge-md badge-info mr-1'>
                 {special}
               </span>
             )}
             {season && (
-              <span className='badge badge-sm sm:badge-md badge-secondary mr-1'>
+              <span className='badge badge-sm sm:badge-md badge-success mr-1'>
                 {displaySeasonMap[season]}
               </span>
             )}
-            <span className='badge badge-sm sm:badge-md badge-ghost mr-1'>
+            <span className='badge badge-sm sm:badge-md badge-warning mr-1'>
               {brand}
             </span>
           </div>
