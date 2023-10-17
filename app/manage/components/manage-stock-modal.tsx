@@ -146,9 +146,11 @@ export default function ManageStockModal({
     const { totalFactoryPrice } = productInfo;
 
     return convertNumberToKRW(
-      getDiscountedPrice(
-        totalFactoryPrice,
-        orderInfos[productCode].discountRate / 100
+      roundUpToHundred(
+        getDiscountedPrice(
+          totalFactoryPrice,
+          orderInfos[productCode].discountRate / 100
+        )
       )
     );
   };

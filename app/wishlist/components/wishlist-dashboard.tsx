@@ -109,6 +109,7 @@ export default function WishlistDashboard({
               defaultDiscountRate={wishlistItem.discountRate}
               onChangeQuantity={handleQuantityChange}
               onChangeDiscountRate={handleDiscountRateChange}
+              onRoundUpToHundred
               onRemoveWishlistClick={() => {
                 setOpenRemoveItemDialog(true);
                 selectedProductCode = wishlistItem.productCode;

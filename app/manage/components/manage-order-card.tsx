@@ -9,11 +9,8 @@ import {
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/20/solid';
 import dayjs from 'dayjs';
 import { ResponseGetOrdersForManager } from 'requests/manage/order.api';
-import ManageStockModal from './manage-stock-modal';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { OrderModalContext } from '../contexts/order-modal.context';
-import { deliveryCompleteOrder } from '../api';
-import { toast } from 'react-toastify';
 
 type ManageOrderCardProps = ResponseGetOrdersForManager & {
   onClickRemove?: () => void;
@@ -177,10 +174,12 @@ export default function ManageOrderCard({
                     <div>{Math.round(product.discountRate * 100)}%</div>
                     <div>
                       {convertNumberToKRW(
-                        getDiscountedPrice(
-                          product.factoryPrice,
-                          product.discountRate,
-                          product.quantity
+                        roundUpToHundred(
+                          getDiscountedPrice(
+                            product.factoryPrice,
+                            product.discountRate,
+                            product.quantity
+                          )
                         )
                       )}
                       원

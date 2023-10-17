@@ -38,7 +38,7 @@ export const roundUpToHundred = (num: number) => {
 
 export const convertNumberToKRW = (price: number) => {
   // 10원 단위로 올림 처리
-  price = roundUpToHundred(price);
+  // price = roundUpToHundred(price);
 
   return `${price.toLocaleString()}`;
 };

@@ -26,6 +26,7 @@ const displaySeasonMap = {
 type ProductCardProps = {
   defaultQuantity?: number;
   defaultDiscountRate?: number;
+  onRoundUpToHundred?: boolean;
   onChangeQuantity?: (productCode: string, quantity: number) => void;
   onChangeDiscountRate?: (productCode: string, discountRate: number) => void;
   onRemoveWishlistClick?: (productCode: string) => void;
@@ -58,6 +59,7 @@ export default function ProductCard({
   productCode,
   defaultQuantity,
   defaultDiscountRate,
+  onRoundUpToHundred = false,
   onChangeDiscountRate,
   onChangeQuantity,
   onPurchaseClick,
@@ -108,6 +110,32 @@ export default function ProductCard({
   const handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {
     event.target.select();
   };
+
+  const totalFactoryPrice = convertNumberToKRW(
+    Math.round(
+      onRoundUpToHundred
+        ? roundUpToHundred(factoryPrice)
+        : factoryPrice * (quantity ?? 1)
+    )
+  );
+
+  const totalFactoryPriceWithDiscount = convertNumberToKRW(
+    Math.round(
+      onRoundUpToHundred
+        ? roundUpToHundred(
+            getDiscountedPrice(
+              factoryPrice,
+              (discountRate ?? 0) / 100,
+              quantity ?? 1
+            )
+          )
+        : getDiscountedPrice(
+            factoryPrice,
+            (discountRate ?? 0) / 100,
+            quantity ?? 1
+          )
+    )
+  );
 
   return (
     <div className='card border border-solid border-neutral-200'>
@@ -190,32 +218,13 @@ export default function ProductCard({
           <span className='text-lg sm:text-3xl relative'>
             {discountRate ? (
               <>
-                {convertNumberToKRW(
-                  getDiscountedPrice(
-                    roundUpToHundred(factoryPrice),
-                    discountRate / 100,
-                    quantity ?? 1
-                  )
-                )}
-                원
+                {totalFactoryPriceWithDiscount}원
                 <del className='absolute right-[-1.5rem] sm:right-0 text-sm sm:text-base text-neutral-400 font-normal bottom-[1.5rem] sm:bottom-[2rem]'>
-                  {
-                    convertNumberToKRW(
-                      Math.round(
-                        roundUpToHundred(factoryPrice) * (quantity ?? 1)
-                      )
-                    ).split(' ')[0]
-                  }
-                  원
+                  {totalFactoryPrice}원
                 </del>
               </>
             ) : (
-              <>
-                {convertNumberToKRW(
-                  Math.round(roundUpToHundred(factoryPrice) * (quantity ?? 1))
-                )}
-                원
-              </>
+              <>{totalFactoryPrice}원</>
             )}
           </span>
         </div>

@@ -6,8 +6,9 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 
 export function NoticeDetailModal() {
-  const { closeModal, open, content, title, noticeId } = useContext(NoticeModalContext);
-  const { data: session, status } = useSession();
+  const { closeModal, open, content, title, noticeId } =
+    useContext(NoticeModalContext);
+  const { data: session } = useSession();
   const { role, id } = session?.user ?? {};
 
   const isAdmin = role === 10 || role === 9;

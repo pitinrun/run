@@ -17,6 +17,7 @@ export default function ProductCardDashboard__V2({
   onlySpecialDiscount = false,
   sizeSearchKeyword = '',
   perPage = 10,
+  onRoundUpToHundred = false,
 }: {
   selectedBrands?: BrandType[] | null;
   title?: string;
@@ -24,6 +25,7 @@ export default function ProductCardDashboard__V2({
   onlySpecialDiscount?: boolean;
   sizeSearchKeyword?: string;
   perPage?: number;
+  onRoundUpToHundred?: boolean;
 }) {
   const router = useRouter();
 
@@ -143,6 +145,7 @@ export default function ProductCardDashboard__V2({
           <ProductCard
             key={`product-card-${index}-${product.pattern}`}
             onPurchaseClick={onPurchaseClick}
+            onRoundUpToHundred={onRoundUpToHundred}
             onStockClick={handleStockClick}
             defaultQuantity={1}
             {...product}

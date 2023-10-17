@@ -100,10 +100,12 @@ export default function OrderCard({
                     <div>{Math.round(product.discountRate * 100)}%</div>
                     <div>
                       {convertNumberToKRW(
-                        getDiscountedPrice(
-                          product.factoryPrice,
-                          product.discountRate,
-                          product.quantity
+                        roundUpToHundred(
+                          getDiscountedPrice(
+                            product.factoryPrice,
+                            product.discountRate,
+                            product.quantity
+                          )
                         )
                       )}{' '}
                       원
