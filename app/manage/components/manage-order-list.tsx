@@ -161,7 +161,9 @@ function ManageOrderList({}) {
           setOpenRemoveConfirm(false);
         }}
       >
-        주문을 삭제하시겠습니까?
+        정보를 삭제하면 복구할 수 없습니다.
+        <br />
+        삭제를 진행하시겠습니까?
       </ConfirmDialog>
       <ManageStockModal
         open={modalType === 'stock'}

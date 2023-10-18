@@ -142,13 +142,15 @@ export async function DELETE(req: NextRequest) {
     }
 
     // 주문한 사용자의 ID와 주문 정보의 사용자 ID가 일치하지 않으면 403을 반환합니다.
-    if (token.sub !== order.userId) {
-      return NextResponse.json(
-        { message: '해당 주문 정보에 접근할 수 없습니다.' },
-        {
-          status: 403,
-        }
-      );
+    if (token?.role && token.role < 9) {
+      if (token.sub !== order.userId) {
+        return NextResponse.json(
+          { message: '해당 주문 정보에 접근할 수 없습니다.' },
+          {
+            status: 403,
+          }
+        );
+      }
     }
 
     // 주문 정보를 삭제합니다.

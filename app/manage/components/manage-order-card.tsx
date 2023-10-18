@@ -84,6 +84,12 @@ export default function ManageOrderCard({
               onClick={onClickRemove}
             />
           </button> */}
+          <button className='btn btn-xs md:btn-sm btn-outline mr-2 md:mr-4'>
+            <TrashIcon
+              className='w-4 h-4 md:w-5 md:h-5'
+              onClick={onClickRemove}
+            />
+          </button>
           {!isDelivered && (
             <button
               className='btn btn-xs btn-neutral md:btn-sm'
