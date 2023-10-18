@@ -61,7 +61,7 @@ export async function PUT(req: NextRequest, { params }) {
 
     if (updateData.password) {
       const hashedPassword = generatePassword(updateData.password);
-      user.password = hashedPassword;
+      updateData.password = hashedPassword;
     }
 
     // 사용자 정보 업데이트
