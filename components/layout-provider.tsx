@@ -8,17 +8,19 @@ import { UserType } from '@/src/types';
 
 export const LayoutProvider = ({
   children,
-  role,
+  // role,
+  userData,
 }: {
   children: React.ReactNode;
-  role?: UserType['role'];
+  userData: UserType | null;
+  // role?: UserType['role'];
 }) => {
   const pathname = usePathname();
   const isShowNav = pathname !== '/auth/sign-in';
 
   return (
     <>
-      {isShowNav && <NavigationBar role={role} />}
+      {isShowNav && <NavigationBar userData={userData} />}
       {children}
     </>
   );

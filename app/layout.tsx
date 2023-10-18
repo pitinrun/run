@@ -42,7 +42,7 @@ async function MainLayout({ children }) {
         <body>
           <div className=''>
             <AuthSession>
-              <LayoutProvider role={userData?.role}>
+              <LayoutProvider userData={userData}>
                 <ToastContainer />
                 {children}
               </LayoutProvider>

@@ -82,14 +82,21 @@ const getContents = (role: UserType['role']) => {
   }[role];
 };
 
-export default function NavigationBar({ role }: { role?: UserType['role'] }) {
+export default function NavigationBar({
+  userData,
+}: {
+  userData: UserType | null;
+}) {
+  if (!userData) return null;
+
+  const { role, businessName } = userData;
   const contents = getContents(role);
   const displayRole = role
     ? {
-        10: '마스터 관리자',
-        9: '일반 관리자',
+        10: businessName + '님' + ' (마스터 관리자)',
+        9: businessName + '님' + ' (일반 관리자)',
       }[role]
-    : '주문 관리';
+    : businessName;
 
   return (
     <div className='drawer drawer-end'>
