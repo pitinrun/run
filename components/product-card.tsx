@@ -150,19 +150,19 @@ export default function ProductCard({
             <span>{patternKr}</span>
           </div>
           <div className=''>
-            {special && (
-              <span className='badge badge-sm sm:badge-md badge-info mr-1'>
-                {special}
-              </span>
-            )}
+            <span className='badge badge-sm sm:badge-md badge-warning mr-1'>
+              {brand}
+            </span>
             {season && (
               <span className='badge badge-sm sm:badge-md badge-success mr-1'>
                 {displaySeasonMap[season]}
               </span>
             )}
-            <span className='badge badge-sm sm:badge-md badge-warning mr-1'>
-              {brand}
-            </span>
+            {special && (
+              <span className='badge badge-sm sm:badge-md badge-info mr-1'>
+                {special}
+              </span>
+            )}
           </div>
         </div>
         <button
