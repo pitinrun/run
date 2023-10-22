@@ -26,8 +26,13 @@ function SizeSearchBar({
     }
   };
 
-  const handleClick = () => {
+  const handleClickButton = () => {
     setValue && setValue(inputValue);
+  };
+
+
+  const handleInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    event.target.select();
   };
 
   return (
@@ -39,12 +44,13 @@ function SizeSearchBar({
         placeholder='2454518'
         className='input-bordered flex-1'
         onKeyDown={handleKeyDown}
+        onFocus={handleInputFocus}
         value={inputValue}
         onChange={e => {
           setInputValue(e.target.value);
         }}
       />
-      <button className='btn-ghost' onClick={handleClick}>
+      <button className='btn-ghost' onClick={handleClickButton}>
         <MagnifyingGlassIcon className='w-8 h-8' />
       </button>
     </div>

@@ -179,34 +179,36 @@ export default function ProductCard({
       <div className='card-body px-4 py-2 text-xs sm:text-sm'>
         <span className='font-bold'>{pattern}</span>
         <div className='flex items-center'>
-          <span
-            className=''
-            style={{
-              color: 'var(--run-red-2)',
-            }}
-          >
-            {size}
-          </span>
-          <DividerHorizon />
-          <span className=''>{speedSymbolLoadIndex}</span>
-          {origin && (
-            <>
-              <DividerHorizon />
-              <span className=''>{origin}</span>
-            </>
-          )}
-          {marking && (
-            <>
-              <DividerHorizon />
-              <span className=''>{marking}</span>
-            </>
-          )}
-          {etc && (
-            <>
-              <DividerHorizon />
-              <span className=''>{etc}</span>
-            </>
-          )}
+          <b>
+            <span
+              className=''
+              style={{
+                color: 'var(--run-red-2)',
+              }}
+            >
+              {size}
+            </span>
+            <DividerHorizon />
+            <span className=''>{speedSymbolLoadIndex}</span>
+            {origin && (
+              <>
+                <DividerHorizon />
+                <span className=''>{origin}</span>
+              </>
+            )}
+            {marking && (
+              <>
+                <DividerHorizon />
+                <span className=''>{marking}</span>
+              </>
+            )}
+            {etc && (
+              <>
+                <DividerHorizon />
+                <span className=''>{etc}</span>
+              </>
+            )}
+          </b>
         </div>
       </div>
       <div className='divider my-0' />
