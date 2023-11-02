@@ -42,8 +42,14 @@ export async function GET(req: NextRequest) {
     // 년도-월 필터링을 위한 로직입니다.
     if (period) {
       const [year, m] = period.split('-');
-      const startDate = new Date(Number(year), Number(m) - 1, 1);
-      const endDate = new Date(Number(year), Number(m), 0);
+      // GPT. 여기를 주목해줘.
+      // UTC를 기준으로 Date 객체 생성
+      const startDate = new Date(Date.UTC(Number(year), Number(m) - 1, 1));
+      // endDate를 다음 달의 첫날로 설정
+      const endDate = new Date(Date.UTC(Number(year), Number(m), 1));
+      console.log('$$ period', period);
+      console.log('$$ startdeate', startDate);
+      console.log('$$ enddate', endDate);
       filter.createdAt = {
         $gte: startDate,
         $lte: endDate,
