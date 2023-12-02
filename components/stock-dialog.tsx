@@ -61,7 +61,7 @@ export default function StockDialog({
             </div>
           </div>
         )}
-        <div className='modal-action w-full mt-6'>
+        <div className='modal-action w-full mt-6 sticky bottom-0'>
           <button className='btn btn-primary flex-1' onClick={onClose}>
             닫기
           </button>

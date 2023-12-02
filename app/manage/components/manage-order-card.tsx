@@ -211,7 +211,7 @@ export default function ManageOrderCard({
             {!isWaiting && (
               <span>
                 <span className='mr-2 text-xs md:text-sm lg:text-base text-neutral-400'>
-                  매입가
+                  공장도가
                 </span>
                 <span className='font-semibold text-base md:text-lg lg:text-xl'>
                   {convertNumberToKRW(

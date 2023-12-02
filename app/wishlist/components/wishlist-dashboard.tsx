@@ -135,7 +135,7 @@ export default function WishlistDashboard({
           </span>
           <span>
             <span className='text-md lg:text-lg text-neutral-400 font-semibold mr-2'>
-              예상 매입가
+              예상 공장도가
             </span>
             <span className='text-xl md:text-3xl text-neutral-800 font-semibold'>
               {convertNumberToKRW(getTotalPrice())} 원

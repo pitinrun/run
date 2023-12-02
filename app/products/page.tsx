@@ -30,9 +30,12 @@ function SizeSearchBar({
     setValue && setValue(inputValue);
   };
 
-
   const handleInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
     event.target.select();
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value.trim());
   };
 
   return (
@@ -47,7 +50,7 @@ function SizeSearchBar({
         onFocus={handleInputFocus}
         value={inputValue}
         onChange={e => {
-          setInputValue(e.target.value);
+          handleChange(e);
         }}
       />
       <button className='btn-ghost' onClick={handleClickButton}>

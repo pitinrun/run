@@ -215,7 +215,7 @@ export default function ProductCard({
       {/* BODY BOTTOM */}
       <div className='card-body px-4 py-2 text-xs sm:text-sm flex-row flex justify-between items-center'>
         <div className='font-semibold'>
-          <span className='text-xs sm:text-sm mr-2'>매입가</span>
+          <span className='text-xs sm:text-sm mr-2'>공장도가</span>
           <br className='sm:hidden' />
           <span className='text-lg sm:text-3xl relative'>
             {discountRate ? (
